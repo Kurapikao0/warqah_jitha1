@@ -20,6 +20,9 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(3, true);
+        $price = $this->faker->randomFloat(2, 20, 500);
+
         return [
             'category_id' => ProductCategory::factory(),
             'sku' => strtoupper($this->faker->bothify('WRK-####-??')),
