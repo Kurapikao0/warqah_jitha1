@@ -317,28 +317,28 @@ class DatabaseSeeder extends Seeder
             ->recycle([$this->orders, $this->products])
             ->create();
 
+        $customers = $this->customers;
+        $products = $this->products;
+        $colors = $this->colors;
+        $designPatterns = $this->designPatterns;
+
         $customizedItems = OrderItem::factory()
             ->count(self::CUSTOMIZED_ORDER_ITEMS_COUNT)
             ->recycle([$this->orders, $this->products])
-<<<<<<< Updated upstream
-            ->state(fn () => [
-                'is_customized' => true,
-                'product_customization_request_id' => ProductCustomizationRequest::factory()
-                    ->recycle([$this->customers, $this->products, $this->colors, $this->designPatterns])
-                    ->create()
-                    ->id,
-            ])
-=======
             ->state(function () use ($customers, $products, $colors, $designPatterns) {
                 return [
                     'is_customized' => true,
                     'product_customization_request_id' => ProductCustomizationRequest::factory()
-                        ->recycle([$customers, $products, $colors, $designPatterns])
+                        ->recycle([
+                            $customers,
+                            $products,
+                            $colors,
+                            $designPatterns,
+                        ])
                         ->create()
                         ->id,
                 ];
             })
->>>>>>> Stashed changes
             ->create();
 
         $this->orderItems = $standardItems->merge($customizedItems);
