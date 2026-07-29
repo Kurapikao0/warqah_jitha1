@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderStatusHistory extends Model
 {
     use HasFactory;
-
+    
+    protected $table = 'order_status_history';
     const UPDATED_AT = null;
 
     protected $fillable = [

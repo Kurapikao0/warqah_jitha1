@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderProductionStageHistory extends Model
 {
     use HasFactory;
-
+    protected $table = 'order_production_stage_history';
     const UPDATED_AT = null;
 
     protected $fillable = [
