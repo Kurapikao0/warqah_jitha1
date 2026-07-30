@@ -26,6 +26,8 @@ class AdminNotification extends Model
         return [
             'type' => AdminNotificationType::class,
             'is_read' => 'boolean',
+            'created_at' => 'datetime',
+
         ];
     }
 
