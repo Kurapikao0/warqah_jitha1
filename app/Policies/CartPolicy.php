@@ -2,87 +2,47 @@
 
 namespace App\Policies;
 
-
 use App\Models\Cart;
-use App\Models\User;
-
-
+use App\Models\Customer;
 
 class CartPolicy
 {
-
-
     /**
-     * View Cart
+     * Determine whether the customer can view the cart.
      */
     public function view(
-        User $user,
+        Customer $customer,
         Cart $cart
-    ): bool
-    {
-
-
-        return
-            $cart->customer_id === $user->id;
-
-
+    ): bool {
+        return $cart->customer_id === $customer->id;
     }
 
-
-
-
-
     /**
-     * Add Item To Cart
+     * Determine whether the customer can create a cart.
      */
     public function create(
-        User $user
-    ): bool
-    {
-
-        return auth()->check();
-
+        Customer $customer
+    ): bool {
+        return true;
     }
 
-
-
-
-
     /**
-     * Update Cart Item
+     * Determine whether the customer can update the cart.
      */
     public function update(
-        User $user,
+        Customer $customer,
         Cart $cart
-    ): bool
-    {
-
-
-        return
-            $cart->customer_id === $user->id;
-
-
+    ): bool {
+        return $cart->customer_id === $customer->id;
     }
-
-
-
-
 
     /**
-     * Delete Cart Item
+     * Determine whether the customer can delete the cart.
      */
     public function delete(
-        User $user,
+        Customer $customer,
         Cart $cart
-    ): bool
-    {
-
-
-        return
-            $cart->customer_id === $user->id;
-
-
+    ): bool {
+        return $cart->customer_id === $customer->id;
     }
-
-
 }

@@ -3,12 +3,12 @@
 namespace App\Policies;
 
 use App\Models\AdminUser;
-use App\Models\Product;
+use App\Models\OrderProductionStage;
 
-class ProductPolicy
+class OrderProductionStagePolicy
 {
     /**
-     * Display all products.
+     * Display all stages.
      */
     public function viewAny(
         AdminUser $admin
@@ -17,17 +17,17 @@ class ProductPolicy
     }
 
     /**
-     * Display product.
+     * Display stage.
      */
     public function view(
         AdminUser $admin,
-        Product $product
+        OrderProductionStage $stage
     ): bool {
         return true;
     }
 
     /**
-     * Create product.
+     * Create stage.
      */
     public function create(
         AdminUser $admin
@@ -36,41 +36,21 @@ class ProductPolicy
     }
 
     /**
-     * Update product.
+     * Update stage.
      */
     public function update(
         AdminUser $admin,
-        Product $product
+        OrderProductionStage $stage
     ): bool {
         return true;
     }
 
     /**
-     * Delete product.
+     * Delete stage.
      */
     public function delete(
         AdminUser $admin,
-        Product $product
-    ): bool {
-        return true;
-    }
-
-    /**
-     * Restore product.
-     */
-    public function restore(
-        AdminUser $admin,
-        Product $product
-    ): bool {
-        return true;
-    }
-
-    /**
-     * Force delete product.
-     */
-    public function forceDelete(
-        AdminUser $admin,
-        Product $product
+        OrderProductionStage $stage
     ): bool {
         return true;
     }

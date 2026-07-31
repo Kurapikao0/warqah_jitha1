@@ -11,35 +11,49 @@ class UpdateOrderStatusRequest extends FormRequest
 {
 
 
-public function authorize(): bool
-{
-return auth()->check();
-}
+    public function authorize(): bool
+    {
+
+        return auth()->check();
+
+    }
 
 
 
 
 
-public function rules(): array
-{
-
-return [
-
-'status'=>
-'required|in:
-received,
-in_production,
-in_transit,
-cancelled',
+    public function rules(): array
+    {
 
 
-'note'=>
-'nullable|string'
+        return [
 
-];
+            'status'=>
+            [
+                'required',
+                'string',
+                'in:
+                received,
+                confirmed,
+                in_production,
+                ready,
+                delivered,
+                cancelled'
+            ],
 
 
-}
+            'note'=>
+            [
+                'nullable',
+                'string'
+            ]
+
+
+        ];
+
+
+    }
+
 
 
 }

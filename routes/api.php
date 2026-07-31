@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Customer\ProductCustomizationController as Customer
 use App\Http\Controllers\API\Admin\ProductController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
 use App\Http\Controllers\API\Admin\OrderStatusController;
+use App\Http\Controllers\API\Admin\OrderProductionController;
 use App\Http\Controllers\API\Customer\CartController;
 use App\Http\Controllers\API\Customer\CartItemController;
 use App\Http\Controllers\API\Customer\FavoriteController;
@@ -22,6 +23,16 @@ use App\Http\Controllers\API\Admin\RawMaterialController;
 use App\Http\Controllers\API\Customer\ReviewController;
 use App\Http\Controllers\API\Customer\ReviewImageController;
 use App\Http\Controllers\API\Customer\CustomerNotificationController;
+use App\Http\Controllers\API\Admin\PaymentController as AdminPayment;
+use App\Http\Controllers\API\Customer\PaymentController as CustomerPayment;
+use App\Http\Controllers\API\Admin\OrderStatusHistoryController;
+use App\Http\Controllers\API\Admin\DesignPatternController;
+use App\Http\Controllers\API\Admin\ProductMediaController;
+use App\Http\Controllers\API\Admin\ColorController;
+use App\Http\Controllers\API\Admin\ProductAttributeController;
+use App\Http\Controllers\API\Admin\ProductAttributeValueController;
+
+
 
 Route::get('/test', function () {
 
@@ -81,6 +92,95 @@ Route::get(
     [RolePermissionController::class,'index']
 );
 
+Route::get(
+    'orders-statistics',
+    [OrderController::class,'statistics']
+);
+
+
+    
+Route::get(
+        'orders/{order}/production-history',
+        [
+            OrderProductionController::class,
+            'history'
+        ]
+    );
+
+
+
+    Route::post(
+        'orders/{order}/next-stage',
+        [
+            OrderProductionController::class,
+            'changeStage'
+        ]
+    );
+
+
+    Route::post(
+        'orders/{order}/stage/{stageId}',
+        [
+            OrderProductionController::class,
+            'updateStage'
+        ]
+    );    
+
+
+    Route::get(
+        'orders/{order}/status-history',
+        [
+        OrderStatusHistoryController::class,
+        'index'
+        ]
+    );    
+
+    Route::get(
+    'payments',
+    [AdminPayment::class,'index']
+    );
+
+
+    Route::get(
+    'payments/{id}',
+    [AdminPayment::class,'show']
+    );
+
+
+    Route::put(
+    'payments/{payment}/status',
+    [AdminPayment::class,'updateStatus']
+    );    
+
+        Route::apiResource(
+            'production-stages',
+            OrderProductionStageController::class
+        );
+
+    Route::apiResource(
+        'design-patterns',
+        DesignPatternController::class
+    );        
+
+    Route::apiResource(
+        'product-media',
+        ProductMediaController::class
+    );    
+
+    Route::apiResource(
+        'colors',
+        ColorController::class
+    );
+
+    Route::apiResource(
+        'product-attributes',
+        ProductAttributeController::class
+    );
+
+    Route::apiResource(
+        'product-attribute-values',
+        ProductAttributeValueController::class
+    );
 
 Route::post(
     'roles/{role}/permissions',
@@ -263,4 +363,11 @@ Route::get(
             [CustomerNotificationController::class,'destroy']
         )
         ->name('notifications.destroy');
+
+
+Route::apiResource(
+'payments',
+CustomerPayment::class
+);
+
 });
