@@ -5,10 +5,10 @@ use App\Models\AdminUser;
 use App\Models\Customer;
 return [
 
-    'defaults' => [
+    /*'defaults' => [
         'guard' => 'sanctum',
         'passwords' => 'users',
-    ],
+    ],*/
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -56,6 +56,20 @@ return [
 
         ],
 
+        'providers' => [
+
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => Customer::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => AdminUser::class,
+        ],
+
+    ],
+
 
     //     'sanctum' => [
     //         'driver' => 'sanctum',
@@ -94,22 +108,31 @@ return [
 
     'passwords' => [
 
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
+    'customers' => [
 
+        'provider' => 'customers',
 
-        'admins' => [
-            'provider' => 'admins',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
-            'throttle' => 60,
-        ],
+        'table' => 'password_reset_tokens',
+
+        'expire' => 60,
+
+        'throttle' => 60,
 
     ],
+
+    'admins' => [
+
+        'provider' => 'admins',
+
+        'table' => 'password_reset_tokens',
+
+        'expire' => 60,
+
+        'throttle' => 60,
+
+    ],
+
+],
 
 
     'password_timeout' => 10800,

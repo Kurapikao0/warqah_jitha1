@@ -5,6 +5,7 @@ use App\Http\Controllers\API\Admin\ProductCustomizationController as AdminCustom
 use App\Http\Controllers\API\Customer\ProductCustomizationController as CustomerCustomization;
 use App\Http\Controllers\API\Admin\ProductController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
+use App\Http\Controllers\API\Admin\AuthController as AdminAuth;
 use App\Http\Controllers\API\Admin\OrderStatusController;
 use App\Http\Controllers\API\Admin\OrderProductionController;
 use App\Http\Controllers\API\Customer\CartController;
@@ -31,8 +32,9 @@ use App\Http\Controllers\API\Admin\ProductMediaController;
 use App\Http\Controllers\API\Admin\ColorController;
 use App\Http\Controllers\API\Admin\ProductAttributeController;
 use App\Http\Controllers\API\Admin\ProductAttributeValueController;
-
-
+use App\Http\Controllers\API\Admin\OrderProductionStageController;
+use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
+use App\Http\Controllers\API\Customer\AuthController;
 
 Route::get('/test', function () {
 
@@ -42,14 +44,22 @@ Route::get('/test', function () {
     ]);
 
 });
+Route::prefix('admin')->group(function(){
 
+    Route::post(
+        'login',
+        [AdminAuth::class,'login']
+    );
+
+});
 Route::prefix('admin')
-->middleware(['auth:sanctum'])
+->middleware(['auth:admin'])
 ->group(function(){
 
 Route::apiResource(
 'roles', 
 RoleController::class);
+
 
 Route::apiResource(
 'products',
@@ -94,7 +104,7 @@ Route::get(
 
 Route::get(
     'orders-statistics',
-    [OrderController::class,'statistics']
+    [CustomerOrder::class,'statistics']
 );
 
 
@@ -238,12 +248,39 @@ Route::apiResource(
     'raw-materials',
     RawMaterialController::class
 );
+Route::post(
+    'logout',
+    [AdminAuth::class,'logout']
+);
+});
+
+
+
+
+Route::prefix('customer')->group(function(){
+
+    Route::post(
+        'login',
+        [AuthController::class,'login']
+    );
+
+
+    Route::post(
+        'register',
+        [AuthController::class,'register']
+    );
+
+    Route::post(
+        'logout',
+        [AuthController::class,'logout']
+    )
+    ->middleware('auth:customer');
 
 });
 
 
 Route::prefix('customer')
-    ->middleware('auth:sanctum')
+    ->middleware('auth:customer')
     ->group(function(){
 
 
@@ -252,10 +289,8 @@ Route::prefix('customer')
     CustomerCustomization::class
     );
 
-    Route::apiResource(
-    'orders',
-    \App\Http\Controllers\API\Customer\OrderController::class
-    );
+    Route::apiResource('orders', CustomerOrder::class)
+    ->except(['update', 'destroy']);
 
     Route::get(
     'cart',

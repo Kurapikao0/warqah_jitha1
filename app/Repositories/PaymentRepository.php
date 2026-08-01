@@ -92,9 +92,37 @@ class PaymentRepository implements PaymentRepositoryInterface
     )
     {
 
-        return $payment->update($data);
+        $payment->update($data);
+
+        return $payment->refresh();
 
     }
 
+/*public function findCustomerPayment(
+    int $customerId,
+    int $paymentId
+)
+{
+    return Payment::whereHas('order', function ($query) use ($customerId) {
 
+        $query->where(
+            'customer_id',
+            $customerId
+        );
+
+    })
+    ->with('order')
+    ->findOrFail($paymentId);
+}*/
+    public function findCustomerPayment(
+    int $customerId,
+    int $paymentId
+)
+{
+    return Payment::with('order')
+        ->whereHas('order', function ($q) use ($customerId) {
+            $q->where('customer_id', $customerId);
+        })
+        ->findOrFail($paymentId);
+}
 }

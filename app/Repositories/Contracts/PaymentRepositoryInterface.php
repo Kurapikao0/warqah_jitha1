@@ -27,6 +27,9 @@ interface PaymentRepositoryInterface
         array $data
     );
 
-
+    public function findCustomerPayment(
+    int $customerId,
+    int $paymentId
+    );
 
 }

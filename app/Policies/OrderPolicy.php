@@ -36,7 +36,7 @@ class OrderPolicy
             $order->customer_id === $customer->id
             &&
             in_array(
-                $order->status,
+                $order->status->value,
                 [
                     'pending',
                     'received'
@@ -54,7 +54,7 @@ class OrderPolicy
             $order->customer_id === $customer->id
             &&
             in_array(
-                $order->status,
+                $order->status->value,
                 [
                     'pending',
                     'received'

@@ -2,58 +2,33 @@
 
 namespace App\Http\Requests\Order;
 
-
 use Illuminate\Foundation\Http\FormRequest;
-
-
+use Illuminate\Validation\Rule;
+use App\Enums\OrderStatus;
 
 class UpdateOrderStatusRequest extends FormRequest
 {
 
-
     public function authorize(): bool
     {
-
-        return auth()->check();
-
+        return auth('admin')->check();
     }
-
-
-
 
 
     public function rules(): array
     {
-
-
         return [
 
-            'status'=>
-            [
+            'status' => [
                 'required',
-                'string',
-                'in:
-                received,
-                confirmed,
-                in_production,
-                ready,
-                delivered,
-                cancelled'
+                Rule::enum(OrderStatus::class),
             ],
 
-
-            'note'=>
-            [
+            'note' => [
                 'nullable',
                 'string'
-            ]
-
+            ],
 
         ];
-
-
     }
-
-
-
 }

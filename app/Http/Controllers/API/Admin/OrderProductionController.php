@@ -6,7 +6,7 @@ namespace App\Http\Controllers\API\Admin;
 use App\Models\Order;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\OrderProductionStage;
 
 
 class OrderProductionController extends Controller
@@ -23,7 +23,7 @@ class OrderProductionController extends Controller
         return response()->json(
 
             $order
-            ->productionHistory()
+            ->productionStageHistory()
             ->with('stage')
             ->get()
 
@@ -59,7 +59,7 @@ class OrderProductionController extends Controller
                 $currentStage
                 ->next()
                 :
-                null;
+                OrderProductionStage::orderBy('sort_order')->first();
 
 
 
@@ -78,20 +78,19 @@ class OrderProductionController extends Controller
 
 
 
-            $order->productionHistory()
+            $order->productionStageHistory()
             ->create([
 
-                'order_production_stage_id'
+                'stage_id'
                 =>
                 $nextStage->id,
 
-
-                'started_at'
-                =>
-                now()
-
             ]);
 
+
+            $order->update([
+                'current_production_stage_id' => $nextStage->id,
+            ]);
 
 
 
@@ -130,20 +129,17 @@ class OrderProductionController extends Controller
 
 
         $order
-        ->productionHistory()
+        ->productionStageHistory()
         ->create([
 
-            'order_production_stage_id'
+            'stage_id'
             =>
             $stageId,
-
-            'started_at'
-            =>
-            now()
-
         ]);
 
-
+        $order->update([
+        'current_production_stage_id'=>$stageId
+        ]);
 
         return response()->json([
 
