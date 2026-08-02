@@ -250,8 +250,24 @@ return $order;
 
                 $product = Product::findOrFail($item['product_id']);
 
-                // ===== هنا سادساً: التحقق من المخزون =====
-                if ($product->stock_quantity < $item['quantity']) {
+                 // ===== التحقق من أن المنتج يدعم التخصيص =====
+                if (
+                    $data['order_type'] === 'custom'
+                    && !$product->is_customizable
+                ) {
+                    abort(422, 'هذا المنتج لا يدعم التخصيص. ' . $product->name);
+                }
+                if (
+                    !empty($item['customization_id']) &&
+                    !$product->is_customizable
+                ) {
+                    abort(422, 'لا يمكن تخصيص هذا المنتج. ' . $product->name);
+                }
+                // ===== التحقق من المخزون =====
+                $availableStock =
+                    $product->stock_quantity - $product->reserved_quantity;
+
+                if ($availableStock < $item['quantity']) {
                     abort(422, 'المنتج المطلوب غير متاح حالياً. ' . $product->name);
                 }
 

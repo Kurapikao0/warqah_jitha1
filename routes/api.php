@@ -130,7 +130,7 @@ Route::get(
 
 
     Route::post(
-        'orders/{order}/stage/{stageId}',
+        'orders/{order}/stage',
         [
             OrderProductionController::class,
             'updateStage'
@@ -401,9 +401,13 @@ Route::get(
         ->name('notifications.destroy');
 
 
-Route::apiResource(
-'payments',
-CustomerPayment::class
-);
+    Route::apiResource(
+        'payments',
+        CustomerPayment::class
+    )->only([
+        'index',
+        'store',
+        'show',
+    ]);
 
 });

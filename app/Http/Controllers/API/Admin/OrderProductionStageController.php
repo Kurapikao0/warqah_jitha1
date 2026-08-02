@@ -33,11 +33,9 @@ class OrderProductionStageController extends Controller
         return new OrderProductionStageResource($stage);
     }
 
-    public function show(
-        OrderProductionStage $productionStage
-    ) {
+    public function show($id) {
         return new OrderProductionStageResource(
-            $productionStage
+            $this->service->find($id)
         );
     }
 
