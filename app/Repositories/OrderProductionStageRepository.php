@@ -29,7 +29,7 @@ class OrderProductionStageRepository implements OrderProductionStageRepositoryIn
     {
         $stage->update($data);
 
-        return $stage;
+        return $stage->refresh();
     }
     public function delete(OrderProductionStage $stage): bool
     {

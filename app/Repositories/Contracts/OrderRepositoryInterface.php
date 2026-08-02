@@ -20,4 +20,6 @@ interface OrderRepositoryInterface
     public function update(Order $order, array $data);
 
     public function findCustomerOrder(int $customerId, int $orderId);
+
+    public function statistics();
 }

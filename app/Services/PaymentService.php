@@ -111,7 +111,7 @@ class PaymentService
         return DB::transaction(function () use ($data) {
             $order = Order::findOrFail($data['order_id']);
             // التأكد أن الطلب يخص العميل الحالي
-            if ($order->customer_id !== auth()->id()) {
+            if ($order->customer_id !== auth('customer')->id()) {
                 throw ValidationException::withMessages([
                     'order_id' => [
                         'You are not allowed to pay for this order.'

@@ -49,13 +49,13 @@ class OrderProductionStageController extends Controller
         $productionStage,
         $request->validated()
     );*/
-        $this->service->update(
-            $productionStage,
-            $request->validated()
+        $stage = $this->service->update(
+                $productionStage,
+                $request->validated()
         );
 
         return new OrderProductionStageResource(
-            $productionStage->refresh()
+            $stage
         );
     }
 
@@ -66,6 +66,6 @@ class OrderProductionStageController extends Controller
 
         return response()->json([
             'message' => 'Stage deleted successfully.'
-        ]);
+        ], 200);
     }
 }

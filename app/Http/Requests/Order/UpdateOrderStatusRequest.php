@@ -28,6 +28,32 @@ class UpdateOrderStatusRequest extends FormRequest
                 'nullable',
                 'string'
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+
+            'status.required' =>
+                'حالة الطلب مطلوبة.',
+
+            'status.enum' =>
+                'حالة الطلب المحددة غير صحيحة.',
+
+            'note.string' =>
+                'الملاحظة يجب أن تكون نصاً.',
+
+        ];
+    }
+
+
+    public function attributes(): array
+    {
+        return [
+
+            'status' => 'حالة الطلب',
+            'note' => 'الملاحظة',
 
         ];
     }

@@ -128,4 +128,27 @@ public function findCustomerOrder(
     ->findOrFail($orderId);
 }
 
+    public function statistics()
+{
+    return [
+
+        'total_orders' => Order::count(),
+
+        'pending' => Order::where(
+            'status',
+            'received'
+        )->count(),
+
+        'production' => Order::where(
+            'status',
+            'in_production'
+        )->count(),
+
+        'completed' => Order::where(
+            'status',
+            'completed'
+        )->count(),
+
+    ];
+}
 }

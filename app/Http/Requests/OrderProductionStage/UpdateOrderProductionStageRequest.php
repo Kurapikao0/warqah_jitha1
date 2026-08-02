@@ -9,7 +9,7 @@ class UpdateOrderProductionStageRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return auth('admin')->check();
     }
 
     public function rules(): array
@@ -31,4 +31,44 @@ class UpdateOrderProductionStageRequest extends FormRequest
 
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+
+            'name.required'
+            =>
+            'اسم مرحلة الإنتاج مطلوب.',
+
+            'sort_order.required'
+            =>
+            'ترتيب مرحلة الإنتاج مطلوب.',
+
+            'sort_order.integer'
+            =>
+            'ترتيب المرحلة يجب أن يكون رقماً.',
+
+            'sort_order.min'
+            =>
+            'ترتيب المرحلة يجب أن يكون أكبر من صفر.',
+
+        ];
+    }
+
+
+    public function attributes(): array
+    {
+        return [
+
+            'name'
+            =>
+            'اسم المرحلة',
+
+            'sort_order'
+            =>
+            'ترتيب المرحلة',
+
+        ];
+    }
+
 }

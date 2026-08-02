@@ -55,11 +55,39 @@ al_kuraimi',
 /*'proof_image'=>
 'nullable|image|max:2048'*/
 
-
     ];
-
 
     }
 
+    public function messages(): array
+    {
+        return [
+
+            'order_id.required' =>
+                'الطلب مطلوب.',
+
+            'order_id.exists' =>
+                'الطلب المحدد غير موجود أو لا ينتمي إلى حسابك.',
+
+
+            'payment_method.required' =>
+                'طريقة الدفع مطلوبة.',
+
+            'payment_method.in' =>
+                'طريقة الدفع المحددة غير مدعومة.',
+
+        ];
+    }
+
+
+public function attributes(): array
+{
+    return [
+
+        'order_id' => 'الطلب',
+        'payment_method' => 'طريقة الدفع',
+
+    ];
+}   
 
 }

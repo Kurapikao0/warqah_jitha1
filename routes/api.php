@@ -86,6 +86,12 @@ Route::put(
 [AdminCustomization::class,'updateStatus']
 );
 
+Route::get(
+'orders/statistics',
+[AdminOrder::class,'statistics']
+);
+
+
 Route::apiResource(
 'orders',
 AdminOrder::class
@@ -96,19 +102,14 @@ Route::put(
 'orders/{order}/status',
 [OrderStatusController::class,'update']
 );
-
+    
 Route::get(
     'roles/{role}/permissions',
     [RolePermissionController::class,'index']
 );
 
-Route::get(
-    'orders-statistics',
-    [CustomerOrder::class,'statistics']
-);
 
 
-    
 Route::get(
         'orders/{order}/production-history',
         [
@@ -162,10 +163,10 @@ Route::get(
     [AdminPayment::class,'updateStatus']
     );    
 
-        Route::apiResource(
-            'production-stages',
-            OrderProductionStageController::class
-        );
+    Route::apiResource(
+    'order-production-stages',
+    OrderProductionStageController::class
+    );
 
     Route::apiResource(
         'design-patterns',

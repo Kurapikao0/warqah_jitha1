@@ -63,66 +63,18 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-
-
-        $order->delete();
-
-
-
+        $this->service->delete($order);
         return response()->json([
-
             'message'=>'Order deleted successfully'
-
         ]);
-
-
     }
 
-
-
-
-
-    /**
-     * Dashboard statistics
-     */
     public function statistics()
-    {
-
-
-        return response()->json([
-
-
-            'total_orders'=>
-                Order::count(),
-
-
-            'pending'=>
-                Order::where(
-                    'status',
-                    'received'
-                )->count(),
-
-
-
-            'production'=>
-                Order::where(
-                    'status',
-                    'in_production'
-                )->count(),
-
-
-
-            'completed'=>
-                Order::where(
-                    'status',
-                    'completed'
-                )->count(),
-
-
-        ]);
-
-    }
-
+{
+    return response()->json(
+        $this->service->statistics()
+    );
+}
 
 
 }

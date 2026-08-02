@@ -31,7 +31,10 @@ return $this->repository->getAll();
 
 }
 
-
+public function statistics()
+{
+    return $this->repository->statistics();
+}
 
 
 
@@ -54,11 +57,6 @@ return $this->repository
 ->findById($id);
 
 }
-
-
-
-
-
 
 /*public function create(array $data)
 {
@@ -235,9 +233,6 @@ return $order;
 }*/
 
 
-
-
-
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {
@@ -257,7 +252,7 @@ return $order;
 
                 // ===== هنا سادساً: التحقق من المخزون =====
                 if ($product->stock_quantity < $item['quantity']) {
-                    abort(422, 'Insufficient stock for product: ' . $product->name);
+                    abort(422, 'المنتج المطلوب غير متاح حالياً. ' . $product->name);
                 }
 
                 $linePrice = $product->price * $item['quantity'];
@@ -381,4 +376,8 @@ public function findCustomerOrder(
             $orderId
         );
 } 
+public function delete(Order $order)
+{
+    return $order->delete();
+}
 }
