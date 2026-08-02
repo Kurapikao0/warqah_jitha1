@@ -317,10 +317,10 @@ class DatabaseSeeder extends Seeder
             ->recycle([$this->orders, $this->products])
             ->create();
 
-        $customers = $this->customers;
-        $products = $this->products;
-        $colors = $this->colors;
-        $designPatterns = $this->designPatterns;
+            $customers = Customer::all();
+            $products = Product::all();
+            $colors = Color::all();
+            $designPatterns = DesignPattern::all();
 
         $customizedItems = OrderItem::factory()
             ->count(self::CUSTOMIZED_ORDER_ITEMS_COUNT)

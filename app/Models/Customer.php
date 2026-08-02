@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Laravel\Sanctum\HasApiTokens;
 use App\Enums\CustomerCategory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,8 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Customer extends Authenticatable
 {
-    use HasFactory, SoftDeletes;
-
+    use HasFactory, SoftDeletes, HasApiTokens;
     protected $fillable = [
         'full_name',
         'email',
@@ -93,3 +92,4 @@ class Customer extends Authenticatable
         return $this->hasMany(Review::class);
     }
 }
+

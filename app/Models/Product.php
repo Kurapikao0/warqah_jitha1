@@ -127,4 +127,6 @@ class Product extends Model
     {
         return $this->hasOne(RawMaterial::class);
     }
+
+    
 }
