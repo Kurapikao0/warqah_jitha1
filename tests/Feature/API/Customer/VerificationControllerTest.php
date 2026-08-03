@@ -45,6 +45,7 @@ class VerificationControllerTest extends TestCase
     {
         if (enum_exists(VerificationPurpose::class)) {
             $cases = VerificationPurpose::cases();
+
             if (!empty($cases)) {
                 return $cases[0]->value ?? $cases[0]->name;
             }
@@ -59,13 +60,12 @@ class VerificationControllerTest extends TestCase
         $purpose = $this->getValidPurpose();
         $contactValue = '0501234567';
 
-        // إنشاء نموذج VerificationCode حقيقي أو وهمي يتطابق مع الـ Return Type
         $verificationModel = class_exists(VerificationCode::class) && method_exists(VerificationCode::class, 'factory')
             ? VerificationCode::factory()->make()
             : new VerificationCode();
 
         $this->mock(VerificationCodeService::class, function (MockInterface $mock) use ($verificationModel) {
-            $mock->shouldReceive('generate')
+            $mock->shouldReceive('generateCode')
                 ->once()
                 ->andReturn($verificationModel);
         });
@@ -96,8 +96,6 @@ class VerificationControllerTest extends TestCase
     public function يمكن_للعميل_التحقق_من_الرمز_بنجاح(): void
     {
         $purpose = $this->getValidPurpose();
-        $contactValue = '0501234567';
-        $code = '123456';
 
         $this->mock(VerificationCodeService::class, function (MockInterface $mock) {
             $mock->shouldReceive('verify')
@@ -105,13 +103,11 @@ class VerificationControllerTest extends TestCase
                 ->andReturn(true);
         });
 
-        $payload = [
+        $response = $this->postJson($this->verifyUrl, [
             'purpose' => $purpose,
-            'contact_value' => $contactValue,
-            'code_or_token' => $code,
-        ];
-
-        $response = $this->postJson($this->verifyUrl, $payload);
+            'contact_value' => '0501234567',
+            'code_or_token' => '123456',
+        ]);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -122,21 +118,17 @@ class VerificationControllerTest extends TestCase
     #[Test]
     public function يرفض_التحقق_عندما_يكون_الرمز_غير_صحيح_أو_منتهي_الصلاحية(): void
     {
-        $purpose = $this->getValidPurpose();
-
         $this->mock(VerificationCodeService::class, function (MockInterface $mock) {
             $mock->shouldReceive('verify')
                 ->once()
                 ->andReturn(false);
         });
 
-        $payload = [
-            'purpose' => $purpose,
+        $response = $this->postJson($this->verifyUrl, [
+            'purpose' => $this->getValidPurpose(),
             'contact_value' => '0501234567',
             'code_or_token' => '999999',
-        ];
-
-        $response = $this->postJson($this->verifyUrl, $payload);
+        ]);
 
         $response->assertStatus(422)
             ->assertJson([
@@ -147,12 +139,10 @@ class VerificationControllerTest extends TestCase
     #[Test]
     public function يرفض_التحقق_عند_عدم_تمرير_رمز_التحقق(): void
     {
-        $payload = [
+        $response = $this->postJson($this->verifyUrl, [
             'purpose' => $this->getValidPurpose(),
             'contact_value' => '0501234567',
-        ];
-
-        $response = $this->postJson($this->verifyUrl, $payload);
+        ]);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['code_or_token']);

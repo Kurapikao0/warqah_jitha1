@@ -18,10 +18,12 @@ class RawMaterialController extends Controller
     }
 
     /**
-     * عرض قائمة المواد الخام (مقسمة لصفحات - Paginated)
+     * عرض قائمة المواد الخام
      */
     public function index(): JsonResponse
     {
+        $this->authorize('viewAny', RawMaterial::class);
+
         $rawMaterials = $this->service->getAll();
 
         return RawMaterialResource::collection($rawMaterials)
@@ -34,6 +36,8 @@ class RawMaterialController extends Controller
      */
     public function store(StoreRawMaterialRequest $request): JsonResponse
     {
+        $this->authorize('create', RawMaterial::class);
+
         $rawMaterial = $this->service->create($request->validated());
 
         return response()->json([
@@ -48,6 +52,8 @@ class RawMaterialController extends Controller
      */
     public function show(RawMaterial $rawMaterial): JsonResponse
     {
+        $this->authorize('view', $rawMaterial);
+
         return response()->json([
             'success' => true,
             'data'    => new RawMaterialResource($rawMaterial->loadMissing('product')),
@@ -61,6 +67,8 @@ class RawMaterialController extends Controller
         UpdateRawMaterialRequest $request,
         RawMaterial $rawMaterial
     ): JsonResponse {
+        $this->authorize('update', $rawMaterial);
+
         $updatedRawMaterial = $this->service->update(
             $rawMaterial,
             $request->validated()
@@ -78,6 +86,8 @@ class RawMaterialController extends Controller
      */
     public function destroy(RawMaterial $rawMaterial): JsonResponse
     {
+        $this->authorize('delete', $rawMaterial);
+
         $this->service->delete($rawMaterial);
 
         return response()->json([

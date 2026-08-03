@@ -24,10 +24,17 @@ class VerificationController extends Controller
     public function generate(
         GenerateVerificationCodeRequest $request
     ): JsonResponse {
-
-        // جلب العميل من طلب التوثيق، أو استرجاع أول عميل لتفادي تعارض الأنواع (TypeError)
         $user = $request->user();
-        $customer = ($user instanceof Customer) ? $user : Customer::first();
+
+        // 1. استخدام العميل المصدق (مسجل الدخول) إن وجد
+        $customer = ($user instanceof Customer) ? $user : null;
+
+        // 2. إذا لم يكن مسجلاً للدخول، يتم البحث عنه عبر contact_value الممررة في الطلب
+        if (! $customer && $request->has('contact_value')) {
+            $customer = Customer::where('email', $request->contact_value)
+                ->orWhere('phone', $request->contact_value)
+                ->first();
+        }
 
         if (! $customer) {
             return response()->json([
@@ -39,7 +46,7 @@ class VerificationController extends Controller
 
         return response()->json([
             'message' => 'Verification generated successfully.',
-            'data' => new VerificationCodeResource($verification),
+            'data'    => new VerificationCodeResource($verification),
         ], 201);
     }
 
@@ -49,10 +56,17 @@ class VerificationController extends Controller
     public function verify(
         VerifyVerificationCodeRequest $request
     ): JsonResponse {
-
-        /** @var Customer $customer */
         $user = $request->user();
-        $customer = ($user instanceof Customer) ? $user : Customer::first();
+
+        // 1. استخدام العميل المصدق (مسجل الدخول) إن وجد
+        $customer = ($user instanceof Customer) ? $user : null;
+
+        // 2. البحث عن العميل ببيانات التواصل بدلاً من Customer::first() لضمان الأمان
+        if (! $customer) {
+            $customer = Customer::where('email', $request->validated('contact_value'))
+                ->orWhere('phone', $request->validated('contact_value'))
+                ->first();
+        }
 
         if (! $customer) {
             return response()->json([

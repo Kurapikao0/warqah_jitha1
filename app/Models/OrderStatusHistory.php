@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,9 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderStatusHistory extends Model
 {
     use HasFactory;
-    
-    protected $table = 'order_status_history';
-    const UPDATED_AT = null;
+
+    public const UPDATED_AT = null;
+
+    protected $table = 'order_status_histories';
 
     protected $fillable = [
         'order_id',
@@ -20,13 +20,6 @@ class OrderStatusHistory extends Model
         'note',
         'changed_by',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'status' => OrderStatus::class,
-        ];
-    }
 
     public function order(): BelongsTo
     {
