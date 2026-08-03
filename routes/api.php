@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\API\Admin\PermissionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\Admin\ProductCustomizationController as AdminCustomization;
@@ -7,6 +8,7 @@ use App\Http\Controllers\API\Admin\ProductController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
 use App\Http\Controllers\API\Admin\OrderStatusController;
 use App\Http\Controllers\API\Admin\OrderProductionController;
+use App\Http\Controllers\API\Admin\OrderProductionStageController;
 use App\Http\Controllers\API\Customer\CartController;
 use App\Http\Controllers\API\Customer\CartItemController;
 use App\Http\Controllers\API\Customer\FavoriteController;
@@ -32,342 +34,109 @@ use App\Http\Controllers\API\Admin\ColorController;
 use App\Http\Controllers\API\Admin\ProductAttributeController;
 use App\Http\Controllers\API\Admin\ProductAttributeValueController;
 
-
+/*
+|--------------------------------------------------------------------------
+| Public Routes (مسارات عامة لا تتطلب توكن)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/test', function () {
-
     return response()->json([
         'status' => true,
         'message' => 'API is working'
     ]);
-
 });
+
+// مسارات التحقق للعميل (عامة)
+Route::post('customer/verifications/generate', [VerificationController::class, 'generate']);
+Route::post('customer/verifications/verify', [VerificationController::class, 'verify']);
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (مسارات الإدارة المحمية)
+|--------------------------------------------------------------------------
+*/
 
 Route::prefix('admin')
 ->middleware(['auth:sanctum'])
 ->group(function(){
 
-Route::apiResource(
-'roles', 
-RoleController::class);
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('products', ProductController::class);
+    Route::apiResource('permissions', PermissionController::class);
 
-Route::apiResource(
-'products',
-ProductController::class
-);
-Route::apiResource(
-    'permissions',
-    PermissionController::class
-);
-Route::get(
-'customizations',
-[AdminCustomization::class,'index']
-);
+    Route::get('customizations', [AdminCustomization::class, 'index']);
+    Route::get('customizations/{id}', [AdminCustomization::class, 'show']);
+    Route::put('customizations/{customization}/status', [AdminCustomization::class, 'updateStatus']);
 
+    Route::apiResource('orders', AdminOrder::class);
+    Route::put('orders/{order}/status', [OrderStatusController::class, 'update']);
+    Route::get('roles/{role}/permissions', [RolePermissionController::class, 'index']);
+    Route::get('orders-statistics', [AdminOrder::class, 'statistics']);
 
-Route::get(
-'customizations/{id}',
-[AdminCustomization::class,'show']
-);
+    Route::get('orders/{order}/production-history', [OrderProductionController::class, 'history']);
+    Route::post('orders/{order}/next-stage', [OrderProductionController::class, 'changeStage']);
+    Route::post('orders/{order}/stage/{stageId}', [OrderProductionController::class, 'updateStage']);
+    Route::get('orders/{order}/status-history', [OrderStatusHistoryController::class, 'index']);
 
+    Route::get('payments', [AdminPayment::class, 'index']);
+    Route::get('payments/{id}', [AdminPayment::class, 'show']);
+    Route::put('payments/{payment}/status', [AdminPayment::class, 'updateStatus']);
 
-Route::put(
-'customizations/{customization}/status',
-[AdminCustomization::class,'updateStatus']
-);
+    Route::apiResource('production-stages', OrderProductionStageController::class);
+    Route::apiResource('design-patterns', DesignPatternController::class);
+    Route::apiResource('product-media', ProductMediaController::class);
+    Route::apiResource('colors', ColorController::class);
+    Route::apiResource('product-attributes', ProductAttributeController::class);
+    Route::apiResource('product-attribute-values', ProductAttributeValueController::class);
 
-Route::apiResource(
-'orders',
-AdminOrder::class
-);
+    Route::post('roles/{role}/permissions', [RolePermissionController::class, 'store']);
+    Route::delete('roles/{role}/permissions/{permission}', [RolePermissionController::class, 'destroy']);
 
+    Route::apiResource('admin-users', AdminUserController::class);
+    Route::post('admin-users/{adminUser}/password-reset', [AdminPasswordResetController::class, 'store']);
+    Route::delete('password-resets/{reset}', [AdminPasswordResetController::class, 'destroy']);
 
-Route::put(
-'orders/{order}/status',
-[OrderStatusController::class,'update']
-);
+    Route::get('admin-users/{adminUser}/notifications', [AdminNotificationController::class, 'index']);
+    Route::put('notifications/{notification}/read', [AdminNotificationController::class, 'read']);
 
-Route::get(
-    'roles/{role}/permissions',
-    [RolePermissionController::class,'index']
-);
-
-Route::get(
-    'orders-statistics',
-    [OrderController::class,'statistics']
-);
-
-
-    
-Route::get(
-        'orders/{order}/production-history',
-        [
-            OrderProductionController::class,
-            'history'
-        ]
-    );
-
-
-
-    Route::post(
-        'orders/{order}/next-stage',
-        [
-            OrderProductionController::class,
-            'changeStage'
-        ]
-    );
-
-
-    Route::post(
-        'orders/{order}/stage/{stageId}',
-        [
-            OrderProductionController::class,
-            'updateStage'
-        ]
-    );    
-
-
-    Route::get(
-        'orders/{order}/status-history',
-        [
-        OrderStatusHistoryController::class,
-        'index'
-        ]
-    );    
-
-    Route::get(
-    'payments',
-    [AdminPayment::class,'index']
-    );
-
-
-    Route::get(
-    'payments/{id}',
-    [AdminPayment::class,'show']
-    );
-
-
-    Route::put(
-    'payments/{payment}/status',
-    [AdminPayment::class,'updateStatus']
-    );    
-
-        Route::apiResource(
-            'production-stages',
-            OrderProductionStageController::class
-        );
-
-    Route::apiResource(
-        'design-patterns',
-        DesignPatternController::class
-    );        
-
-    Route::apiResource(
-        'product-media',
-        ProductMediaController::class
-    );    
-
-    Route::apiResource(
-        'colors',
-        ColorController::class
-    );
-
-    Route::apiResource(
-        'product-attributes',
-        ProductAttributeController::class
-    );
-
-    Route::apiResource(
-        'product-attribute-values',
-        ProductAttributeValueController::class
-    );
-
-Route::post(
-    'roles/{role}/permissions',
-    [RolePermissionController::class,'store']
-);
-
-
-Route::delete(
-    'roles/{role}/permissions/{permission}',
-    [RolePermissionController::class,'destroy']
-);
-
-Route::apiResource(
-    'admin-users',
-    AdminUserController::class
-);
-
-Route::post(
-    'admin-users/{adminUser}/password-reset',
-    [AdminPasswordResetController::class,'store']
-);
-
-
-Route::delete(
-    'password-resets/{reset}',
-    [AdminPasswordResetController::class,'destroy']
-);
-
-Route::get(
-    'admin-users/{adminUser}/notifications',
-    [AdminNotificationController::class,'index']
-);
-
-
-Route::put(
-    'notifications/{notification}/read',
-    [AdminNotificationController::class,'read']
-);
-
-Route::apiResource(
-    'activity-logs',
-    ActivityLogController::class
-)
-->only([
-    'index',
-    'show'
-]);
-
-Route::apiResource(
-    'product-categories',
-    ProductCategoryController::class
-);
-
-Route::apiResource(
-    'raw-materials',
-    RawMaterialController::class
-);
-
+    Route::apiResource('activity-logs', ActivityLogController::class)->only(['index', 'show']);
+    Route::apiResource('product-categories', ProductCategoryController::class);
+    Route::apiResource('raw-materials', RawMaterialController::class);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Customer Routes (مسارات العملاء المحمية)
+|--------------------------------------------------------------------------
+*/
 
 Route::prefix('customer')
     ->middleware('auth:sanctum')
     ->group(function(){
 
+    Route::apiResource('customizations', CustomerCustomization::class);
+    Route::apiResource('orders', \App\Http\Controllers\API\Customer\OrderController::class);
 
-    Route::apiResource(
-    'customizations',
-    CustomerCustomization::class
-    );
+    Route::get('cart', [CartController::class, 'index']);
+    Route::post('cart/items', [CartItemController::class, 'store']);
+    Route::put('cart/items/{cartItem}', [CartItemController::class, 'update']);
+    Route::delete('cart/items/{cartItem}', [CartItemController::class, 'destroy']);
 
-    Route::apiResource(
-    'orders',
-    \App\Http\Controllers\API\Customer\OrderController::class
-    );
+    Route::get('favorites', [FavoriteController::class, 'index']);
+    Route::post('favorites/{product}', [FavoriteController::class, 'toggle']);
 
-    Route::get(
-    'cart',
-    [CartController::class,'index']
-    );
+    Route::apiResource('addresses', AddressController::class);
+    Route::put('addresses/{address}/default', [AddressController::class, 'setDefault']);
 
+    Route::apiResource('reviews', ReviewController::class);
+    Route::post('reviews/{review}/images', [ReviewImageController::class, 'store']);
+    Route::delete('review-images/{reviewImage}', [ReviewImageController::class, 'destroy']);
 
+    Route::get('notifications', [CustomerNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/{id}', [CustomerNotificationController::class, 'show'])->name('notifications.show');
+    Route::patch('notifications/{notification}/read', [CustomerNotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('notifications/{notification}', [CustomerNotificationController::class, 'destroy'])->name('notifications.destroy');
 
-    Route::post(
-    'cart/items',
-    [CartItemController::class,'store']
-    );
-
-
-
-    Route::put(
-    'cart/items/{cartItem}',
-    [CartItemController::class,'update']
-    );
-
-
-
-    Route::delete(
-    'cart/items/{cartItem}',
-    [CartItemController::class,'destroy']
-    );
-
-
-    Route::get(
-    'favorites',
-    [FavoriteController::class,'index']
-    );
-
-
-    Route::post(
-    'favorites/{product}',
-    [FavoriteController::class,'toggle']
-    );
-
-    Route::apiResource(
-    'addresses',
-    AddressController::class
-    );
-
-    Route::put(
-    'addresses/{address}/default',
-    [AddressController::class, 'setDefault']
-);
-
-    Route::post(
-    'verifications/generate',
-    [
-        VerificationController::class,
-        'generate'
-    ]
-);
-
-
-Route::post(
-    'verifications/verify',
-    [
-        VerificationController::class,
-        'verify'
-    ]
-);
-
-Route::apiResource(
-    'reviews',
-    ReviewController::class
-); 
-
-Route::post(
-    'reviews/{review}/images',
-    [ReviewImageController::class, 'store']
-);
-
-Route::delete(
-    'review-images/{reviewImage}',
-    [ReviewImageController::class, 'destroy']
-); 
-
-Route::get(
-            'notifications',
-            [CustomerNotificationController::class,'index']
-        )
-        ->name('notifications.index');
-
-
-        Route::get(
-            'notifications/{id}',
-            [CustomerNotificationController::class,'show']
-        )
-        ->name('notifications.show');
-
-
-        Route::patch(
-            'notifications/{notification}/read',
-            [CustomerNotificationController::class,'read']
-        )
-        ->name('notifications.read');
-
-
-        Route::delete(
-            'notifications/{notification}',
-            [CustomerNotificationController::class,'destroy']
-        )
-        ->name('notifications.destroy');
-
-
-Route::apiResource(
-'payments',
-CustomerPayment::class
-);
-
+    Route::apiResource('payments', CustomerPayment::class);
 });

@@ -2,37 +2,44 @@
 
 namespace App\Models;
 
+// 1. استدعاء HasApiTokens من مكتبة Sanctum
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-/**
- * Framework-default `users` table (Laravel's built-in auth scaffold).
- *
- * NOTE (architectural finding — see Schema Analysis Report): no domain
- * table holds a constrained foreign key to `users`. The `sessions.user_id`
- * column references it only by convention (no DB-level FK). The actual
- * application actors are `admin_users` and `customers`, each with their
- * own dedicated tables/guards. This model is kept because the migration
- * exists and is part of Laravel's default scaffolding, but it is not
- * wired into any domain relationship, since none is declared in the
- * migrations.
- */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    // 2. تفعيل الخصائص داخل الكلاس
+    use HasApiTokens, HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'phone',
     ];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
     protected function casts(): array
     {
         return [

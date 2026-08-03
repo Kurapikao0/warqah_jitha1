@@ -9,7 +9,6 @@ use App\Http\Resources\RawMaterialResource;
 use App\Models\RawMaterial;
 use App\Services\RawMaterialService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class RawMaterialController extends Controller
 {
@@ -18,85 +17,72 @@ class RawMaterialController extends Controller
     ) {
     }
 
-
     /**
-     * Display all raw materials
+     * عرض قائمة المواد الخام (مقسمة لصفحات - Paginated)
      */
     public function index(): JsonResponse
     {
-        return response()->json([
-            'data' => RawMaterialResource::collection(
-                $this->service->getAll()
-            )
-        ]);
+        $rawMaterials = $this->service->getAll();
+
+        return RawMaterialResource::collection($rawMaterials)
+            ->additional(['success' => true])
+            ->response();
     }
 
-
     /**
-     * Store raw material
+     * إنشاء مادة خام جديدة
      */
-    public function store(
-        StoreRawMaterialRequest $request
-    ): JsonResponse {
-
-        $rawMaterial = $this->service->create(
-            $request->validated()
-        );
+    public function store(StoreRawMaterialRequest $request): JsonResponse
+    {
+        $rawMaterial = $this->service->create($request->validated());
 
         return response()->json([
-            'message' => 'Raw material created successfully',
-            'data' => new RawMaterialResource($rawMaterial)
+            'success' => true,
+            'message' => 'تم إنشاء المادة الخام بنجاح',
+            'data'    => new RawMaterialResource($rawMaterial),
         ], 201);
     }
 
-
     /**
-     * Show raw material
+     * عرض تفاصيل مادة خام محددة
      */
-    public function show(
-        RawMaterial $rawMaterial
-    ): JsonResponse {
-
+    public function show(RawMaterial $rawMaterial): JsonResponse
+    {
         return response()->json([
-            'data' => new RawMaterialResource(
-                $rawMaterial->load('product')
-            )
+            'success' => true,
+            'data'    => new RawMaterialResource($rawMaterial->loadMissing('product')),
         ]);
     }
 
-
     /**
-     * Update raw material
+     * تحديث بيانات مادة خام
      */
     public function update(
         UpdateRawMaterialRequest $request,
         RawMaterial $rawMaterial
     ): JsonResponse {
-
-        $rawMaterial = $this->service->update(
+        $updatedRawMaterial = $this->service->update(
             $rawMaterial,
             $request->validated()
         );
 
-
         return response()->json([
-            'message' => 'Raw material updated successfully',
-            'data' => new RawMaterialResource($rawMaterial)
+            'success' => true,
+            'message' => 'تم تحديث المادة الخام بنجاح',
+            'data'    => new RawMaterialResource($updatedRawMaterial),
         ]);
     }
 
-
     /**
-     * Delete raw material
+     * حذف مادة خام
      */
-    public function destroy(
-        RawMaterial $rawMaterial
-    ): JsonResponse {
-
+    public function destroy(RawMaterial $rawMaterial): JsonResponse
+    {
         $this->service->delete($rawMaterial);
 
         return response()->json([
-            'message' => 'Raw material deleted successfully'
+            'success' => true,
+            'message' => 'تم حذف المادة الخام بنجاح',
         ]);
     }
 }

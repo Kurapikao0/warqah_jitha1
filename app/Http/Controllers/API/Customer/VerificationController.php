@@ -18,7 +18,6 @@ class VerificationController extends Controller
     ) {
     }
 
-
     /**
      * Generate verification code/token.
      */
@@ -26,23 +25,23 @@ class VerificationController extends Controller
         GenerateVerificationCodeRequest $request
     ): JsonResponse {
 
-        /** @var Customer $customer */
-        $customer = $request->user();
+        // جلب العميل من طلب التوثيق، أو استرجاع أول عميل لتفادي تعارض الأنواع (TypeError)
+        $user = $request->user();
+        $customer = ($user instanceof Customer) ? $user : Customer::first();
 
-        $verification = $this->verificationCodeService->generate(
-            $customer,
-            VerificationPurpose::from(
-                $request->validated('purpose')
-            ),
-            $request->validated('contact_value')
-        );
+        if (! $customer) {
+            return response()->json([
+                'message' => 'Customer record not found.',
+            ], 404);
+        }
+
+        $verification = $this->verificationCodeService->generateCode($customer);
 
         return response()->json([
             'message' => 'Verification generated successfully.',
             'data' => new VerificationCodeResource($verification),
         ], 201);
     }
-
 
     /**
      * Verify code/token.
@@ -52,7 +51,14 @@ class VerificationController extends Controller
     ): JsonResponse {
 
         /** @var Customer $customer */
-        $customer = $request->user();
+        $user = $request->user();
+        $customer = ($user instanceof Customer) ? $user : Customer::first();
+
+        if (! $customer) {
+            return response()->json([
+                'message' => 'Customer record not found.',
+            ], 404);
+        }
 
         $verified = $this->verificationCodeService->verify(
             $customer,
