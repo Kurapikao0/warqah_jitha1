@@ -86,16 +86,21 @@ class VerificationCodeService
         $contactValue,
         $code
     ) {
-
+        \Log::info('Verify attempt', [
+            'customer_id' => $customer->id,
+            'purpose' => $purpose->value,
+            'contact_value' => $contactValue,
+            'code' => $code,
+        ]);
         $verification = VerificationCode::query()
             ->where('customer_id', $customer->id)
-            ->where('purpose', $purpose)
+            ->where('purpose', $purpose->value)
             ->where('contact_value', $contactValue)
             ->where('code_or_token', $code)
             ->whereNull('consumed_at')
-            ->latest()
+            ->latest('id')
             ->first();
-
+        
         if (! $verification) {
             return false;
         }
@@ -104,31 +109,45 @@ class VerificationCodeService
             return false;
         }
 
-        $verification->update([
-            'consumed_at' => now(),
+        $verification->consumed_at = now();
+        $verification->save();
+
+        \Log::info('After save consumed', [
+            'id' => $verification->id,
+            'dirty' => $verification->getDirty(),
+            'fresh_consumed_at' => $verification->fresh()->consumed_at,
         ]);
-
-
+        \Log::info('Code consumed', [
+            'verification_id' => $verification->id,
+            'consumed_at' => $verification->fresh()->consumed_at,
+        ]);
         switch ($purpose) {
+
+            case VerificationPurpose::SignupEmailVerification:
+
+                $customer->update([
+                    'email_verified_at' => now(),
+                ]);
+                break;
 
             case VerificationPurpose::SignupPhoneVerification:
 
                 $customer->update([
                     'phone_verified_at' => now(),
                 ]);
-
                 break;
 
-
             case VerificationPurpose::PasswordResetEmailLink:
+
                 break;
 
 
             case VerificationPurpose::PasswordResetPhoneOtp:
+
                 break;
         }
-
-
+                
+        
         return true;
     });
 }
@@ -160,7 +179,7 @@ class VerificationCodeService
     ): string {
 
         return match ($purpose) {
-
+            VerificationPurpose::SignupEmailVerification,
             VerificationPurpose::SignupPhoneVerification,
             VerificationPurpose::PasswordResetPhoneOtp
                 => (string) random_int(100000, 999999),
@@ -179,6 +198,7 @@ class VerificationCodeService
     ): int {
 
         return match ($purpose) {
+            VerificationPurpose::SignupEmailVerification => 10,
 
             VerificationPurpose::SignupPhoneVerification => 10,
 

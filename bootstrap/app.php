@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Configuration\Events;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,8 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectGuestsTo(function (Request $request) {
             abort(response()->json([
-            'message' => 'Unauthenticated'
-        ], 401));
+                'message' => 'Unauthenticated'
+            ], 401));
         });
 
     })

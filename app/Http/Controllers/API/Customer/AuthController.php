@@ -6,11 +6,14 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
-
-
+use App\Events\CustomerRegistered;
+use App\Enums\VerificationPurpose;
+use App\Services\VerificationCodeService;
 class AuthController extends Controller
 {
-
+    public function __construct(
+        protected VerificationCodeService $verificationCodeService
+    ) {}
 
     public function register(Request $request)
     {
@@ -36,8 +39,11 @@ class AuthController extends Controller
             'password_hash'=>$data['password'],
 
         ]);
+        event(new CustomerRegistered($customer));
 
-
+        \Log::info('Event dispatched', [
+            'customer_id' => $customer->id,
+        ]);
 
         $token = $customer
             ->createToken('customer-token')
