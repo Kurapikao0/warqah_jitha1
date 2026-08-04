@@ -36,4 +36,15 @@ class OrderProductionStage extends Model
     {
         return $this->hasMany(OrderProductionStageHistory::class, 'stage_id');
     }
+
+    public function next()
+    {
+        return self::where(
+            'sort_order',
+            '>',
+            $this->sort_order
+        )
+        ->orderBy('sort_order')
+        ->first();
+    }
 }

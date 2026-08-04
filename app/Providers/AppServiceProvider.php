@@ -29,7 +29,8 @@ use App\Repositories\ProductAttributeRepository;
 use App\Repositories\Contracts\ProductAttributeRepositoryInterface;
 use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
-
+use App\Repositories\OrderProductionRepository;
+use App\Repositories\Contracts\OrderProductionRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-         $this->app->bind(
+        $this->app->bind(
         ProductRepositoryInterface::class,
         ProductRepository::class
 
@@ -98,6 +99,11 @@ class AppServiceProvider extends ServiceProvider
         );        
 
         $this->app->bind(
+            OrderProductionRepositoryInterface::class,
+            OrderProductionRepository::class
+        );
+
+        $this->app->bind(
             DesignPatternRepositoryInterface::class,
             DesignPatternRepository::class
         );
@@ -121,7 +127,7 @@ class AppServiceProvider extends ServiceProvider
             ProductAttributeValueRepositoryInterface::class,
             ProductAttributeValueRepository::class
         );        
-
+        
     }
 
     /**

@@ -15,7 +15,7 @@ interface OrderProductionStageRepositoryInterface
     public function update(
         OrderProductionStage $stage,
         array $data
-    ): bool;
+    ): OrderProductionStage;
 
     public function delete(OrderProductionStage $stage): bool;
 }

@@ -2,120 +2,43 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-
 use App\Models\Order;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-
-
+use App\Services\OrderProductionService;
+use App\Http\Requests\OrderProduction\UpdateOrderStageRequest;
 
 class OrderProductionController extends Controller
 {
 
-
-    /**
-     * Show production history
-     */
-    public function history(Order $order)
-    {
-
-
-        return response()->json(
-
-            $order
-            ->productionHistory()
-            ->with('stage')
-            ->get()
-
-        );
-
-
+    public function __construct(
+        protected OrderProductionService $service
+    ) {
     }
 
 
-
-
     /**
-     * Move order to next stage
+     * Move order to next production stage
      */
-    public function changeStage(
-        Order $order
-    )
+    public function changeStage(Order $order)
     {
+        $result = $this->service->changeStage($order);
 
-
-        return DB::transaction(function()
-        use($order){
-
-
-            $currentStage =
-                $order->currentProductionStage;
-
-
-
-            $nextStage =
-                $currentStage
-                ?
-                $currentStage
-                ->next()
-                :
-                null;
-
-
-
-            if(!$nextStage)
-            {
-
-                return response()->json([
-
-                    'message'=>
-                    'No next production stage'
-
-                ]);
-
-            }
-
-
-
-
-            $order->productionHistory()
-            ->create([
-
-                'order_production_stage_id'
-                =>
-                $nextStage->id,
-
-
-                'started_at'
-                =>
-                now()
-
-            ]);
-
-
-
-
-
+        if (!$result) {
             return response()->json([
+                'message' => 'No next production stage'
+            ],404);
+        }
 
 
-                'message'=>
-                'Order moved to next stage',
+        return response()->json([
 
+            'message' => 'Order moved to next production stage',
 
-                'stage'=>
-                $nextStage->name
+            'stage' =>
+                $result->currentProductionStage?->name
 
-
-            ]);
-
-
-        });
-
-
+        ]);
     }
-
-
 
 
 
@@ -123,37 +46,34 @@ class OrderProductionController extends Controller
      * Set specific production stage
      */
     public function updateStage(
-        Order $order,
-        $stageId
-    )
-    {
+    UpdateOrderStageRequest $request,
+    Order $order
+){
 
-
-        $order
-        ->productionHistory()
-        ->create([
-
-            'order_production_stage_id'
-            =>
-            $stageId,
-
-            'started_at'
-            =>
-            now()
-
-        ]);
-
+        $this->service->updateStage(
+        $order,
+        $request->validated()['stage_id']
+    );
 
 
         return response()->json([
 
-            'message'=>
-            'Production stage updated'
+            'message' =>
+                'Production stage updated'
 
         ]);
-
     }
 
 
+
+    /**
+     * Production history
+     */
+    public function history(Order $order)
+    {
+        return response()->json(
+            $this->service->history($order)
+        );
+    }
 
 }

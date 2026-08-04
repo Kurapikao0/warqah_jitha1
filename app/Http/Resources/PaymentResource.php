@@ -38,8 +38,8 @@ return [
 'amount'=>$this->amount,
 
 
-'transaction_reference'=>
-$this->transaction_reference,
+/*'transaction_reference'=>
+$this->transaction_reference,*/
 
 
 
@@ -47,8 +47,8 @@ $this->transaction_reference,
 
 
 
-'proof_image'=>
-$this->proof_image,
+/*'proof_image'=>
+$this->proof_image,*/
 
 
 

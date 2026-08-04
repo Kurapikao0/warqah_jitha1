@@ -26,8 +26,8 @@ return [
 'note'=>$this->note,
 
 
-'changed_by'=>
-$this->changedBy?->name,
+'changed_by' =>
+$this->changedBy?->full_name,
 
 
 'created_at'=>$this->created_at

@@ -9,43 +9,41 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\UpdateOrderStatusRequest;
 
 
-
 class OrderStatusController extends Controller
 {
 
 
-public function __construct(
-protected OrderService $service
-)
-{}
+    public function __construct(
+    protected OrderService $service
+    )
+    {}
 
 
 
 
-public function update(
-UpdateOrderStatusRequest $request,
-Order $order
-)
-{
+    public function update(
+    UpdateOrderStatusRequest $request,
+    Order $order
+    )
+    {
 
 
-$this->service
-->updateStatus(
-$order,
-$request->validated()
-);
+        $this->service
+        ->updateStatus(
+        $order,
+        $request->validated()
+        );
 
 
 
-return response()->json([
+        return response()->json([
 
-'message'=>
-'Order status updated'
+        'message'=>
+        'Order status updated'
 
-]);
+        ]);
 
 
-}
-
+    }
 
 }

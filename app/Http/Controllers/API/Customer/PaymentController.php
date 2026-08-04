@@ -43,30 +43,22 @@ auth()->id()
 
 
 
-public function store(
-StorePaymentRequest $request
-)
-{
-
-
-$data=$request->validated();
-
-
-$payment =
-$this->service->create($data);
-
-
-
-return new PaymentResource($payment);
-
-
-}
+    public function store(
+    StorePaymentRequest $request
+    )
+    {
+        $data=$request->validated();
+        $payment =
+            $this->service->create($data);
+        $this->authorize('view', $payment);
+        return new PaymentResource($payment);
+    }
 
 
 
 
 
-public function show($id)
+/*public function show($id)
 {
 
 return new PaymentResource(
@@ -75,8 +67,17 @@ $this->service->find($id)
 
 );
 
+}*/
+
+public function show($id)
+{
+    $payment = $this->service
+        ->findCustomerPayment(
+            auth()->id(),
+            $id
+        );
+    $this->authorize('view', $payment);
+    return new PaymentResource($payment);
 }
-
-
 
 }

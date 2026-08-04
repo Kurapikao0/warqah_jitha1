@@ -92,3 +92,4 @@ class Customer extends Authenticatable
         return $this->hasMany(Review::class);
     }
 }
+

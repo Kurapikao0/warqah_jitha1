@@ -5,7 +5,7 @@ namespace App\Repositories;
 
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
-
+use App\Models\OrderItem;
 
 
 class OrderRepository implements OrderRepositoryInterface
@@ -76,7 +76,7 @@ return Order::with([
 
 'statusHistory',
 
-'productionHistory'
+'productionStageHistory'
 
 ])
 
@@ -95,7 +95,10 @@ return Order::create($data);
 
 }
 
-
+public function createItem(array $data): OrderItem
+{
+    return OrderItem::create($data);
+}
 
 
 
@@ -105,9 +108,47 @@ array $data
 )
 {
 
-return $order->update($data);
+$order->update($data);
 
+return $order->refresh();
 }
 
+public function findCustomerOrder(
+    int $customerId,
+    int $orderId
+)
+{
+    return Order::with([
+        'items.product',
+        'payment',
+        'statusHistory',
+        'productionStageHistory',
+    ])
+    ->where('customer_id', $customerId)
+    ->findOrFail($orderId);
+}
 
+    public function statistics()
+{
+    return [
+
+        'total_orders' => Order::count(),
+
+        'pending' => Order::where(
+            'status',
+            'received'
+        )->count(),
+
+        'production' => Order::where(
+            'status',
+            'in_production'
+        )->count(),
+
+        'completed' => Order::where(
+            'status',
+            'completed'
+        )->count(),
+
+    ];
+}
 }

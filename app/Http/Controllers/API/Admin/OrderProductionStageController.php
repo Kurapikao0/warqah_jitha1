@@ -33,35 +33,37 @@ class OrderProductionStageController extends Controller
         return new OrderProductionStageResource($stage);
     }
 
-    public function show(
-        OrderProductionStage $orderProductionStage
-    ) {
+    public function show($id) {
         return new OrderProductionStageResource(
-            $orderProductionStage
+            $this->service->find($id)
         );
     }
 
     public function update(
         UpdateOrderProductionStageRequest $request,
-        OrderProductionStage $orderProductionStage
+        OrderProductionStage $productionStage
     ) {
-        $this->service->update(
-            $orderProductionStage,
-            $request->validated()
+        /*dd(
+        $productionStage,
+        $request->validated()
+    );*/
+        $stage = $this->service->update(
+                $productionStage,
+                $request->validated()
         );
 
         return new OrderProductionStageResource(
-            $orderProductionStage->refresh()
+            $stage
         );
     }
 
     public function destroy(
-        OrderProductionStage $orderProductionStage
+        OrderProductionStage $productionStage
     ) {
-        $this->service->delete($orderProductionStage);
+        $this->service->delete($productionStage);
 
         return response()->json([
             'message' => 'Stage deleted successfully.'
-        ]);
+        ], 200);
     }
 }
