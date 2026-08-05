@@ -35,6 +35,37 @@ use App\Http\Controllers\API\Admin\ProductAttributeValueController;
 use App\Http\Controllers\API\Admin\OrderProductionStageController;
 use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
 use App\Http\Controllers\API\Customer\AuthController;
+use App\Http\Controllers\API\Customer\PasswordResetController;
+
+Route::post('/customer/register', [AuthController::class,'register']);
+
+Route::post('/customer/verify-email', [AuthController::class,'verifyEmail']);
+
+Route::prefix('customer')->group(function(){
+
+    Route::post(
+        'forgot-password',
+        [
+            PasswordResetController::class,
+            'forgotPassword'
+        ]
+    );
+
+    Route::post(
+        'reset-password',
+        [
+            PasswordResetController::class,
+            'resetPassword'
+        ]
+    );
+
+});
+
+Route::post(
+    '/customer/resend-verification',
+    [AuthController::class, 'resendVerification']
+)->middleware('throttle:3,1');
+
 
 Route::get('/test', function () {
 
@@ -267,11 +298,6 @@ Route::prefix('customer')->group(function(){
 
 
     Route::post(
-        'register',
-        [AuthController::class,'register']
-    );
-
-    Route::post(
         'logout',
         [AuthController::class,'logout']
     )
@@ -409,5 +435,7 @@ Route::get(
         'store',
         'show',
     ]);
+
+    
 
 });

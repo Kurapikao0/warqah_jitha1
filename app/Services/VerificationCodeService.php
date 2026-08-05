@@ -26,6 +26,18 @@ class VerificationCodeService
             $contactValue
         ) {
 
+            $recentCode = VerificationCode::query()
+                ->where('customer_id', $customer->id)
+                ->where('purpose', $purpose->value)
+                ->where('created_at', '>', now()->subMinute())
+                ->exists();
+
+
+            if ($recentCode) {
+
+                abort(429, 'Please wait before requesting another code.');
+
+            }       
             $this->invalidatePreviousCodes(
                 $customer,
                 $purpose
@@ -74,84 +86,68 @@ class VerificationCodeService
 
         return true;
     }*/
+
     public function verify(
     Customer $customer,
     VerificationPurpose $purpose,
     string $contactValue,
     string $code
 ): bool {
+
     return DB::transaction(function () use (
         $customer,
         $purpose,
         $contactValue,
         $code
     ) {
-        \Log::info('Verify attempt', [
-            'customer_id' => $customer->id,
-            'purpose' => $purpose->value,
-            'contact_value' => $contactValue,
-            'code' => $code,
-        ]);
+        
         $verification = VerificationCode::query()
             ->where('customer_id', $customer->id)
             ->where('purpose', $purpose->value)
             ->where('contact_value', $contactValue)
-            ->where('code_or_token', $code)
             ->whereNull('consumed_at')
+            ->where('expires_at', '>', now())
             ->latest('id')
             ->first();
+
         
         if (! $verification) {
             return false;
         }
 
-        if ($verification->expires_at->isPast()) {
+
+        if (! hash_equals(
+            $verification->code_or_token,
+            $code
+        )) {
             return false;
         }
 
-        $verification->consumed_at = now();
-        $verification->save();
 
-        \Log::info('After save consumed', [
-            'id' => $verification->id,
-            'dirty' => $verification->getDirty(),
-            'fresh_consumed_at' => $verification->fresh()->consumed_at,
+        $verification->update([
+            'consumed_at' => now(),
         ]);
-        \Log::info('Code consumed', [
-            'verification_id' => $verification->id,
-            'consumed_at' => $verification->fresh()->consumed_at,
-        ]);
-        switch ($purpose) {
 
-            case VerificationPurpose::SignupEmailVerification:
 
+        match ($purpose) {
+
+            VerificationPurpose::SignupEmailVerification =>
                 $customer->update([
                     'email_verified_at' => now(),
-                ]);
-                break;
+                ]),
 
-            case VerificationPurpose::SignupPhoneVerification:
-
+            VerificationPurpose::SignupPhoneVerification =>
                 $customer->update([
                     'phone_verified_at' => now(),
-                ]);
-                break;
+                ]),
 
-            case VerificationPurpose::PasswordResetEmailLink:
-
-                break;
+            default => null,
+        };
 
 
-            case VerificationPurpose::PasswordResetPhoneOtp:
-
-                break;
-        }
-                
-        
         return true;
     });
 }
-
 
     /**
      * Invalidate previous unused codes.

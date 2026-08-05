@@ -9,6 +9,13 @@ use App\Http\Controllers\Controller;
 use App\Events\CustomerRegistered;
 use App\Enums\VerificationPurpose;
 use App\Services\VerificationCodeService;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Customer\VerifyEmailRequest;
+use App\Http\Requests\Customer\ForgotPasswordRequest;
+use App\Http\Requests\Customer\ResetPasswordRequest;
+use App\Notifications\ResetPasswordNotification;
+use App\Http\Requests\Customer\ResendVerificationRequest;
+use App\Notifications\VerifyEmailOtpNotification;
 class AuthController extends Controller
 {
     public function __construct(
@@ -68,72 +75,65 @@ class AuthController extends Controller
 
 
 
-    public function login(Request $request)
-    {
+    public function login(Request $request): JsonResponse
+{
+    $data = $request->validate([
+
+        'email' => 'required|email',
+
+        'password' => 'required|string',
+
+    ]);
 
 
-        $data=$request->validate([
+    $customer = Customer::where(
+        'email',
+        $data['email']
+    )->first();
 
 
-            'email'=>'required|email',
-
-            'password'=>'required|string'
-
-
-        ]);
-
-
-
-
-        $customer = Customer::where(
-            'email',
-            $data['email']
-        )->first();
-
-
-
-
-        if(
-            !$customer ||
-            !Hash::check(
-                $data['password'],
-                $customer->password_hash
-            )
+    if (
+        ! $customer ||
+        ! Hash::check(
+            $data['password'],
+            $customer->password_hash
         )
-        {
+    ) {
+
+        return response()->json([
+            'message' => 'Invalid credentials'
+        ], 401);
+
+    }
 
 
-            return response()->json([
+    if (! $customer->email_verified_at) {
 
-                'message'=>'Invalid credentials'
+        return response()->json([
+            'message' => 'Please verify your email first.'
+        ], 403);
 
-            ],401);
-
-
-        }
-
+    }
 
 
+    $customer->tokens()->delete();
 
 
-        $token=$customer
+    $token = $customer
         ->createToken('customer-token')
         ->plainTextToken;
 
 
+    return response()->json([
 
-        return response()->json([
+        'message' => 'Login successful',
 
-            'message'=>'Login successful',
+        'customer' => $customer,
 
-            'customer'=>$customer,
+        'token' => $token
 
-            'token'=>$token
-
-        ]);
-
-
-    }
+    ]);
+}
 
 
 
@@ -159,5 +159,168 @@ class AuthController extends Controller
 
     }
 
+    public function verifyEmail(
+    VerifyEmailRequest $request
+): JsonResponse {
 
+    $customer = Customer::where(
+        'email',
+        $request->contact_value
+    )->firstOrFail();
+
+
+    $verified = $this->verificationCodeService->verify(
+        $customer,
+        VerificationPurpose::SignupEmailVerification,
+        $request->contact_value,
+        $request->code_or_token
+    );
+
+
+    if (! $verified) {
+
+        return response()->json([
+            'message' => 'Invalid or expired verification code.'
+        ], 422);
+
+    }
+
+
+    return response()->json([
+        'message' => 'Email verified successfully.'
+    ]);
+}
+public function resendVerification(
+    ResendVerificationRequest $request
+): JsonResponse {
+
+    $customer = Customer::where(
+        'email',
+        $request->email
+    )->first();
+
+
+    if (! $customer) {
+
+        return response()->json([
+            'message' => 'Customer not found.'
+        ], 404);
+
+    }
+
+
+    if ($customer->email_verified_at) {
+
+        return response()->json([
+            'message' => 'Email already verified.'
+        ], 422);
+
+    }
+
+
+    $verification = $this->verificationCodeService->generate(
+        $customer,
+        VerificationPurpose::SignupEmailVerification,
+        $customer->email
+    );
+
+
+    $customer->notify(
+        new VerifyEmailOtpNotification(
+            $verification->code_or_token
+        )
+    );
+
+
+    return response()->json([
+
+        'message' => 'Verification code sent successfully.'
+
+    ]);
+
+}
+
+public function forgotPassword(
+    ForgotPasswordRequest $request
+): JsonResponse {
+
+    $customer = Customer::where(
+        'email',
+        $request->email
+    )->firstOrFail();
+
+
+    $verification = $this->verificationCodeService->generate(
+        $customer,
+        VerificationPurpose::PasswordResetEmailLink,
+        $customer->email
+    );
+
+
+    $customer->notify(
+        new ResetPasswordNotification(
+            $verification->code_or_token
+        )
+    );
+
+
+    return response()->json([
+        'message' => 'Password reset instructions sent successfully.'
+    ]);
+}
+public function resetPassword(
+    ResetPasswordRequest $request
+): JsonResponse {
+
+
+    $verification = \App\Models\VerificationCode::query()
+        ->where(
+            'code_or_token',
+            $request->code_or_token
+        )
+        ->where(
+            'purpose',
+            VerificationPurpose::PasswordResetEmailLink
+        )
+        ->whereNull('consumed_at')
+        ->where(
+            'expires_at',
+            '>',
+            now()
+        )
+        ->first();
+
+
+    if (! $verification) {
+
+        return response()->json([
+            'message' => 'Invalid or expired reset token.'
+        ],422);
+
+    }
+
+
+    $customer = Customer::find(
+        $verification->customer_id
+    );
+
+
+    $customer->update([
+
+        'password_hash' => $request->password,
+
+    ]);
+
+
+    $verification->update([
+        'consumed_at'=>now(),
+    ]);
+
+
+    return response()->json([
+
+        'message'=>'Password reset successfully.'
+
+    ]);
+}
 }

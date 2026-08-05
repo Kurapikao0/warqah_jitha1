@@ -31,7 +31,9 @@ use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
 use App\Repositories\OrderProductionRepository;
 use App\Repositories\Contracts\OrderProductionRepositoryInterface;
-
+use Illuminate\Support\Facades\Event;
+use App\Events\CustomerRegistered;
+use App\Listeners\SendVerificationOtpListener;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -134,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        //
-    }
+{
+    
+}
 }
