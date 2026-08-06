@@ -9,13 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderProductionStageHistory extends Model
 {
     use HasFactory;
+
+    // تم ربط الموديل باسم الجدول الصحيح (جمع) ليتوافق مع التهجيرات
     protected $table = 'order_production_stage_histories';
+
     const UPDATED_AT = null;
 
     protected $fillable = [
         'order_id',
         'stage_id',
         'changed_by',
+        'note',
     ];
 
     public function order(): BelongsTo

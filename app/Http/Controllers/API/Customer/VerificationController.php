@@ -18,31 +18,37 @@ class VerificationController extends Controller
     ) {
     }
 
-
     /**
      * Generate verification code/token.
      */
     public function generate(
         GenerateVerificationCodeRequest $request
     ): JsonResponse {
+        $user = $request->user();
 
-        /** @var Customer $customer */
-        $customer = $request->user();
+        // 1. استخدام العميل المصدق (مسجل الدخول) إن وجد
+        $customer = ($user instanceof Customer) ? $user : null;
 
-        $verification = $this->verificationCodeService->generate(
-            $customer,
-            VerificationPurpose::from(
-                $request->validated('purpose')
-            ),
-            $request->validated('contact_value')
-        );
+        // 2. إذا لم يكن مسجلاً للدخول، يتم البحث عنه عبر contact_value الممررة في الطلب
+        if (! $customer && $request->has('contact_value')) {
+            $customer = Customer::where('email', $request->contact_value)
+                ->orWhere('phone', $request->contact_value)
+                ->first();
+        }
+
+        if (! $customer) {
+            return response()->json([
+                'message' => 'Customer record not found.',
+            ], 404);
+        }
+
+        $verification = $this->verificationCodeService->generateCode($customer);
 
         return response()->json([
             'message' => 'Verification generated successfully.',
-            'data' => new VerificationCodeResource($verification),
+            'data'    => new VerificationCodeResource($verification),
         ], 201);
     }
-
 
     /**
      * Verify code/token.
@@ -50,9 +56,23 @@ class VerificationController extends Controller
     public function verify(
         VerifyVerificationCodeRequest $request
     ): JsonResponse {
+        $user = $request->user();
 
-        /** @var Customer $customer */
-        $customer = $request->user();
+        // 1. استخدام العميل المصدق (مسجل الدخول) إن وجد
+        $customer = ($user instanceof Customer) ? $user : null;
+
+        // 2. البحث عن العميل ببيانات التواصل بدلاً من Customer::first() لضمان الأمان
+        if (! $customer) {
+            $customer = Customer::where('email', $request->validated('contact_value'))
+                ->orWhere('phone', $request->validated('contact_value'))
+                ->first();
+        }
+
+        if (! $customer) {
+            return response()->json([
+                'message' => 'Customer record not found.',
+            ], 404);
+        }
 
         $verified = $this->verificationCodeService->verify(
             $customer,

@@ -12,21 +12,23 @@ class UpdatePermissionRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
+        // نحدد الـ ID سواء كان الـ Route يحمل model object أو مجرد ID رقمي
+        $permissionId = $this->route('permission')?->id ?? $this->route('permission');
+
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('permissions', 'name')
-                    ->ignore($this->route('permission')),
+                Rule::unique('permissions', 'name')->ignore($permissionId),
             ],
-
-            'description' => [
-                'nullable',
+            'module' => [
+                'sometimes',
+                'required',
                 'string',
+                'max:255',
             ],
         ];
     }
