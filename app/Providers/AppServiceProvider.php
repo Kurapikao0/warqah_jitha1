@@ -31,9 +31,11 @@ use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
 use App\Repositories\OrderProductionRepository;
 use App\Repositories\Contracts\OrderProductionRepositoryInterface;
-use Illuminate\Support\Facades\Event;
-use App\Events\CustomerRegistered;
-use App\Listeners\SendVerificationOtpListener;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
+use App\Models\EmailNotification;
+use App\Observers\EmailNotificationObserver;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -136,7 +138,14 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-{
-    
-}
+    {
+        RateLimiter::for('emails', function () {
+
+            return Limit::perMinute(20);
+            });
+
+        EmailNotification::observe(
+            EmailNotificationObserver::class
+        );
+    }
 }

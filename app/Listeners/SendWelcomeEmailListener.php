@@ -2,24 +2,29 @@
 
 namespace App\Listeners;
 
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-
+use App\Events\CustomerRegistered;
+use App\Notifications\WelcomeNotification;
+use App\Services\NotificationService;
+use App\Enums\EmailNotificationType;
 class SendWelcomeEmailListener
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
+
+    public function __construct(
+        protected NotificationService $notificationService
+    ){
+    }
+    public function handle(
+        CustomerRegistered $event
+    ): void {
+
+        $this->notificationService->send(
+
+            $event->customer,
+
+            new WelcomeNotification(),
+
+        );
+
     }
 
-    /**
-     * Handle the event.
-     */
-    public function handle(object $event): void
-    {
-        //
-    }
 }

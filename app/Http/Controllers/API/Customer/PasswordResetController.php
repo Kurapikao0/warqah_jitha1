@@ -9,10 +9,18 @@ use App\Models\Customer;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Customer\ResetPasswordRequest;
 use App\Models\VerificationCode;
-use Illuminate\Support\Facades\Hash; 
+use Illuminate\Support\Facades\Hash;
+use App\Enums\VerificationPurpose; 
+use App\Notifications\PasswordChangedNotification;
+use App\Services\NotificationService;
+use App\Enums\EmailNotificationType;
+
 class PasswordResetController extends Controller
 {
-
+    public function __construct(
+        protected NotificationService $notificationService
+    ) {
+    }
     public function forgotPassword(
         ForgotPasswordRequest $request
     ): JsonResponse {
@@ -41,27 +49,22 @@ public function resetPassword(
     ResetPasswordRequest $request
 ): JsonResponse {
 
+    //dd('PasswordResetController reached');
 
-    $verification = VerificationCode::query()
-        ->where(
-            'purpose',
-            'password_reset_email_link'
-        )
-        ->where(
-            'code_or_token',
-            $request->validated('code_or_token')
-        )
-        ->where(
-            'contact_value',
-            $request->validated('email')
-        )
-        ->whereNull('consumed_at')
-        ->where(
-            'expires_at',
-            '>',
-            now()
-        )
-        ->first();
+
+    $customer = Customer::where(
+    'email',
+    $request->validated('email')
+)->firstOrFail();
+
+$verification = VerificationCode::query()
+    ->where('customer_id', $customer->id)
+    ->where('purpose', VerificationPurpose::PasswordResetEmailLink->value)
+    ->where('code_or_token', $request->validated('code_or_token'))
+    ->whereNull('consumed_at')
+    ->where('expires_at', '>', now())
+    ->first();
+
 
 
     if (! $verification) {
@@ -79,7 +82,10 @@ public function resetPassword(
     $customer->update([
         'password_hash' => $request->validated('password')
     ]);
-
+    $this->notificationService->send(
+        $customer,
+        new PasswordChangedNotification(),
+    );
 
     VerificationCode::where('customer_id',$customer->id)
     ->where('purpose','password_reset_email_link')

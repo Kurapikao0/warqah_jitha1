@@ -5,8 +5,9 @@ namespace App\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Contracts\EmailNotificationInterface;
 
-class VerifyEmailOtpNotification extends Notification
+class VerifyEmailOtpNotification extends Notification implements EmailNotificationInterface
 {
     use Queueable;
 
@@ -21,18 +22,29 @@ class VerifyEmailOtpNotification extends Notification
         return ['mail'];
     }
 
+    public function notificationType(): string
+    {
+        return 'verification_otp';
+    }
+
+    public function notificationSubject(): string
+    {
+        return 'تأكيد البريد الإلكتروني - ورقة وجذع';
+    }
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('تأكيد البريد الإلكتروني - ورقة وجذع')
-            ->greeting('مرحباً بك في ورقة وجذع 🌿')
-            ->line('شكراً لتسجيلك في منصتنا.')
-            ->line('رمز تأكيد البريد الإلكتروني الخاص بك هو:')
-            ->line('# ' . $this->otp)
-            ->line('صلاحية الرمز 10 دقائق فقط.')
-            ->line('إذا لم تقم بإنشاء هذا الحساب، يمكنك تجاهل هذه الرسالة.')
-            ->salutation('مع تحيات فريق ورقة وجذع');
+
+        ->subject($this->notificationSubject())
+
+        ->view(
+            'emails.customer.verification-otp',
+            [
+                'customer'=>$notifiable,
+                'otp'=>$this->otp,
+            ]
+);
     }
 
 

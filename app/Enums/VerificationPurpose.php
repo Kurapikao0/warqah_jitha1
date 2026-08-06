@@ -11,4 +11,6 @@ enum VerificationPurpose: string
     case PasswordResetEmailLink = 'password_reset_email_link';
 
     case PasswordResetPhoneOtp = 'password_reset_phone_otp';
+
+    case ChangeEmailVerification = 'change_email_verification';
 }

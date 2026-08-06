@@ -8,7 +8,7 @@ use App\Models\VerificationCode;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-
+use App\Exceptions\VerificationCodeException;
 class VerificationCodeService
 {
     /**
@@ -35,9 +35,11 @@ class VerificationCodeService
 
             if ($recentCode) {
 
-                abort(429, 'Please wait before requesting another code.');
+                throw new VerificationCodeException(
+                    'Please wait before requesting another code.'
+                );
 
-            }       
+            }    
             $this->invalidatePreviousCodes(
                 $customer,
                 $purpose
@@ -159,7 +161,7 @@ class VerificationCodeService
 
         VerificationCode::query()
             ->where('customer_id', $customer->id)
-            ->where('purpose', $purpose)
+            ->where('purpose', $purpose->value)
             ->whereNull('consumed_at')
             ->update([
                 'consumed_at' => now(),
@@ -175,10 +177,13 @@ class VerificationCodeService
     ): string {
 
         return match ($purpose) {
+
             VerificationPurpose::SignupEmailVerification,
             VerificationPurpose::SignupPhoneVerification,
-            VerificationPurpose::PasswordResetPhoneOtp
+            VerificationPurpose::PasswordResetPhoneOtp,
+            VerificationPurpose::ChangeEmailVerification
                 => (string) random_int(100000, 999999),
+
 
             VerificationPurpose::PasswordResetEmailLink
                 => Str::random(64),
@@ -194,13 +199,17 @@ class VerificationCodeService
     ): int {
 
         return match ($purpose) {
+
             VerificationPurpose::SignupEmailVerification => 10,
 
             VerificationPurpose::SignupPhoneVerification => 10,
 
             VerificationPurpose::PasswordResetPhoneOtp => 10,
 
+            VerificationPurpose::ChangeEmailVerification => 10,
+
             VerificationPurpose::PasswordResetEmailLink => 30,
+
         };
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 class Customer extends Authenticatable
 {
     use HasFactory, SoftDeletes, HasApiTokens, Notifiable;
@@ -90,6 +91,17 @@ class Customer extends Authenticatable
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function emailNotifications(): HasMany
+    {
+        return $this->hasMany(
+            EmailNotification::class
+        );
+    }
+    public function routeNotificationForMail()
+    {
+        return $this->email;
     }
 }
 

@@ -3,8 +3,9 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+
 
 class ResetPasswordNotification extends Notification
 {
@@ -17,34 +18,53 @@ class ResetPasswordNotification extends Notification
     }
 
 
+
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return [
+            'mail'
+        ];
     }
+
+
+
+    public function type(): string
+    {
+        return 'password_reset';
+    }
+
+
+
+    public function subject(): string
+    {
+        return 'إعادة تعيين كلمة المرور - ورقة وجذع';
+    }
+
 
 
     public function toMail(object $notifiable): MailMessage
     {
+
         return (new MailMessage)
 
-            ->subject('إعادة تعيين كلمة المرور - ورقة وجذع')
-
-            ->greeting('مرحباً بك 🌿')
-
-            ->line('تم طلب إعادة تعيين كلمة المرور لحسابك.')
-
-            ->line(
-                'رمز إعادة التعيين الخاص بك:'
+            ->subject(
+                $this->subject()
             )
 
-            ->line($this->token)
-
-            ->line(
-                'صلاحية الرمز 30 دقيقة فقط.'
-            )
-
-            ->line(
-                'إذا لم تطلب إعادة التعيين، تجاهل هذه الرسالة.'
+            ->view(
+                'emails.customer.password-reset',
+                [
+                    'customer'=>$notifiable,
+                    'token'=>$this->token,
+                ]
             );
+
+    }
+
+
+
+    public function toArray(object $notifiable): array
+    {
+        return [];
     }
 }

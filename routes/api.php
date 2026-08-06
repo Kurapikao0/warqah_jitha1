@@ -36,6 +36,7 @@ use App\Http\Controllers\API\Admin\OrderProductionStageController;
 use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
 use App\Http\Controllers\API\Customer\AuthController;
 use App\Http\Controllers\API\Customer\PasswordResetController;
+use App\Http\Controllers\API\Customer\EmailNotificationController;
 
 Route::post('/customer/register', [AuthController::class,'register']);
 
@@ -284,6 +285,14 @@ Route::post(
     'logout',
     [AdminAuth::class,'logout']
 );
+
+Route::get(
+    '/notifications',
+    [
+        EmailNotificationController::class,
+        'index'
+    ]
+);
 });
 
 
@@ -436,6 +445,12 @@ Route::get(
         'show',
     ]);
 
-    
-
+    Route::get(
+    '/notifications',
+    [EmailNotificationController::class, 'index']
+);
+Route::post(
+    '/customer/change-email/request',
+    [AuthController::class,'requestEmailChange']
+);
 });

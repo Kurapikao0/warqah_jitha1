@@ -36,7 +36,7 @@ class ResetPasswordRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'token.required' => 'رابط إعادة التعيين غير صالح.',
+            'code_or_token.required' => 'رابط إعادة التعيين غير صالح.',
 
             'password.required' => 'كلمة المرور مطلوبة.',
 

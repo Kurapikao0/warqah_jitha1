@@ -11,15 +11,21 @@ use App\Enums\VerificationPurpose;
 use App\Services\VerificationCodeService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Customer\VerifyEmailRequest;
-use App\Http\Requests\Customer\ForgotPasswordRequest;
-use App\Http\Requests\Customer\ResetPasswordRequest;
-use App\Notifications\ResetPasswordNotification;
 use App\Http\Requests\Customer\ResendVerificationRequest;
 use App\Notifications\VerifyEmailOtpNotification;
+use App\Http\Requests\Customer\ChangeEmailRequest;
+use App\Http\Requests\Customer\RequestEmailChangeRequest;
+use App\Models\EmailChangeRequest;
+use App\Notifications\ChangeEmailOtpNotification;
+use App\Exceptions\VerificationCodeException;
+use App\Services\NotificationService;
+
 class AuthController extends Controller
 {
     public function __construct(
-        protected VerificationCodeService $verificationCodeService
+        protected VerificationCodeService $verificationCodeService,
+            protected NotificationService $notificationService
+
     ) {}
 
     public function register(Request $request)
@@ -218,17 +224,28 @@ public function resendVerification(
     }
 
 
-    $verification = $this->verificationCodeService->generate(
+        try {
+
+            $verification = $this->verificationCodeService->generate(
+                $customer,
+                VerificationPurpose::SignupEmailVerification,
+                $customer->email
+            );
+        } catch (VerificationCodeException $e) {
+            return response()->json([
+                'message'=>$e->getMessage()
+            ],429);
+        }
+
+
+    $this->notificationService->send(
+
         $customer,
-        VerificationPurpose::SignupEmailVerification,
-        $customer->email
-    );
 
-
-    $customer->notify(
         new VerifyEmailOtpNotification(
             $verification->code_or_token
-        )
+        ),
+
     );
 
 
@@ -240,7 +257,7 @@ public function resendVerification(
 
 }
 
-public function forgotPassword(
+/*public function forgotPassword(
     ForgotPasswordRequest $request
 ): JsonResponse {
 
@@ -257,10 +274,18 @@ public function forgotPassword(
     );
 
 
-    $customer->notify(
+    $this->notificationService->send(
+
+        $customer,
+
         new ResetPasswordNotification(
             $verification->code_or_token
-        )
+        ),
+
+        'password_reset',
+
+        'إعادة تعيين كلمة المرور - ورقة وجذع'
+
     );
 
 
@@ -322,5 +347,80 @@ public function resetPassword(
         'message'=>'Password reset successfully.'
 
     ]);
+}*/
+public function changeEmail(
+    ChangeEmailRequest $request
+): JsonResponse {
+
+    /** @var Customer $customer */
+    $customer = auth('customer')->user();
+
+
+    $customer->update([
+
+        'email'=>$request->email,
+
+        'email_verified_at'=>null,
+
+    ]);
+
+
+    return response()->json([
+
+        'message'=>'Email changed successfully.'
+
+    ]);
+
+}
+public function requestEmailChange(
+    RequestEmailChangeRequest $request
+): JsonResponse {
+
+    /** @var Customer $customer */
+    $customer = auth('customer')->user();
+
+
+    $code = (string) random_int(
+        100000,
+        999999
+    );
+
+
+
+    EmailChangeRequest::create([
+
+        'customer_id'=>$customer->id,
+
+        'old_email'=>$customer->email,
+
+        'new_email'=>$request->email,
+
+        'verification_code'=>$code,
+
+        'expires_at'=>now()->addMinutes(10),
+
+    ]);
+
+
+
+    $this->notificationService->send(
+
+    $customer,
+
+    new ChangeEmailOtpNotification($code),
+
+    $request->email
+
+
+);
+
+
+
+    return response()->json([
+
+        'message'=>'Verification code sent to new email.'
+
+    ]);
+
 }
 }

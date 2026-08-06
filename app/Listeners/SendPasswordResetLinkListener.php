@@ -5,15 +5,16 @@ namespace App\Listeners;
 use App\Events\PasswordResetRequested;
 use App\Enums\VerificationPurpose;
 use App\Services\VerificationCodeService;
+use App\Services\NotificationService;
 use App\Notifications\ResetPasswordLinkNotification;
-
 
 class SendPasswordResetLinkListener
 {
 
 
     public function __construct(
-        protected VerificationCodeService $verificationCodeService
+        protected VerificationCodeService $verificationCodeService,
+        protected NotificationService $notificationService
     ) {
     }
 
@@ -33,10 +34,9 @@ class SendPasswordResetLinkListener
 
 
 
-        $event->customer->notify(
-            new ResetPasswordLinkNotification(
-                $verification->code_or_token
-            )
+        $this->notificationService->sendPasswordResetLink(
+            $event->customer,
+            $verification->code_or_token
         );
 
 

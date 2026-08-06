@@ -6,8 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Contracts\EmailNotificationInterface;
 
-class WelcomeNotification extends Notification
+
+class WelcomeNotification extends Notification implements EmailNotificationInterface
 {
     use Queueable;
 
@@ -24,20 +26,32 @@ class WelcomeNotification extends Notification
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function notificationType(): string
     {
-        return ['mail'];
+        return 'welcome_email';
     }
 
+
+    public function notificationSubject(): string
+    {
+        return 'مرحباً بك في ورقة وجذع 🌿';
+    }
     /**
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+
+            ->subject($this->notificationSubject())
+
+
+            ->view(
+                'emails.customer.welcome',
+                [
+                    'customer'=>$notifiable
+                ]
+            );
     }
 
     /**

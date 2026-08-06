@@ -7,7 +7,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 
-class ResetPasswordLinkNotification extends Notification
+class ResetPasswordLinkNotification extends Notification 
 {
     use Queueable;
 

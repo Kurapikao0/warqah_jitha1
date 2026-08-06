@@ -6,12 +6,15 @@ use App\Events\CustomerRegistered;
 use App\Enums\VerificationPurpose;
 use App\Services\VerificationCodeService;
 use App\Notifications\VerifyEmailOtpNotification;
-
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Log;
+use App\Enums\EmailNotificationType;
 class SendVerificationOtpListener
 {
 
     public function __construct(
-        protected VerificationCodeService $verificationCodeService
+        protected VerificationCodeService $verificationCodeService,
+                protected NotificationService $notificationService
     ) {
     }
 
@@ -35,10 +38,14 @@ class SendVerificationOtpListener
             'code' => $verification->code_or_token,
         ]);
 
-        $event->customer->notify(
+        $this->notificationService->send(
+
+            $event->customer,
+
             new VerifyEmailOtpNotification(
                 $verification->code_or_token
-            )
+            ),
+
         );
 
 
