@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Customer;
+use App\Policies\CustomerPolicy;
 use App\Repositories\CustomizationRepository;
 use App\Repositories\Contracts\CustomizationRepositoryInterface;
 use App\Repositories\ProductRepository;
@@ -31,6 +34,17 @@ use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
 use App\Repositories\OrderProductionRepository;
 use App\Repositories\Contracts\OrderProductionRepositoryInterface;
+use App\Repositories\Contracts\CustomerRepositoryInterface;
+use App\Repositories\CustomerRepository;
+use \App\Repositories\Contracts\AdminReviewRepositoryInterface;
+use \App\Repositories\AdminReviewRepository;
+use \App\Repositories\Contracts\AuthRepositoryInterface;
+use \App\Repositories\AuthRepository;
+use App\Models\Address;
+use App\Policies\AddressPolicy;
+use App\Repositories\Contracts\AddressRepositoryInterface;
+use App\Repositories\AddressRepository;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -128,6 +142,28 @@ class AppServiceProvider extends ServiceProvider
             ProductAttributeValueRepository::class
         );        
         
+
+        $this->app->bind(
+            CustomerRepositoryInterface::class,
+            CustomerRepository::class
+        );        
+
+        $this->app->bind(
+            AdminReviewRepositoryInterface::class,
+            AdminReviewRepository::class
+        );
+
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);      
+
+        
+        $this->app->bind(
+
+            AddressRepositoryInterface::class,
+
+            AddressRepository::class
+
+        );
+
     }
 
     /**
@@ -135,6 +171,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(
+            Customer::class,
+            CustomerPolicy::class
+        ); 
+
+        // Gate::policy(
+        //     Category::class,
+        //     CategoryPolicy::class
+        // );      
+        
+        Gate::policy(
+            Address::class,
+            AddressPolicy::class
+        );        
     }
 }
