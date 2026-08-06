@@ -8,18 +8,22 @@ use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
 use App\Http\Controllers\API\Admin\AuthController as AdminAuth;
 use App\Http\Controllers\API\Admin\OrderStatusController;
 use App\Http\Controllers\API\Admin\OrderProductionController;
+use App\Http\Controllers\API\Admin\OrderProductionStageController;
+use App\Http\Controllers\API\Customer\OrderController;
 use App\Http\Controllers\API\Customer\CartController;
 use App\Http\Controllers\API\Customer\CartItemController;
 use App\Http\Controllers\API\Customer\FavoriteController;
 use App\Http\Controllers\API\Admin\RoleController;
 use App\Http\Controllers\API\Admin\RolePermissionController;
 use App\Http\Controllers\API\Admin\AdminUserController;
+use App\Http\Controllers\API\Admin\CustomerController;
 use App\Http\Controllers\API\Admin\AdminPasswordResetController;
 use App\Http\Controllers\API\Admin\AdminNotificationController;
 use App\Http\Controllers\API\Admin\ActivityLogController;
 use App\Http\Controllers\API\Admin\ProductCategoryController;
 use App\Http\Controllers\API\Customer\AddressController;
 use App\Http\Controllers\API\Customer\VerificationController;
+use App\Http\Controllers\API\Customer\ProfileController;
 use App\Http\Controllers\API\Admin\RawMaterialController;
 use App\Http\Controllers\API\Customer\ReviewController;
 use App\Http\Controllers\API\Customer\ReviewImageController;
@@ -32,9 +36,10 @@ use App\Http\Controllers\API\Admin\ProductMediaController;
 use App\Http\Controllers\API\Admin\ColorController;
 use App\Http\Controllers\API\Admin\ProductAttributeController;
 use App\Http\Controllers\API\Admin\ProductAttributeValueController;
-use App\Http\Controllers\API\Admin\OrderProductionStageController;
 use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
 use App\Http\Controllers\API\Customer\AuthController;
+use App\Http\Controllers\API\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\API\Auth\CustomerAuthController;
 
 Route::get('/test', function () {
 
@@ -52,6 +57,10 @@ Route::prefix('admin')->group(function(){
     );
 
 });
+    Route::post('/register', [CustomerAuthController::class, 'register']);        
+    Route::post('/login', [CustomerAuthController::class, 'login']);        
+
+    
 Route::prefix('admin')
 ->middleware(['auth:admin'])
 ->group(function(){
@@ -277,6 +286,62 @@ Route::prefix('customer')->group(function(){
     )
     ->middleware('auth:customer');
 
+        // عرض جميع العملاء
+        Route::get(
+            'customers',
+            [CustomerController::class, 'index']
+        );
+
+
+        // إنشاء عميل
+        Route::post(
+            'customers',
+            [CustomerController::class, 'store']
+        );
+
+
+        // عرض عميل محدد
+        Route::get(
+            'customers/{customer}',
+            [CustomerController::class, 'show']
+        );
+
+        // تعديل عميل
+        Route::put(
+            'customers/{customer}',
+            [CustomerController::class, 'update']
+        );
+
+
+        // حذف عميل Soft Delete
+        Route::delete(
+            'customers/{customer}',
+            [CustomerController::class, 'destroy']
+        );
+
+        // استعادة عميل محذوف
+        Route::patch(
+            'customers/{customer}/restore',
+            [CustomerController::class, 'restore']
+        );
+
+
+        // تغيير حالة العميل
+        Route::patch(
+            'customers/{customer}/status',
+            [CustomerController::class, 'changeStatus']
+        );
+
+        // تفعيل حساب العميل
+        Route::patch(
+            'customers/{customer}/verify',
+            [CustomerController::class, 'verify']
+        );    
+            
+        Route::get('/reviews', [AdminReviewController::class, 'index']);
+        Route::put('/reviews/{review}/status', [AdminReviewController::class, 'updateStatus']);
+        Route::post('/reviews/{review}/reply', [AdminReviewController::class, 'reply']);
+
 });
 
 
@@ -292,6 +357,10 @@ Route::prefix('customer')
 
     Route::apiResource('orders', CustomerOrder::class)
     ->except(['update', 'destroy']);
+    Route::apiResource(
+    'orders',
+    OrderController::class
+    );
 
     Route::get(
     'cart',
@@ -331,15 +400,62 @@ Route::prefix('customer')
     [FavoriteController::class,'toggle']
     );
 
-    Route::apiResource(
-    'addresses',
-    AddressController::class
-    );
+        Route::get(
+            'addresses',
+            [
+                AddressController::class,
+                'index'
+            ]
+        );
 
-    Route::put(
-    'addresses/{address}/default',
-    [AddressController::class, 'setDefault']
-);
+
+
+        Route::post(
+            'addresses',
+            [
+                AddressController::class,
+                'store'
+            ]
+        );
+
+        
+        Route::get(
+            'addresses/{address}',
+            [
+                AddressController::class,
+                'show'
+            ]
+        );
+
+
+
+        Route::put(
+            'addresses/{address}',
+            [
+                AddressController::class,
+                'update'
+            ]
+        );
+
+
+
+        Route::delete(
+            'addresses/{address}',
+            [
+                AddressController::class,
+                'destroy'
+            ]
+        );
+
+
+
+        Route::patch(
+            'addresses/{address}/default',
+            [
+                AddressController::class,
+                'setDefault'
+            ]
+        );        
 
     Route::post(
     'verifications/generate',
@@ -410,4 +526,31 @@ Route::get(
         'show',
     ]);
 
+        // عرض الملف الشخصي
+        Route::get(
+            'profile',
+            [ProfileController::class, 'show']
+        );
+
+
+        // تعديل الملف الشخصي
+        Route::put(
+            'profile',
+            [ProfileController::class, 'update']
+        );
+
+
+        // تغيير كلمة المرور
+        Route::put(
+            'profile/password',
+            [ProfileController::class, 'updatePassword']
+        );
+
+        // تسجيل خروج
+        Route::post(
+            'logout',
+            [ProfileController::class, 'logout']
+        );        
+
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);        
 });

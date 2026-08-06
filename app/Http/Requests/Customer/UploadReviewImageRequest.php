@@ -17,7 +17,8 @@ class UploadReviewImageRequest extends FormRequest
             'image' => [
                 'required',
                 'image',
-                'max:5120',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
             ],
         ];
     }
