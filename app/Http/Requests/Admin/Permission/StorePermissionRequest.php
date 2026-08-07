@@ -11,7 +11,6 @@ class StorePermissionRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
@@ -21,10 +20,10 @@ class StorePermissionRequest extends FormRequest
                 'max:255',
                 'unique:permissions,name',
             ],
-
-            'description' => [
-                'nullable',
+            'module' => [
+                'required',
                 'string',
+                'max:255',
             ],
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\ProductCategoryResource;
 
 
 class ProductResource extends JsonResource
@@ -39,7 +40,7 @@ return [
 'is_customizable'=>$this->is_customizable,
 
 
-'category'=>new CategoryResource(
+'category'=>new ProductCategoryResource(
     $this->whenLoaded('category')
 ),
 

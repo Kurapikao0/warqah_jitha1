@@ -2,16 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\VerificationCode;
 use App\Models\Customer;
+use App\Models\VerificationCode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<VerificationCode>
- */
 class VerificationCodeFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
     protected $model = VerificationCode::class;
+
     /**
      * Define the model's default state.
      *
@@ -20,17 +23,10 @@ class VerificationCodeFactory extends Factory
     public function definition(): array
     {
         return [
-            'customer_id' => Customer::factory(),
-            'purpose' => $this->faker->randomElement([
-                'signup_phone_verification',
-                'password_reset_email_link',
-                'password_reset_phone_otp'
-            ]),
-            'code_or_token' => (string) $this->faker->numberBetween(100000, 999999),
-            'contact_value' => $this->faker->safeEmail(),
-            'expires_at' => now()->addMinutes(15),
-            'consumed_at' => null,
-            'created_at' => now(),
+            'customer_id' => Customer::factory(), // ينشئ عميل تلقائياً ويأخذ id الخاص به
+            'code'        => (string) rand(100000, 999999),
+            'expires_at'  => now()->addMinutes(10),
+            'is_used'     => false,
         ];
     }
 }

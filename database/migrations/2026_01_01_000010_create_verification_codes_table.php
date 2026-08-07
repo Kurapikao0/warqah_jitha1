@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('verification_codes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->constrained('customers')->cascadeOnDelete();
+
             $table->enum('purpose', ['signup_email_verification','signup_phone_verification', 'password_reset_email_link', 'password_reset_phone_otp']);
             $table->string('code_or_token', 255);
             $table->string('contact_value', 255);
@@ -19,6 +20,10 @@ return new class extends Migration
             $table->timestampTz('created_at')->useCurrent();
 
             $table->index(['customer_id', 'purpose']);
+            
+            // التأكد من وجود عمود code هنا
+            
+            $table->timestamps();
         });
     }
 
