@@ -10,7 +10,7 @@ class CustomerRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     * 
+     *
      * @return bool
      */
     public function authorize(): bool
@@ -21,7 +21,7 @@ class CustomerRegisterRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     * 
+     *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
     public function rules(): array
@@ -33,14 +33,14 @@ class CustomerRegisterRequest extends FormRequest
             'phone' => ['required', 'string', 'unique:customers,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
-            'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],            
+            'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'category' => ['sometimes', Rule::enum(CustomerCategory::class)],
         ];
     }
 
     /**
      * Get custom messages for validator errors.
-     * 
+     *
      * @return array<string, string>
      */
     public function messages(): array
@@ -49,36 +49,36 @@ class CustomerRegisterRequest extends FormRequest
             'full_name.required' => 'الاسم الكامل مطلوب',
             'full_name.string' => 'الاسم الكامل يجب أن يكون نصاً',
             'full_name.max' => 'الاسم الكامل يجب ألا يتجاوز 255 حرف',
-            
+
             'email.required' => 'البريد الإلكتروني مطلوب',
             'email.email' => 'البريد الإلكتروني غير صحيح',
             'email.unique' => 'البريد الإلكتروني مسجل بالفعل',
-            
+
             'phone_country_code.required' => 'رمز الدولة مطلوب',
             'phone_country_code.string' => 'رمز الدولة يجب أن يكون نصاً',
-            
+
             'phone.required' => 'رقم الهاتف مطلوب',
             'phone.unique' => 'رقم الهاتف مسجل بالفعل',
-            
+
             'password.required' => 'كلمة المرور مطلوبة',
             'password.min' => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
             'password.confirmed' => 'تأكيد كلمة المرور لا يطابق',
-            
+
             'password_confirmation.required' => 'تأكيد كلمة المرور مطلوب',
-            
+
             'category.enum' => 'فئة العميل غير صحيحة',
         ];
     }
 
     /**
      * Prepare the data for validation.
-     * 
+     *
      * @return void
      */
     protected function prepareForValidation(): void
     {
         // إذا لم يتم تحديد category، اضبطها على الفئة الافتراضية (الأولى)
-        if (!$this->has('category') || empty($this->get('category'))) {
+        if (!$this->has('category') || empty($this->input('category'))) {
             $this->merge([
                 'category' => CustomerCategory::cases()[0]->value,
             ]);

@@ -24,8 +24,7 @@ return [
 'order_number'=>$this->order_number,
 
 
-'type'=>$this->order_type,
-
+'type' => $this->type->value,
 
 'status'=>$this->status,
 
