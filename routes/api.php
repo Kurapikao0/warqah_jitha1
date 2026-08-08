@@ -48,6 +48,7 @@ use App\Http\Controllers\API\Admin\RolePermissionController;
 |--------------------------------------------------------------------------
 */
 
+use App\Http\Controllers\API\Customer\PasswordResetController;
 use App\Http\Controllers\API\Customer\AddressController;
 use App\Http\Controllers\API\Customer\CartController;
 use App\Http\Controllers\API\Customer\CartItemController;
@@ -107,6 +108,16 @@ Route::prefix('customer')->group(function (): void {
         'login',
         [CustomerAuthController::class, 'login']
     )->middleware('throttle:5,1');
+
+    Route::post(
+        'password/forgot',
+        [PasswordResetController::class, 'forgotPassword']
+    )->middleware('throttle:5,1');
+
+    Route::post(
+        'password/reset',
+        [PasswordResetController::class, 'resetPassword']
+    );
 });
 
 

@@ -9,7 +9,7 @@
         color: #263238;
         font-weight: 700;
     ">
-        تم تغيير كلمة المرور
+        إعادة تعيين كلمة المرور
     </h1>
 
     <p style="
@@ -21,7 +21,7 @@
     ">
         مرحباً
         <strong style="color: #263238;">
-            {{ $user->full_name }}
+            {{ $customer->full_name }}
         </strong>
         ،
     </p>
@@ -33,37 +33,50 @@
         line-height: 1.9;
         color: #6b747a;
     ">
-        نود إعلامك بأنه تم تغيير كلمة المرور الخاصة بحسابك بنجاح.
+        تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك.
+        استخدم الرمز التالي لإكمال عملية إعادة التعيين.
     </p>
 
+    <!-- Reset Token -->
     <div style="
         margin: 0 auto 25px;
+        padding: 18px 20px;
         max-width: 430px;
-        padding: 20px 22px;
         background-color: #f7f9f8;
         border: 1px solid #dfe7e3;
         border-radius: 10px;
         text-align: center;
+        word-break: break-all;
     ">
 
         <div style="
             margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #263238;
+            font-size: 12px;
+            color: #899197;
         ">
-            تم تحديث بيانات الأمان
+            رمز إعادة التعيين
         </div>
 
         <div style="
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.8;
-            color: #7d878c;
+            font-weight: 600;
+            color: #263238;
+            direction: ltr;
         ">
-            يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.
+            {{ $token }}
         </div>
 
     </div>
+
+    <p style="
+        margin: 0 auto 10px;
+        font-size: 13px;
+        line-height: 1.8;
+        color: #7d878c;
+    ">
+        صلاحية رمز إعادة التعيين محدودة.
+    </p>
 
     <p style="
         margin: 0;
@@ -71,8 +84,7 @@
         line-height: 1.8;
         color: #9aa1a5;
     ">
-        إذا لم تقم بهذا التغيير، يرجى التواصل مع فريق الدعم فوراً
-        لحماية حسابك.
+        إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذه الرسالة.
     </p>
 
 @endsection
