@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Configuration\Events;
 use Illuminate\Http\Request;
+use App\Http\Middleware\CheckPermission;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Unauthenticated'
             ], 401));
         });
+
+        $middleware->alias([
+            'permission' => CheckPermission::class,
+        ]);
 
     })
 

@@ -9,54 +9,38 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification implements EmailNotificationInterface
+final class PasswordChangedNotification extends Notification implements EmailNotificationInterface
 {
     use Queueable;
-
-
-    public function __construct(
-        protected string $token
-    ) {
-    }
-
 
     public function via(object $notifiable): array
     {
         return [
-            'mail'
+            'mail',
         ];
     }
 
-
     public function notificationType(): string
     {
-        return 'password_reset';
+        return 'password_changed';
     }
-
 
     public function notificationSubject(): string
     {
-        return 'إعادة تعيين كلمة المرور - ورقة وجذع';
+        return 'تم تغيير كلمة المرور - ورقة وجذع';
     }
-
 
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-
-            ->subject(
-                $this->notificationSubject()
-            )
-
+            ->subject($this->notificationSubject())
             ->view(
-                'emails.customer.password-reset',
+                'emails.security.password-changed',
                 [
-                    'customer' => $notifiable,
-                    'token' => $this->token,
+                    'user' => $notifiable,
                 ]
             );
     }
-
 
     public function toArray(object $notifiable): array
     {

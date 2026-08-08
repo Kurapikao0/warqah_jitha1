@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\AdminUser;
@@ -7,38 +9,59 @@ use App\Models\Permission;
 
 class PermissionPolicy
 {
+    /**
+     * Determine whether the admin can view any permissions.
+     */
     public function viewAny(AdminUser $admin): bool
     {
         return $this->can($admin, 'permissions.view');
     }
 
-
-    public function view(AdminUser $admin, Permission $permission): bool
-    {
+    /**
+     * Determine whether the admin can view a specific permission.
+     */
+    public function view(
+        AdminUser $admin,
+        Permission $permission
+    ): bool {
         return $this->can($admin, 'permissions.view');
     }
 
-
+    /**
+     * Determine whether the admin can create permissions.
+     */
     public function create(AdminUser $admin): bool
     {
         return $this->can($admin, 'permissions.create');
     }
 
-
-    public function update(AdminUser $admin, Permission $permission): bool
-    {
+    /**
+     * Determine whether the admin can update a permission.
+     */
+    public function update(
+        AdminUser $admin,
+        Permission $permission
+    ): bool {
         return $this->can($admin, 'permissions.update');
     }
 
-
-    public function delete(AdminUser $admin, Permission $permission): bool
-    {
+    /**
+     * Determine whether the admin can delete a permission.
+     */
+    public function delete(
+        AdminUser $admin,
+        Permission $permission
+    ): bool {
         return $this->can($admin, 'permissions.delete');
     }
 
-
-    protected function can(AdminUser $admin, string $permission): bool
-    {
+    /**
+     * Determine whether the admin has the required permission.
+     */
+    protected function can(
+        AdminUser $admin,
+        string $permission
+    ): bool {
         if (!$admin->role) {
             return false;
         }

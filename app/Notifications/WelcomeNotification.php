@@ -1,31 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
+use App\Contracts\EmailNotificationInterface;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Contracts\EmailNotificationInterface;
 
-
-class WelcomeNotification extends Notification implements EmailNotificationInterface
+final class WelcomeNotification extends Notification implements EmailNotificationInterface
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
+
+    public function via(object $notifiable): array
     {
-        //
+        return [
+            'mail',
+        ];
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
+
     public function notificationType(): string
     {
         return 'welcome_email';
@@ -36,33 +32,27 @@ class WelcomeNotification extends Notification implements EmailNotificationInter
     {
         return 'مرحباً بك في ورقة وجذع 🌿';
     }
-    /**
-     * Get the mail representation of the notification.
-     */
+
+
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
 
-            ->subject($this->notificationSubject())
-
+            ->subject(
+                $this->notificationSubject()
+            )
 
             ->view(
                 'emails.customer.welcome',
                 [
-                    'customer'=>$notifiable
+                    'customer' => $notifiable,
                 ]
             );
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
+
     public function toArray(object $notifiable): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

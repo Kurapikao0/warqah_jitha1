@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\EmailLog;
 
 class Customer extends Authenticatable
 {
@@ -93,11 +94,9 @@ class Customer extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
-    public function emailNotifications(): HasMany
+    public function emailLogs(): HasMany
     {
-        return $this->hasMany(
-            EmailNotification::class
-        );
+        return $this->hasMany(EmailLog::class);
     }
     public function routeNotificationForMail()
     {

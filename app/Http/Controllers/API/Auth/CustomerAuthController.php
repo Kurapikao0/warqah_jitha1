@@ -7,7 +7,7 @@ use App\Http\Requests\Auth\CustomerLoginRequest;
 use App\Http\Requests\Auth\CustomerRegisterRequest;
 use App\Http\Resources\CustomerResource;
 use App\Services\AuthService;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -20,7 +20,7 @@ class CustomerAuthController extends Controller
 
     /**
      * Register new customer
-     * 
+     *
      * @param CustomerRegisterRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -57,7 +57,7 @@ class CustomerAuthController extends Controller
 
     /**
      * Login customer via phone and password
-     * 
+     *
      * @param CustomerLoginRequest $request
      * @return \Illuminate\Http\JsonResponse
      */

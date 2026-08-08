@@ -65,7 +65,11 @@ use App\Repositories\AuthRepository;
 use App\Repositories\Contracts\AddressRepositoryInterface;
 use App\Repositories\AddressRepository;
 
+use App\Repositories\Contracts\EmailLogRepositoryInterface;
+use App\Repositories\EmailLogRepository;
 
+use App\Factories\NotificationFactory;
+use App\Notifications\WelcomeNotification;
 class AppServiceProvider extends ServiceProvider
 {
 
@@ -179,6 +183,25 @@ class AppServiceProvider extends ServiceProvider
             AddressRepository::class
         );
 
+        $this->app->bind(
+            EmailLogRepositoryInterface::class,
+            EmailLogRepository::class
+        );
+
+        $this->app->singleton(
+            NotificationFactory::class,
+            function (): NotificationFactory {
+
+                $factory = new NotificationFactory();
+
+                $factory->register(
+                    'welcome_email',
+                    WelcomeNotification::class
+                );
+
+                return $factory;
+            }
+        );
     }
 
 

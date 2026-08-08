@@ -8,14 +8,13 @@ use App\Models\Customer;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class CustomerRegistered
+final class PasswordChanged
 {
     use Dispatchable;
     use SerializesModels;
 
-
     public function __construct(
-        public readonly Customer $customer
+        public readonly Customer $customer,
     ) {
     }
 }

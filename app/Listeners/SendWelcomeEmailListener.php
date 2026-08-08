@@ -1,30 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Listeners;
 
 use App\Events\CustomerRegistered;
 use App\Notifications\WelcomeNotification;
-use App\Services\NotificationService;
-use App\Enums\EmailNotificationType;
-class SendWelcomeEmailListener
-{
+use App\Services\EmailNotificationService;
 
+final class SendWelcomeEmailListener
+{
     public function __construct(
-        protected NotificationService $notificationService
-    ){
+        protected EmailNotificationService $emailNotificationService,
+    ) {
     }
+
     public function handle(
         CustomerRegistered $event
     ): void {
+        $notification = new WelcomeNotification();
 
-        $this->notificationService->send(
-
-            $event->customer,
-
-            new WelcomeNotification(),
-
+        $this->emailNotificationService->dispatch(
+            user: $event->customer,
+            notificationClass: $notification::class,
+            notificationType: $notification->notificationType(),
+            subject: $notification->notificationSubject(),
         );
-
     }
-
 }
+

@@ -5,31 +5,25 @@ declare(strict_types=1);
 namespace App\Listeners;
 
 use App\Enums\VerificationPurpose;
-use App\Events\CustomerRegistered;
+use App\Events\EmailChanged;
 use App\Notifications\VerifyEmailOtpNotification;
 use App\Services\EmailNotificationService;
 use App\Services\VerificationCodeService;
-use Illuminate\Support\Facades\Log;
 
-final class SendVerificationOtpListener
+final class SendChangeEmailVerificationOtpListener
 {
     public function __construct(
-        protected VerificationCodeService $verificationCodeService,
-        protected EmailNotificationService $emailNotificationService,
+        private readonly VerificationCodeService $verificationCodeService,
+        private readonly EmailNotificationService $emailNotificationService,
     ) {
     }
 
-    public function handle(
-        CustomerRegistered $event
-    ): void {
-        Log::info('CustomerRegistered verification listener executed', [
-            'customer_id' => $event->customer->id,
-        ]);
-
+    public function handle(EmailChanged $event): void
+    {
         $verification = $this->verificationCodeService->generate(
             $event->customer,
-            VerificationPurpose::SignupEmailVerification,
-            $event->customer->email,
+            VerificationPurpose::ChangeEmailVerification,
+            $event->newEmail,
         );
 
         $notification = new VerifyEmailOtpNotification(
@@ -44,11 +38,7 @@ final class SendVerificationOtpListener
             payload: [
                 'otp' => $verification->code_or_token,
             ],
+            recipient: $event->newEmail,
         );
-
-        Log::info('Verification email queued', [
-            'customer_id' => $event->customer->id,
-        ]);
     }
 }
-

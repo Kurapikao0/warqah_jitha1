@@ -10,15 +10,15 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Customer\ResetPasswordRequest;
 use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Hash;
-use App\Enums\VerificationPurpose; 
+use App\Enums\VerificationPurpose;
 use App\Notifications\PasswordChangedNotification;
-use App\Services\NotificationService;
+use App\Services\EmailNotificationService;
 use App\Enums\EmailNotificationType;
 
 class PasswordResetController extends Controller
 {
     public function __construct(
-        protected NotificationService $notificationService
+        protected EmailNotificationService $notificationService
     ) {
     }
     public function forgotPassword(
