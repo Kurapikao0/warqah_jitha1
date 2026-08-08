@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\VerificationPurpose;
+use App\Events\PasswordChanged;
 use App\Models\Customer;
 use App\Models\VerificationCode;
-use App\Notifications\PasswordChangedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
 
 final class PasswordResetService
 {
-    public function __construct(
-        private readonly EmailNotificationService $emailNotificationService,
-    ) {
-    }
-
     public function reset(
         Customer $customer,
         string $codeOrToken,
@@ -56,9 +51,8 @@ final class PasswordResetService
                 'consumed_at' => now(),
             ]);
 
-            $this->emailNotificationService->send(
-                $customer,
-                new PasswordChangedNotification(),
+            PasswordChanged::dispatch(
+                customer: $customer->fresh(),
             );
         });
     }
