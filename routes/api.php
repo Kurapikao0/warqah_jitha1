@@ -1,5 +1,6 @@
 <?php
 
+
 use App\Http\Controllers\API\Admin\PermissionController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,7 +64,6 @@ Route::get('/test', function () {
         'status' => true,
         'message' => 'API is working'
     ]);
-
 });
 
 
@@ -84,13 +84,12 @@ Route::post(
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->group(function(){
+Route::prefix('admin')->group(function () {
 
     Route::post(
         'login',
-        [AdminAuth::class,'login']
+        [AdminAuth::class, 'login']
     );
-
 });
 
 
@@ -102,12 +101,12 @@ Route::prefix('admin')->group(function(){
 
 Route::post(
     'register',
-    [AuthController::class,'register']
+    [AuthController::class, 'register']
 );
 
 Route::post(
     'login',
-    [AuthController::class,'login']
+    [AuthController::class, 'login']
 );
 
 
@@ -119,7 +118,7 @@ Route::post(
 
 Route::prefix('admin')
     ->middleware(['auth:sanctum'])
-    ->group(function(){
+    ->group(function () {
 
         Route::apiResource(
             'roles',
@@ -139,17 +138,17 @@ Route::prefix('admin')
 
         Route::get(
             'customizations',
-            [AdminCustomization::class,'index']
+            [AdminCustomization::class, 'index']
         );
 
         Route::get(
             'customizations/{id}',
-            [AdminCustomization::class,'show']
+            [AdminCustomization::class, 'show']
         );
 
         Route::put(
             'customizations/{customization}/status',
-            [AdminCustomization::class,'updateStatus']
+            [AdminCustomization::class, 'updateStatus']
         );
 
 
@@ -160,47 +159,47 @@ Route::prefix('admin')
 
         Route::put(
             'orders/{order}/status',
-            [OrderStatusController::class,'update']
+            [OrderStatusController::class, 'update']
         );
 
         Route::get(
             'orders-statistics',
-            [AdminOrder::class,'statistics']
+            [AdminOrder::class, 'statistics']
         );
-              Route::get(
+        Route::get(
             'orders/{order}/production-history',
-            [OrderProductionController::class,'history']
+            [OrderProductionController::class, 'history']
         );
 
         Route::post(
             'orders/{order}/next-stage',
-            [OrderProductionController::class,'changeStage']
+            [OrderProductionController::class, 'changeStage']
         );
 
         Route::post(
             'orders/{order}/stage/{stageId}',
-            [OrderProductionController::class,'updateStage']
+            [OrderProductionController::class, 'updateStage']
         );
 
         Route::get(
             'orders/{order}/status-history',
-            [OrderStatusHistoryController::class,'index']
+            [OrderStatusHistoryController::class, 'index']
         );
 
 
         Route::get(
             'payments',
-            [AdminPayment::class,'index']
+            [AdminPayment::class, 'index']
         );
 
         Route::get(
             'payments/{id}',
-            [AdminPayment::class,'show']
+            [AdminPayment::class, 'show']
         );
 
         Route::put(
             'payments/{payment}/status',
-            [AdminPayment::class,'updateStatus']
+            [AdminPayment::class, 'updateStatus']
         );
 
 
@@ -237,12 +236,17 @@ Route::prefix('admin')
 
         Route::post(
             'roles/{role}/permissions',
-            [RolePermissionController::class,'store']
+            [RolePermissionController::class, 'store']
         );
 
         Route::delete(
             'roles/{role}/permissions/{permission}',
-            [RolePermissionController::class,'destroy']
+            [RolePermissionController::class, 'destroy']
+        );
+
+        Route::get(
+            'roles/{role}/permissions',
+            [RolePermissionController::class, 'index']
         );
 
 
@@ -254,23 +258,23 @@ Route::prefix('admin')
 
         Route::post(
             'admin-users/{adminUser}/password-reset',
-            [AdminPasswordResetController::class,'store']
+            [AdminPasswordResetController::class, 'store']
         );
 
         Route::delete(
             'password-resets/{reset}',
-            [AdminPasswordResetController::class,'destroy']
+            [AdminPasswordResetController::class, 'destroy']
         );
 
 
         Route::get(
             'admin-users/{adminUser}/notifications',
-            [AdminNotificationController::class,'index']
+            [AdminNotificationController::class, 'index']
         );
 
         Route::put(
             'notifications/{notification}/read',
-            [AdminNotificationController::class,'read']
+            [AdminNotificationController::class, 'read']
         );
 
 
@@ -291,33 +295,33 @@ Route::prefix('admin')
 
         Route::patch(
             'customers/{customer}/restore',
-            [CustomerController::class,'restore']
+            [CustomerController::class, 'restore']
         );
 
         Route::patch(
             'customers/{customer}/status',
-            [CustomerController::class,'changeStatus']
+            [CustomerController::class, 'changeStatus']
         );
 
         Route::patch(
             'customers/{customer}/verify',
-            [CustomerController::class,'verify']
+            [CustomerController::class, 'verify']
         );
 
 
         Route::get(
             'reviews',
-            [AdminReviewController::class,'index']
+            [AdminReviewController::class, 'index']
         );
 
         Route::put(
             'reviews/{review}/status',
-            [AdminReviewController::class,'updateStatus']
+            [AdminReviewController::class, 'updateStatus']
         );
 
         Route::post(
             'reviews/{review}/reply',
-            [AdminReviewController::class,'reply']
+            [AdminReviewController::class, 'reply']
         );
 
 
@@ -344,18 +348,17 @@ Route::prefix('admin')
 
         Route::post(
             'logout',
-            [AdminAuth::class,'logout']
+            [AdminAuth::class, 'logout']
         );
-
     });
-   /*
+/*
 |--------------------------------------------------------------------------
 | Customer Routes
 |--------------------------------------------------------------------------
 */
 
 Route::prefix('customer')
-    ->group(function(){
+    ->group(function () {
 
 
         /*
@@ -366,30 +369,28 @@ Route::prefix('customer')
 
         Route::post(
             'login',
-            [AuthController::class,'login']
+            [AuthController::class, 'login']
         );
 
 
         Route::post(
             'register',
-            [AuthController::class,'register']
+            [AuthController::class, 'register']
         );
 
 
         Route::post(
             'logout',
-            [AuthController::class,'logout']
+            [AuthController::class, 'logout']
         )
-        ->middleware('auth:sanctum');
-
-
+            ->middleware('auth:sanctum');
     });
 
 
 
 Route::prefix('customer')
     ->middleware('auth:sanctum')
-    ->group(function(){
+    ->group(function () {
 
 
         Route::apiResource(
@@ -402,45 +403,45 @@ Route::prefix('customer')
             'orders',
             CustomerOrder::class
         )
-        ->except([
-            'update',
-            'destroy'
-        ]);
+            ->except([
+                'update',
+                'destroy'
+            ]);
 
 
         Route::get(
             'cart',
-            [CartController::class,'index']
+            [CartController::class, 'index']
         );
 
 
         Route::post(
             'cart/items',
-            [CartItemController::class,'store']
+            [CartItemController::class, 'store']
         );
 
 
         Route::put(
             'cart/items/{cartItem}',
-            [CartItemController::class,'update']
+            [CartItemController::class, 'update']
         );
 
 
         Route::delete(
             'cart/items/{cartItem}',
-            [CartItemController::class,'destroy']
+            [CartItemController::class, 'destroy']
         );
 
 
         Route::get(
             'favorites',
-            [FavoriteController::class,'index']
+            [FavoriteController::class, 'index']
         );
 
 
         Route::post(
             'favorites/{product}',
-            [FavoriteController::class,'toggle']
+            [FavoriteController::class, 'toggle']
         );
 
 
@@ -452,19 +453,19 @@ Route::prefix('customer')
 
         Route::put(
             'addresses/{address}/default',
-            [AddressController::class,'setDefault']
+            [AddressController::class, 'setDefault']
         );
 
 
         Route::post(
             'verifications/generate',
-            [VerificationController::class,'generate']
+            [VerificationController::class, 'generate']
         );
 
 
         Route::post(
             'verifications/verify',
-            [VerificationController::class,'verify']
+            [VerificationController::class, 'verify']
         );
 
 
@@ -476,53 +477,53 @@ Route::prefix('customer')
 
         Route::post(
             'reviews/{review}/images',
-            [ReviewImageController::class,'store']
+            [ReviewImageController::class, 'store']
         );
 
 
         Route::delete(
             'review-images/{reviewImage}',
-            [ReviewImageController::class,'destroy']
+            [ReviewImageController::class, 'destroy']
         );
 
 
         Route::get(
             'notifications',
-            [CustomerNotificationController::class,'index']
+            [CustomerNotificationController::class, 'index']
         )
-        ->name('notifications.index');
+            ->name('notifications.index');
 
 
         Route::get(
             'notifications/{id}',
-            [CustomerNotificationController::class,'show']
+            [CustomerNotificationController::class, 'show']
         )
-        ->name('notifications.show');
+            ->name('notifications.show');
 
 
         Route::patch(
             'notifications/{notification}/read',
-            [CustomerNotificationController::class,'read']
+            [CustomerNotificationController::class, 'read']
         )
-        ->name('notifications.read');
+            ->name('notifications.read');
 
 
         Route::delete(
             'notifications/{notification}',
-            [CustomerNotificationController::class,'destroy']
+            [CustomerNotificationController::class, 'destroy']
         )
-        ->name('notifications.destroy');
+            ->name('notifications.destroy');
 
 
         Route::apiResource(
             'payments',
             CustomerPayment::class
         )
-        ->only([
-            'index',
-            'store',
-            'show'
-        ]);
+            ->only([
+                'index',
+                'store',
+                'show'
+            ]);
 
 
         /*
@@ -533,26 +534,24 @@ Route::prefix('customer')
 
         Route::get(
             'profile',
-            [ProfileController::class,'show']
+            [ProfileController::class, 'show']
         );
 
 
         Route::put(
             'profile',
-            [ProfileController::class,'update']
+            [ProfileController::class, 'update']
         );
 
 
         Route::put(
             'profile/password',
-            [ProfileController::class,'updatePassword']
+            [ProfileController::class, 'updatePassword']
         );
 
 
         Route::post(
             'profile/avatar',
-            [ProfileController::class,'updateAvatar']
+            [ProfileController::class, 'updateAvatar']
         );
-
-
     });

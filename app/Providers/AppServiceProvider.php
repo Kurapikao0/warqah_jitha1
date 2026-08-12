@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\RawMaterial;
+use App\Policies\RawMaterialPolicy;
+use App\Models\Role;
+use App\Policies\RolePolicy;
+use App\Models\Permission;
+use App\Policies\PermissionPolicy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Customer;
@@ -55,24 +61,24 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         $this->app->bind(
-        ProductRepositoryInterface::class,
-        ProductRepository::class
+            ProductRepositoryInterface::class,
+            ProductRepository::class
 
         );
         $this->app->bind(
 
-        CustomizationRepositoryInterface::class,
+            CustomizationRepositoryInterface::class,
 
-        CustomizationRepository::class
+            CustomizationRepository::class
         );
 
         $this->app->bind(
 
-        OrderRepositoryInterface::class,
+            OrderRepositoryInterface::class,
 
-        OrderRepository::class
+            OrderRepository::class
 
-        );        
+        );
 
         $this->app->bind(
 
@@ -93,24 +99,24 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(
 
-        PaymentRepositoryInterface::class,
+            PaymentRepositoryInterface::class,
 
-        PaymentRepository::class     
+            PaymentRepository::class
 
-        );   
+        );
 
         $this->app->bind(
 
-        OrderStatusHistoryRepositoryInterface::class,
+            OrderStatusHistoryRepositoryInterface::class,
 
-        OrderStatusHistoryRepository::class
+            OrderStatusHistoryRepository::class
 
-        );        
+        );
 
         $this->app->bind(
             OrderProductionStageRepositoryInterface::class,
             OrderProductionStageRepository::class
-        );        
+        );
 
         $this->app->bind(
             OrderProductionRepositoryInterface::class,
@@ -130,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ColorRepositoryInterface::class,
             ColorRepository::class
-        );        
+        );
 
         $this->app->bind(
             ProductAttributeRepositoryInterface::class,
@@ -140,22 +146,22 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ProductAttributeValueRepositoryInterface::class,
             ProductAttributeValueRepository::class
-        );        
-        
+        );
+
 
         $this->app->bind(
             CustomerRepositoryInterface::class,
             CustomerRepository::class
-        );        
+        );
 
         $this->app->bind(
             AdminReviewRepositoryInterface::class,
             AdminReviewRepository::class
         );
 
-        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);      
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
 
-        
+
         $this->app->bind(
 
             AddressRepositoryInterface::class,
@@ -163,7 +169,6 @@ class AppServiceProvider extends ServiceProvider
             AddressRepository::class
 
         );
-
     }
 
     /**
@@ -174,16 +179,31 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(
             Customer::class,
             CustomerPolicy::class
-        ); 
+        );
+
+        Gate::policy(
+            Permission::class,
+            PermissionPolicy::class
+        );
+
+        Gate::policy(
+            Role::class,
+            RolePolicy::class
+        );
+
+        Gate::policy(
+            RawMaterial::class,
+            RawMaterialPolicy::class
+        );
 
         // Gate::policy(
         //     Category::class,
         //     CategoryPolicy::class
         // );      
-        
+
         Gate::policy(
             Address::class,
             AddressPolicy::class
-        );        
+        );
     }
 }

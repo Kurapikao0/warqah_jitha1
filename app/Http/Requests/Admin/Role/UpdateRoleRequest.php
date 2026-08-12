@@ -14,7 +14,7 @@ class UpdateRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        
+
 
         return true;
     }
@@ -31,7 +31,10 @@ class UpdateRoleRequest extends FormRequest
                 'string',
                 'min:2',
                 'max:100',
-                Rule::unique('roles', 'name'),
+                //  Rule::unique('roles', 'name'),
+                Rule::unique('roles', 'name')
+                    ->ignore($this->role->id), // هذا تعديلي 
+
             ],
 
             'description' => [

@@ -11,10 +11,11 @@ class StoreRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        return true; //هذا تعديلي 
         // استخدام guard الصريح أو الـ Null-safe operator يمنع Error 500
-        $user = $this->user('sanctum') ?? $this->user();
+        // $user = $this->user('sanctum') ?? $this->user();
 
-        return $user?->can('create-roles') ?? true;
+        //return $user?->can('create-roles') ?? true;
     }
 
     /**
@@ -22,12 +23,49 @@ class StoreRoleRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+
+
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['exists:permissions,id'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:roles,name',
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+
+            'permissions' => [
+                'nullable',
+                'array',
+            ],
+
+            'permissions.*' => [
+                'exists:permissions,id',
+            ],
         ];
     }
+
+
+
+
+
+
+
+
+
+    /** 
+     * public function rules(): array
+     *  {
+     *   return [
+     *      'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
+     *    'permissions.*' => ['exists:permissions,id'],
+     * ];
+     * } */
 }
