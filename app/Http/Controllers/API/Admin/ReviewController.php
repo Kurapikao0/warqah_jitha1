@@ -55,4 +55,15 @@ class ReviewController extends Controller
             'data'    => new ReviewResource($updatedReview),
         ], 200);
     }
+
+    public function destroy(Review $review): JsonResponse
+    {
+        $this->authorize('delete', $review);
+
+        $this->reviewService->deleteReview($review);
+
+        return response()->json([
+            'message' => 'تم حذف التقييم بنجاح.',
+        ], 200);
+    }
 }

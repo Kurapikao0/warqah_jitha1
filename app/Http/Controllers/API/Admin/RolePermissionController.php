@@ -50,25 +50,26 @@ class RolePermissionController extends Controller
             $role
         );
 
+        if ($request->has('permission_ids') || $request->isMethod('PUT')) {
+            $this->service->sync(
+                $role,
+                (array) $request->input('permission_ids', [])
+            );
+        } else {
+            $permission = Permission::findOrFail(
+                $request->permission_id
+            );
 
-        $permission = Permission::findOrFail(
-            $request->permission_id
-        );
-
-
-        $this->service->attach(
-            $role,
-            $permission
-        );
-
+            $this->service->attach(
+                $role,
+                $permission
+            );
+        }
 
         return response()->json([
-
-            'success'=>true,
-
-            'message'=>'Permission assigned successfully.',
-
-        ], Response::HTTP_CREATED);
+            'success' => true,
+            'message' => 'Permissions updated successfully.',
+        ], Response::HTTP_OK);
     }
 
 

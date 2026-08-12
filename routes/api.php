@@ -219,7 +219,8 @@ Route::prefix('admin')
             [RolePermissionController::class, 'index']
         )->name('roles.permissions.index');
 
-        Route::post(
+        Route::match(
+            ['post', 'put'],
             'roles/{role}/permissions',
             [RolePermissionController::class, 'store']
         )->name('roles.permissions.store');
@@ -322,8 +323,30 @@ Route::prefix('admin')
         );
 
         Route::apiResource(
+            'categories',
+            ProductCategoryController::class
+        );
+
+        Route::apiResource(
             'product-categories',
             ProductCategoryController::class
+        );
+
+        // Specialized Product Media routes — must be declared BEFORE apiResource
+        // so 'upload' and 'reorder' static segments take priority over {productMedia}.
+        Route::post(
+            'product-media/upload',
+            [ProductMediaController::class, 'upload']
+        );
+
+        Route::put(
+            'product-media/reorder',
+            [ProductMediaController::class, 'reorder']
+        );
+
+        Route::put(
+            'product-media/{productMedia}/primary',
+            [ProductMediaController::class, 'setPrimary']
         );
 
         Route::apiResource(
@@ -393,6 +416,11 @@ Route::prefix('admin')
         | Design Patterns
         |--------------------------------------------------------------------------
         */
+
+        Route::apiResource(
+            'patterns',
+            DesignPatternController::class
+        );
 
         Route::apiResource(
             'design-patterns',
@@ -487,14 +515,21 @@ Route::prefix('admin')
             [AdminReviewController::class, 'index']
         );
 
-        Route::put(
+        Route::match(
+            ['put', 'patch'],
             'reviews/{review}/status',
             [AdminReviewController::class, 'updateStatus']
         );
 
-        Route::post(
+        Route::match(
+            ['post', 'patch'],
             'reviews/{review}/reply',
             [AdminReviewController::class, 'reply']
+        );
+
+        Route::delete(
+            'reviews/{review}',
+            [AdminReviewController::class, 'destroy']
         );
 
 

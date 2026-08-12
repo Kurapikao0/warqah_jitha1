@@ -1,7 +1,8 @@
 <?php
 
 namespace Database\Seeders;
-
+use LogicException ;
+use App\Enums\VerificationPurpose;
 use App\Models\ActivityLog;
 use App\Models\Address;
 use App\Models\AdminNotification;
@@ -173,10 +174,40 @@ class DatabaseSeeder extends Seeder
             ->has(Address::factory()->count(self::ADDRESSES_PER_CUSTOMER), 'addresses')
             ->create();
 
-        VerificationCode::factory()
-            ->count(self::VERIFICATION_CODES_COUNT)
-            ->recycle($this->customers)
-            ->create();
+        $verificationPurposes = [
+            VerificationPurpose::SignupEmailVerification,
+            VerificationPurpose::PasswordResetEmailLink,
+            VerificationPurpose::ChangeEmailVerification,
+        ];
+
+        $verificationCodes = $this->customers
+            ->take(self::VERIFICATION_CODES_COUNT)
+            ->map(function (Customer $customer, int $index) use ($verificationPurposes) {
+                $purpose = $verificationPurposes[$index % count($verificationPurposes)];
+
+                return [
+                    'customer_id' => $customer->id,
+                    'purpose' => $purpose->value,
+                    'code_or_token' => match ($purpose) {
+                        VerificationPurpose::SignupEmailVerification,
+                        VerificationPurpose::ChangeEmailVerification => (string) random_int(100000, 999999),
+
+                        VerificationPurpose::PasswordResetEmailLink => bin2hex(random_bytes(32)),
+
+                        default => throw new LogicException("Unsupported verification purpose: {$purpose->value}"),
+                    },
+                    'contact_value' => $customer->email,
+                    'expires_at' => now()->addMinutes(10),
+                    'consumed_at' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })
+            ->all();
+
+VerificationCode::insert($verificationCodes);
+
+VerificationCode::insert($verificationCodes);
 
         CustomerNotification::factory()
             ->count(self::CUSTOMER_NOTIFICATIONS_COUNT)

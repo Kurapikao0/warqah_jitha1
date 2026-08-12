@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Admin\Review;
+namespace App\Http\Requests\ProductMedia;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ReplyToReviewRequest extends FormRequest
+class SetPrimaryProductMediaRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,7 +14,10 @@ class ReplyToReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'admin_reply' => ['required', 'string', 'max:1000'],
+            'product_id' => [
+                'nullable',
+                'exists:products,id'
+            ],
         ];
     }
 }

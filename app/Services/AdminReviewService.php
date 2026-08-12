@@ -31,4 +31,11 @@ class AdminReviewService
             return $this->reviewRepository->addReply($review, $reply);
         });
     }
+
+    public function deleteReview(Review $review): bool
+    {
+        return DB::transaction(function () use ($review) {
+            return $this->reviewRepository->delete($review);
+        });
+    }
 }

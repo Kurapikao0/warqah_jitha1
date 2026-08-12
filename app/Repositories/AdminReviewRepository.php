@@ -33,4 +33,9 @@ class AdminReviewRepository implements AdminReviewRepositoryInterface
 
         return $review->fresh();
     }
+
+    public function delete(Review $review): bool
+    {
+        return (bool) $review->delete();
+    }
 }

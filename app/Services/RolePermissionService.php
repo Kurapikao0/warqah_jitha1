@@ -40,4 +40,11 @@ class RolePermissionService
                 $permission->id
             );
     }
+
+    public function sync(
+        Role $role,
+        array $permissionIds
+    ): void {
+        $role->permissions()->sync($permissionIds);
+    }
 }

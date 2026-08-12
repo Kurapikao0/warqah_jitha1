@@ -10,4 +10,5 @@ interface AdminReviewRepositoryInterface
     public function getAllPaginated(int $perPage = 15): LengthAwarePaginator;
     public function updateStatus(Review $review, string $status): Review;
     public function addReply(Review $review, string $reply): Review;
+    public function delete(Review $review): bool;
 }
