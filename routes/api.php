@@ -4,84 +4,120 @@
 use App\Http\Controllers\API\Admin\PermissionController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\API\Admin\ProductCustomizationController as AdminCustomization;
-use App\Http\Controllers\API\Customer\ProductCustomizationController as CustomerCustomization;
+/*
+|--------------------------------------------------------------------------
+| Authentication Controllers
+|--------------------------------------------------------------------------
+*/
 
-use App\Http\Controllers\API\Admin\ProductController;
+use App\Http\Controllers\API\Auth\AdminAuthController;
+use App\Http\Controllers\API\Auth\CustomerAuthController;
+
+/*
+|--------------------------------------------------------------------------
+| Admin Controllers
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\API\Admin\ActivityLogController;
+use App\Http\Controllers\API\Admin\AdminNotificationController;
+use App\Http\Controllers\API\Admin\AdminPasswordResetController;
+use App\Http\Controllers\API\Admin\AdminUserController;
+use App\Http\Controllers\API\Admin\ColorController;
+use App\Http\Controllers\API\Admin\CustomerController;
+use App\Http\Controllers\API\Admin\DesignPatternController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
-use App\Http\Controllers\API\Admin\OrderStatusController;
 use App\Http\Controllers\API\Admin\OrderProductionController;
 use App\Http\Controllers\API\Admin\OrderProductionStageController;
-
-use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
-use App\Http\Controllers\API\Customer\CartController;
-use App\Http\Controllers\API\Customer\CartItemController;
-use App\Http\Controllers\API\Customer\FavoriteController;
-
-use App\Http\Controllers\API\Admin\RoleController;
-use App\Http\Controllers\API\Admin\RolePermissionController;
-use App\Http\Controllers\API\Admin\AdminUserController;
-use App\Http\Controllers\API\Admin\CustomerController;
-use App\Http\Controllers\API\Admin\AdminPasswordResetController;
-use App\Http\Controllers\API\Admin\AdminNotificationController;
-use App\Http\Controllers\API\Admin\ActivityLogController;
-use App\Http\Controllers\API\Admin\ProductCategoryController;
-
-use App\Http\Controllers\API\Customer\AddressController;
-use App\Http\Controllers\API\Customer\VerificationController;
-use App\Http\Controllers\API\Customer\ProfileController;
-
-use App\Http\Controllers\API\Admin\RawMaterialController;
-
-use App\Http\Controllers\API\Customer\ReviewController;
-use App\Http\Controllers\API\Customer\ReviewImageController;
-use App\Http\Controllers\API\Customer\CustomerNotificationController;
-
-use App\Http\Controllers\API\Admin\PaymentController as AdminPayment;
-use App\Http\Controllers\API\Customer\PaymentController as CustomerPayment;
-
+use App\Http\Controllers\API\Admin\OrderStatusController;
 use App\Http\Controllers\API\Admin\OrderStatusHistoryController;
-use App\Http\Controllers\API\Admin\DesignPatternController;
-use App\Http\Controllers\API\Admin\ProductMediaController;
-use App\Http\Controllers\API\Admin\ColorController;
+use App\Http\Controllers\API\Admin\PaymentController as AdminPayment;
+use App\Http\Controllers\API\Admin\PermissionController;
 use App\Http\Controllers\API\Admin\ProductAttributeController;
 use App\Http\Controllers\API\Admin\ProductAttributeValueController;
-
-use App\Http\Controllers\API\Customer\AuthController;
-use App\Http\Controllers\API\Admin\AuthController as AdminAuth;
+use App\Http\Controllers\API\Admin\ProductCategoryController;
+use App\Http\Controllers\API\Admin\ProductController;
+use App\Http\Controllers\API\Admin\ProductCustomizationController as AdminCustomization;
+use App\Http\Controllers\API\Admin\ProductMediaController;
+use App\Http\Controllers\API\Admin\RawMaterialController;
 use App\Http\Controllers\API\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\API\Admin\RoleController;
+use App\Http\Controllers\API\Admin\RolePermissionController;
 
+/*
+|--------------------------------------------------------------------------
+| Customer Controllers
+|--------------------------------------------------------------------------
+*/
 
+use App\Http\Controllers\API\Customer\PasswordResetController;
+use App\Http\Controllers\API\Customer\AddressController;
+use App\Http\Controllers\API\Customer\CartController;
+use App\Http\Controllers\API\Customer\CartItemController;
+use App\Http\Controllers\API\Customer\CustomerNotificationController;
+use App\Http\Controllers\API\Customer\FavoriteController;
+use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
+use App\Http\Controllers\API\Customer\PaymentController as CustomerPayment;
+use App\Http\Controllers\API\Customer\ProductCustomizationController as CustomerCustomization;
+use App\Http\Controllers\API\Customer\ProfileController;
+use App\Http\Controllers\API\Customer\ReviewController;
+use App\Http\Controllers\API\Customer\ReviewImageController;
+use App\Http\Controllers\API\Customer\VerificationController;
+
+Route::get('/test-admin-auth', function () {
+    return response()->json([
+        'admin' => auth('admin')->user(),
+        'sanctum' => auth()->user(),
+    ]);
+})->middleware('auth:admin');
 /*
 |--------------------------------------------------------------------------
 | Public Routes
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test', function () {
+/*
+|--------------------------------------------------------------------------
+| API Health Check
+|--------------------------------------------------------------------------
+*/
 
+Route::get('/test', function (): \Illuminate\Http\JsonResponse {
     return response()->json([
         'status' => true,
-        'message' => 'API is working'
+        'message' => 'API is working',
     ]);
 });
 
 
+/*
+|--------------------------------------------------------------------------
+| Customer Authentication - Legacy Aliases
+|--------------------------------------------------------------------------
+|
+| Kept for backward compatibility with existing frontend clients.
+|
+*/
+
 Route::post(
-    'customer/verifications/generate',
-    [VerificationController::class, 'generate']
+    'register',
+    [CustomerAuthController::class, 'register']
 );
 
 Route::post(
-    'customer/verifications/verify',
-    [VerificationController::class, 'verify']
-);
+    'login',
+    [CustomerAuthController::class, 'login']
+)->middleware('throttle:5,1');
 
 
 /*
 |--------------------------------------------------------------------------
 | Admin Authentication
 |--------------------------------------------------------------------------
+|
+| Login is public.
+| Logout requires an authenticated Admin Sanctum token.
+|
 */
 
 Route::prefix('admin')->group(function () {
@@ -95,8 +131,12 @@ Route::prefix('admin')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Customer Authentication
+| Customer Verification - Public
 |--------------------------------------------------------------------------
+|
+| These endpoints are intentionally public because verification can be
+| required before the customer is fully authenticated.
+|
 */
 
 Route::post(
@@ -112,8 +152,14 @@ Route::post(
 
 /*
 |--------------------------------------------------------------------------
-| Admin Routes
+| Admin API
 |--------------------------------------------------------------------------
+|
+| Every route in this group requires an authenticated Admin.
+|
+| IMPORTANT:
+| We explicitly use auth:admin instead of auth:sanctum.
+|
 */
 
 Route::prefix('admin')
@@ -125,10 +171,27 @@ Route::prefix('admin')
             RoleController::class
         );
 
-        Route::apiResource(
-            'products',
-            ProductController::class
-        );
+        // Role Permissions
+        Route::get(
+            'roles/{role}/permissions',
+            [RolePermissionController::class, 'index']
+        )->name('roles.permissions.index');
+
+        Route::post(
+            'roles/{role}/permissions',
+            [RolePermissionController::class, 'store']
+        )->name('roles.permissions.store');
+
+        Route::delete(
+            'roles/{role}/permissions/{permission}',
+            [RolePermissionController::class, 'destroy']
+        )->name('roles.permissions.destroy');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Permissions
+        |--------------------------------------------------------------------------
+        */
 
         Route::apiResource(
             'permissions',
@@ -146,15 +209,36 @@ Route::prefix('admin')
             [AdminCustomization::class, 'show']
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Admin Notifications
+        |--------------------------------------------------------------------------
+        */
+
         Route::put(
             'customizations/{customization}/status',
             [AdminCustomization::class, 'updateStatus']
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Customers Management
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
-            'orders',
-            AdminOrder::class
+            'customers',
+            CustomerController::class
+        )->except([
+            'create',
+            'edit',
+        ]);
+
+        Route::patch(
+            'customers/{customer}/restore',
+            [CustomerController::class, 'restore']
         );
 
         Route::put(
@@ -186,6 +270,17 @@ Route::prefix('admin')
             [OrderStatusHistoryController::class, 'index']
         );
 
+        Route::apiResource(
+            'product-attribute-values',
+            ProductAttributeValueController::class
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Product Customizations
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             'payments',
@@ -203,34 +298,39 @@ Route::prefix('admin')
         );
 
 
-        Route::apiResource(
-            'production-stages',
-            OrderProductionStageController::class
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Raw Materials
+        |--------------------------------------------------------------------------
+        */
 
         Route::apiResource(
-            'design-patterns',
-            DesignPatternController::class
+            'raw-materials',
+            RawMaterialController::class
         );
 
-        Route::apiResource(
-            'product-media',
-            ProductMediaController::class
-        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Colors
+        |--------------------------------------------------------------------------
+        */
 
         Route::apiResource(
             'colors',
             ColorController::class
         );
 
-        Route::apiResource(
-            'product-attributes',
-            ProductAttributeController::class
-        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Design Patterns
+        |--------------------------------------------------------------------------
+        */
 
         Route::apiResource(
-            'product-attribute-values',
-            ProductAttributeValueController::class
+            'design-patterns',
+            DesignPatternController::class
         );
 
 
@@ -250,11 +350,21 @@ Route::prefix('admin')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Orders
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
-            'admin-users',
-            AdminUserController::class
+            'orders',
+            AdminOrder::class
         );
 
+        Route::put(
+            'orders/{order}/status',
+            [OrderStatusController::class, 'update']
+        );
 
         Route::post(
             'admin-users/{adminUser}/password-reset',
@@ -266,6 +376,10 @@ Route::prefix('admin')
             [AdminPasswordResetController::class, 'destroy']
         );
 
+        Route::post(
+            'orders/{order}/next-stage',
+            [OrderProductionController::class, 'changeStage']
+        );
 
         Route::get(
             'admin-users/{adminUser}/notifications',
@@ -280,7 +394,7 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
-        | Customer Management (Admin)
+        | Payments
         |--------------------------------------------------------------------------
         */
 
@@ -309,6 +423,12 @@ Route::prefix('admin')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Reviews
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             'reviews',
             [AdminReviewController::class, 'index']
@@ -325,13 +445,20 @@ Route::prefix('admin')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Activity Logs
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
             'activity-logs',
             ActivityLogController::class
         )->only([
             'index',
-            'show'
+            'show',
         ]);
+    });
 
 
         Route::apiResource(
@@ -353,8 +480,11 @@ Route::prefix('admin')
     });
 /*
 |--------------------------------------------------------------------------
-| Customer Routes
+| Customer API
 |--------------------------------------------------------------------------
+|
+| Every protected customer endpoint requires an authenticated Customer.
+|
 */
 
 Route::prefix('customer')
@@ -363,7 +493,7 @@ Route::prefix('customer')
 
         /*
         |--------------------------------------------------------------------------
-        | Customer Authentication
+        | Authentication
         |--------------------------------------------------------------------------
         */
 
@@ -399,6 +529,12 @@ Route::prefix('customer')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Orders
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
             'orders',
             CustomerOrder::class
@@ -409,23 +545,26 @@ Route::prefix('customer')
             ]);
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Cart
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             'cart',
             [CartController::class, 'index']
         );
-
 
         Route::post(
             'cart/items',
             [CartItemController::class, 'store']
         );
 
-
         Route::put(
             'cart/items/{cartItem}',
             [CartItemController::class, 'update']
         );
-
 
         Route::delete(
             'cart/items/{cartItem}',
@@ -433,11 +572,16 @@ Route::prefix('customer')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Favorites
+        |--------------------------------------------------------------------------
+        */
+
         Route::get(
             'favorites',
             [FavoriteController::class, 'index']
         );
-
 
         Route::post(
             'favorites/{product}',
@@ -445,11 +589,16 @@ Route::prefix('customer')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Addresses
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
             'addresses',
             AddressController::class
         );
-
 
         Route::put(
             'addresses/{address}/default',
@@ -457,11 +606,16 @@ Route::prefix('customer')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Verification
+        |--------------------------------------------------------------------------
+        */
+
         Route::post(
             'verifications/generate',
             [VerificationController::class, 'generate']
         );
-
 
         Route::post(
             'verifications/verify',
@@ -469,23 +623,33 @@ Route::prefix('customer')
         );
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Reviews
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
             'reviews',
             ReviewController::class
         );
-
 
         Route::post(
             'reviews/{review}/images',
             [ReviewImageController::class, 'store']
         );
 
-
         Route::delete(
             'review-images/{reviewImage}',
             [ReviewImageController::class, 'destroy']
         );
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Customer Notifications
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             'notifications',
@@ -515,6 +679,12 @@ Route::prefix('customer')
             ->name('notifications.destroy');
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | Payments
+        |--------------------------------------------------------------------------
+        */
+
         Route::apiResource(
             'payments',
             CustomerPayment::class
@@ -537,18 +707,15 @@ Route::prefix('customer')
             [ProfileController::class, 'show']
         );
 
-
         Route::put(
             'profile',
             [ProfileController::class, 'update']
         );
 
-
         Route::put(
             'profile/password',
             [ProfileController::class, 'updatePassword']
         );
-
 
         Route::post(
             'profile/avatar',

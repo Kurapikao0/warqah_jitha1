@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\Role;
 
 use App\Models\Role;
@@ -16,14 +18,17 @@ class UpdateRoleRequest extends FormRequest
     {
 
 
-        return true;
+        return $this->user('admin')?->can('update', $role) ?? false;
     }
 
     /**
      * Validation rules.
+     *
+     * @return array<string, mixed>
      */
     public function rules(): array
     {
+        $role = $this->route('role');
 
         return [
             'name' => [
@@ -57,6 +62,8 @@ class UpdateRoleRequest extends FormRequest
 
     /**
      * Custom validation messages.
+     *
+     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -65,9 +72,7 @@ class UpdateRoleRequest extends FormRequest
             'name.unique' => 'Another role already uses this name.',
             'name.min' => 'Role name must contain at least 2 characters.',
             'name.max' => 'Role name may not exceed 100 characters.',
-
             'description.max' => 'Description may not exceed 1000 characters.',
-
             'permissions.array' => 'Permissions must be an array.',
             'permissions.*.exists' => 'One or more selected permissions are invalid.',
         ];
@@ -75,6 +80,8 @@ class UpdateRoleRequest extends FormRequest
 
     /**
      * Human-readable attribute names.
+     *
+     * @return array<string, string>
      */
     public function attributes(): array
     {
@@ -92,13 +99,13 @@ class UpdateRoleRequest extends FormRequest
     {
         if ($this->filled('name')) {
             $this->merge([
-                'name' => trim($this->name),
+                'name' => trim((string) $this->input('name')),
             ]);
         }
 
-        if ($this->has('description') && $this->description !== null) {
+        if ($this->has('description') && $this->input('description') !== null) {
             $this->merge([
-                'description' => trim($this->description),
+                'description' => trim((string) $this->input('description')),
             ]);
         }
     }

@@ -1,24 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\VerificationPurpose;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VerificationCode extends Model
 {
-    use HasFactory;
+    protected $table = 'verification_codes';
+
+    public const UPDATED_AT = null;
 
     protected $fillable = [
-        'customer_id', // يجب أن يكون مسموحاً بالتعبئة الجماعية Mass Assignment
-        'code',
+        'customer_id',
+        'purpose',
+        'code_or_token',
+        'contact_value',
         'expires_at',
-        'is_used',
+        'consumed_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'purpose' => VerificationPurpose::class,
+            'expires_at' => 'datetime',
+            'consumed_at' => 'datetime',
+        ];
+    }
 
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
 }
+
