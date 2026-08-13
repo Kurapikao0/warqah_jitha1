@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DesignPatternResource;
 use App\Http\Requests\DesignPattern\StoreDesignPatternRequest;
 use App\Http\Requests\DesignPattern\UpdateDesignPatternRequest;
+use Illuminate\Http\Request;
 
 class DesignPatternController extends Controller
 {
@@ -16,7 +17,7 @@ class DesignPatternController extends Controller
     ) {
     }
 
-    protected function normalizePayload(array $data, $request): array
+    protected function normalizePayload(array $data, Request $request): array
     {
         if ($request->hasFile('image')) {
             $data['preview_image_url'] = $request->file('image')->store('design-patterns', 'public');

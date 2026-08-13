@@ -10,6 +10,8 @@ use App\Models\ProductCategory;
 use App\Services\ProductCategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Request;
+
 
 
 class ProductCategoryController extends Controller
@@ -20,7 +22,7 @@ class ProductCategoryController extends Controller
     ){
     }
 
-    protected function normalizePayload(array $data, $request): array
+    protected function normalizePayload(array $data, Request $request): array
     {
         if ($request->hasFile('image')) {
             $data['image_url'] = $request->file('image')->store('product-categories', 'public');
