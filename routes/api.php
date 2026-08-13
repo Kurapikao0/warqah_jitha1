@@ -1,5 +1,7 @@
 <?php
 
+
+use App\Http\Controllers\API\Admin\PermissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -90,39 +92,6 @@ Route::get('/test', function (): \Illuminate\Http\JsonResponse {
 
 /*
 |--------------------------------------------------------------------------
-| Customer Authentication - Canonical Routes
-|--------------------------------------------------------------------------
-|
-| These are the primary customer authentication endpoints.
-|
-*/
-
-Route::prefix('customer')->group(function (): void {
-
-    Route::post(
-        'register',
-        [CustomerAuthController::class, 'register']
-    );
-
-    Route::post(
-        'login',
-        [CustomerAuthController::class, 'login']
-    )->middleware('throttle:5,1');
-
-    Route::post(
-        'password/forgot',
-        [PasswordResetController::class, 'forgotPassword']
-    )->middleware('throttle:5,1');
-
-    Route::post(
-        'password/reset',
-        [PasswordResetController::class, 'resetPassword']
-    );
-});
-
-
-/*
-|--------------------------------------------------------------------------
 | Customer Authentication - Legacy Aliases
 |--------------------------------------------------------------------------
 |
@@ -151,17 +120,12 @@ Route::post(
 |
 */
 
-Route::prefix('admin/auth')->group(function (): void {
+Route::prefix('admin')->group(function () {
 
     Route::post(
         'login',
-        [AdminAuthController::class, 'login']
-    )->middleware('throttle:5,1');
-
-    Route::post(
-        'logout',
-        [AdminAuthController::class, 'logout']
-    )->middleware('auth:admin');
+        [AdminAuth::class, 'login']
+    );
 });
 
 
@@ -176,13 +140,13 @@ Route::prefix('admin/auth')->group(function (): void {
 */
 
 Route::post(
-    'customer/verifications/generate',
-    [VerificationController::class, 'generate']
+    'register',
+    [AuthController::class, 'register']
 );
 
 Route::post(
-    'customer/verifications/verify',
-    [VerificationController::class, 'verify']
+    'login',
+    [AuthController::class, 'login']
 );
 
 
@@ -199,14 +163,8 @@ Route::post(
 */
 
 Route::prefix('admin')
-    ->middleware('auth:admin')
-    ->group(function (): void {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Roles
-        |--------------------------------------------------------------------------
-        */
+    ->middleware(['auth:sanctum'])
+    ->group(function () {
 
         Route::apiResource(
             'roles',
@@ -241,30 +199,14 @@ Route::prefix('admin')
         );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Admin Users
-        |--------------------------------------------------------------------------
-        */
-
-        Route::apiResource(
-            'admin-users',
-            AdminUserController::class
-        );
-
-        Route::post(
-            'admin-users/{adminUser}/password-reset',
-            [AdminPasswordResetController::class, 'store']
-        );
-
-        Route::delete(
-            'password-resets/{reset}',
-            [AdminPasswordResetController::class, 'destroy']
+        Route::get(
+            'customizations',
+            [AdminCustomization::class, 'index']
         );
 
         Route::get(
-            'admin-users/{adminUser}/notifications',
-            [AdminNotificationController::class, 'index']
+            'customizations/{id}',
+            [AdminCustomization::class, 'show']
         );
 
 
@@ -275,8 +217,8 @@ Route::prefix('admin')
         */
 
         Route::put(
-            'notifications/{notification}/read',
-            [AdminNotificationController::class, 'read']
+            'customizations/{customization}/status',
+            [AdminCustomization::class, 'updateStatus']
         );
 
 
@@ -299,41 +241,33 @@ Route::prefix('admin')
             [CustomerController::class, 'restore']
         );
 
-        Route::patch(
-            'customers/{customer}/status',
-            [CustomerController::class, 'changeStatus']
+        Route::put(
+            'orders/{order}/status',
+            [OrderStatusController::class, 'update']
         );
 
-        Route::patch(
-            'customers/{customer}/verify',
-            [CustomerController::class, 'verify']
+        Route::get(
+            'orders-statistics',
+            [AdminOrder::class, 'statistics']
+        );
+        Route::get(
+            'orders/{order}/production-history',
+            [OrderProductionController::class, 'history']
         );
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Products
-        |--------------------------------------------------------------------------
-        */
-
-        Route::apiResource(
-            'products',
-            ProductController::class
+        Route::post(
+            'orders/{order}/next-stage',
+            [OrderProductionController::class, 'changeStage']
         );
 
-        Route::apiResource(
-            'product-categories',
-            ProductCategoryController::class
+        Route::post(
+            'orders/{order}/stage/{stageId}',
+            [OrderProductionController::class, 'updateStage']
         );
 
-        Route::apiResource(
-            'product-media',
-            ProductMediaController::class
-        );
-
-        Route::apiResource(
-            'product-attributes',
-            ProductAttributeController::class
+        Route::get(
+            'orders/{order}/status-history',
+            [OrderStatusHistoryController::class, 'index']
         );
 
         Route::apiResource(
@@ -349,18 +283,18 @@ Route::prefix('admin')
         */
 
         Route::get(
-            'customizations',
-            [AdminCustomization::class, 'index']
+            'payments',
+            [AdminPayment::class, 'index']
         );
 
         Route::get(
-            'customizations/{id}',
-            [AdminCustomization::class, 'show']
+            'payments/{id}',
+            [AdminPayment::class, 'show']
         );
 
         Route::put(
-            'customizations/{customization}/status',
-            [AdminCustomization::class, 'updateStatus']
+            'payments/{payment}/status',
+            [AdminPayment::class, 'updateStatus']
         );
 
 
@@ -400,15 +334,19 @@ Route::prefix('admin')
         );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Production Stages
-        |--------------------------------------------------------------------------
-        */
+        Route::post(
+            'roles/{role}/permissions',
+            [RolePermissionController::class, 'store']
+        );
 
-        Route::apiResource(
-            'production-stages',
-            OrderProductionStageController::class
+        Route::delete(
+            'roles/{role}/permissions/{permission}',
+            [RolePermissionController::class, 'destroy']
+        );
+
+        Route::get(
+            'roles/{role}/permissions',
+            [RolePermissionController::class, 'index']
         );
 
 
@@ -428,14 +366,14 @@ Route::prefix('admin')
             [OrderStatusController::class, 'update']
         );
 
-        Route::get(
-            'orders-statistics',
-            [AdminOrder::class, 'statistics']
+        Route::post(
+            'admin-users/{adminUser}/password-reset',
+            [AdminPasswordResetController::class, 'store']
         );
 
-        Route::get(
-            'orders/{order}/production-history',
-            [OrderProductionController::class, 'history']
+        Route::delete(
+            'password-resets/{reset}',
+            [AdminPasswordResetController::class, 'destroy']
         );
 
         Route::post(
@@ -443,14 +381,14 @@ Route::prefix('admin')
             [OrderProductionController::class, 'changeStage']
         );
 
-        Route::post(
-            'orders/{order}/stage/{stageId}',
-            [OrderProductionController::class, 'updateStage']
+        Route::get(
+            'admin-users/{adminUser}/notifications',
+            [AdminNotificationController::class, 'index']
         );
 
-        Route::get(
-            'orders/{order}/status-history',
-            [OrderStatusHistoryController::class, 'index']
+        Route::put(
+            'notifications/{notification}/read',
+            [AdminNotificationController::class, 'read']
         );
 
 
@@ -460,19 +398,28 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
-        Route::get(
-            'payments',
-            [AdminPayment::class, 'index']
+        Route::apiResource(
+            'customers',
+            CustomerController::class
+        )->except([
+            'create',
+            'edit'
+        ]);
+
+
+        Route::patch(
+            'customers/{customer}/restore',
+            [CustomerController::class, 'restore']
         );
 
-        Route::get(
-            'payments/{id}',
-            [AdminPayment::class, 'show']
+        Route::patch(
+            'customers/{customer}/status',
+            [CustomerController::class, 'changeStatus']
         );
 
-        Route::put(
-            'payments/{payment}/status',
-            [AdminPayment::class, 'updateStatus']
+        Route::patch(
+            'customers/{customer}/verify',
+            [CustomerController::class, 'verify']
         );
 
 
@@ -514,6 +461,23 @@ Route::prefix('admin')
     });
 
 
+        Route::apiResource(
+            'product-categories',
+            ProductCategoryController::class
+        );
+
+
+        Route::apiResource(
+            'raw-materials',
+            RawMaterialController::class
+        );
+
+
+        Route::post(
+            'logout',
+            [AdminAuth::class, 'logout']
+        );
+    });
 /*
 |--------------------------------------------------------------------------
 | Customer API
@@ -524,8 +488,8 @@ Route::prefix('admin')
 */
 
 Route::prefix('customer')
-    ->middleware('auth:customer')
-    ->group(function (): void {
+    ->group(function () {
+
 
         /*
         |--------------------------------------------------------------------------
@@ -534,16 +498,30 @@ Route::prefix('customer')
         */
 
         Route::post(
-            'logout',
-            [CustomerAuthController::class, 'logout']
+            'login',
+            [AuthController::class, 'login']
         );
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Product Customizations
-        |--------------------------------------------------------------------------
-        */
+        Route::post(
+            'register',
+            [AuthController::class, 'register']
+        );
+
+
+        Route::post(
+            'logout',
+            [AuthController::class, 'logout']
+        )
+            ->middleware('auth:sanctum');
+    });
+
+
+
+Route::prefix('customer')
+    ->middleware('auth:sanctum')
+    ->group(function () {
+
 
         Route::apiResource(
             'customizations',
@@ -560,10 +538,11 @@ Route::prefix('customer')
         Route::apiResource(
             'orders',
             CustomerOrder::class
-        )->except([
-            'update',
-            'destroy',
-        ]);
+        )
+            ->except([
+                'update',
+                'destroy'
+            ]);
 
 
         /*
@@ -675,22 +654,29 @@ Route::prefix('customer')
         Route::get(
             'notifications',
             [CustomerNotificationController::class, 'index']
-        )->name('notifications.index');
+        )
+            ->name('notifications.index');
+
 
         Route::get(
             'notifications/{id}',
             [CustomerNotificationController::class, 'show']
-        )->name('notifications.show');
+        )
+            ->name('notifications.show');
+
 
         Route::patch(
             'notifications/{notification}/read',
             [CustomerNotificationController::class, 'read']
-        )->name('notifications.read');
+        )
+            ->name('notifications.read');
+
 
         Route::delete(
             'notifications/{notification}',
             [CustomerNotificationController::class, 'destroy']
-        )->name('notifications.destroy');
+        )
+            ->name('notifications.destroy');
 
 
         /*
@@ -702,11 +688,12 @@ Route::prefix('customer')
         Route::apiResource(
             'payments',
             CustomerPayment::class
-        )->only([
-            'index',
-            'store',
-            'show',
-        ]);
+        )
+            ->only([
+                'index',
+                'store',
+                'show'
+            ]);
 
 
         /*

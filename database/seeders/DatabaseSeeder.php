@@ -113,30 +113,168 @@ class DatabaseSeeder extends Seeder
      */
     private function seedAccessControl(): void
     {
-        $this->roles = Role::factory()->count(self::ROLES_COUNT)->create();
-        $this->permissions = Permission::factory()->count(self::PERMISSIONS_COUNT)->create();
+        /**
+         * Create roles
+         */
+        $this->roles = collect();
 
-        $this->roles->each(function (Role $role) {
-            $assigned = $this->permissions->random(min(random_int(4, 8), $this->permissions->count()));
 
-            foreach ($assigned as $permission) {
-                RolePermission::factory()->create([
-                    'role_id' => $role->id,
+        $this->roles->push(
+            Role::factory()->create([
+                'name' => 'Super Admin',
+                'description' => 'Full system access'
+            ])
+        );
+
+
+        Role::factory()
+            ->count(self::ROLES_COUNT - 1)
+            ->create()
+            ->each(function ($role) {
+                $this->roles->push($role);
+            });
+
+
+        /**
+         * Fixed permissions with modules
+         */
+        $permissions = [
+
+            // Admin Users
+            [
+                'name' => 'admin_users.view',
+                'module' => 'admin_users',
+            ],
+            [
+                'name' => 'admin_users.create',
+                'module' => 'admin_users',
+            ],
+            [
+                'name' => 'admin_users.update',
+                'module' => 'admin_users',
+            ],
+            [
+                'name' => 'admin_users.delete',
+                'module' => 'admin_users',
+            ],
+
+
+            // Notifications
+            [
+                'name' => 'notifications.view',
+                'module' => 'notifications',
+            ],
+            [
+                'name' => 'notifications.read',
+                'module' => 'notifications',
+            ],
+
+
+            // Orders
+            [
+                'name' => 'orders.view',
+                'module' => 'orders',
+            ],
+            [
+                'name' => 'orders.create',
+                'module' => 'orders',
+            ],
+            [
+                'name' => 'orders.update',
+                'module' => 'orders',
+            ],
+            [
+                'name' => 'orders.delete',
+                'module' => 'orders',
+            ],
+
+
+            // Products
+            [
+                'name' => 'products.view',
+                'module' => 'products',
+            ],
+            [
+                'name' => 'products.create',
+                'module' => 'products',
+            ],
+            [
+                'name' => 'products.update',
+                'module' => 'products',
+            ],
+            [
+                'name' => 'products.delete',
+                'module' => 'products',
+            ],
+
+
+            // Customers
+            [
+                'name' => 'customers.view',
+                'module' => 'customers',
+            ],
+            [
+                'name' => 'customers.update',
+                'module' => 'customers',
+            ],
+
+
+            // Reports
+            [
+                'name' => 'reports.view',
+                'module' => 'reports',
+            ],
+        ];
+
+
+        $this->permissions = collect($permissions)
+            ->map(function ($permission) {
+
+                return Permission::firstOrCreate(
+                    [
+                        'name' => $permission['name'],
+                    ],
+                    [
+                        'module' => $permission['module'],
+                    ]
+                );
+            });
+
+
+        /**
+         * Give all permissions to first role
+         * (Super Admin)
+         */
+        $adminRole = $this->roles->where('name', 'Super Admin')->first();
+
+        if (!$adminRole) {
+            $adminRole = $this->roles->first();
+        }
+
+
+        foreach ($this->permissions as $permission) {
+
+            RolePermission::updateOrCreate(
+                [
+                    'role_id' => $adminRole->id,
                     'permission_id' => $permission->id,
-                ]);
-            }
-        });
+                ]
+            );
+        }
     }
-
     /**
      * Module 1b: Admin/back-office accounts and their activity trail.
      */
     private function seedAdminStaff(): void
     {
-        $this->adminUsers = AdminUser::factory()
-            ->count(self::ADMIN_USERS_COUNT)
-            ->recycle($this->roles)
-            ->create();
+        
+          $this->adminUsers = AdminUser::factory()
+           ->count(self::ADMIN_USERS_COUNT)
+          ->recycle($this->roles)
+          ->create();
+         
+
+
 
         AdminPasswordReset::factory()
             ->count(self::ADMIN_PASSWORD_RESETS_COUNT)
@@ -203,7 +341,7 @@ class DatabaseSeeder extends Seeder
 
         $childCategories = ProductCategory::factory()
             ->count(self::CHILD_CATEGORIES_COUNT)
-            ->state(fn () => ['parent_id' => $rootCategories->random()->id])
+            ->state(fn() => ['parent_id' => $rootCategories->random()->id])
             ->create();
 
         $this->categories = $rootCategories->merge($childCategories);
@@ -260,7 +398,7 @@ class DatabaseSeeder extends Seeder
         $cartOwners = $this->customers->random(min(self::CARTS_COUNT, $this->customers->count()));
 
         $this->carts = $cartOwners->map(
-            fn (Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
+            fn(Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
         );
 
         $this->carts->each(function (Cart $cart) {
@@ -305,7 +443,7 @@ class DatabaseSeeder extends Seeder
      */
     private function seedOrders(): void
     {
-        $addresses = $this->customers->flatMap(fn (Customer $customer) => $customer->addresses);
+        $addresses = $this->customers->flatMap(fn(Customer $customer) => $customer->addresses);
 
         $this->orders = Order::factory()
             ->count(self::ORDERS_COUNT)
@@ -317,10 +455,10 @@ class DatabaseSeeder extends Seeder
             ->recycle([$this->orders, $this->products])
             ->create();
 
-            $customers = Customer::all();
-            $products = Product::all();
-            $colors = Color::all();
-            $designPatterns = DesignPattern::all();
+        $customers = Customer::all();
+        $products = Product::all();
+        $colors = Color::all();
+        $designPatterns = DesignPattern::all();
 
         $customizedItems = OrderItem::factory()
             ->count(self::CUSTOMIZED_ORDER_ITEMS_COUNT)
@@ -369,7 +507,7 @@ class DatabaseSeeder extends Seeder
 
         $reviewedItems = $this->orderItems->random(min(self::REVIEWED_ITEMS_COUNT, $this->orderItems->count()));
 
-        $reviews = $reviewedItems->map(fn (OrderItem $item) => Review::factory()->create([
+        $reviews = $reviewedItems->map(fn(OrderItem $item) => Review::factory()->create([
             'customer_id' => $orderCustomerMap[$item->order_id],
             'product_id' => $item->product_id,
             'order_item_id' => $item->id,
