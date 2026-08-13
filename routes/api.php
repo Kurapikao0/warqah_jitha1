@@ -204,6 +204,18 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
+        | Profile & Settings
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('profile', [\App\Http\Controllers\API\Admin\AdminProfileController::class, 'show']);
+        Route::put('profile', [\App\Http\Controllers\API\Admin\AdminProfileController::class, 'update']);
+        
+        Route::get('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'show']);
+        Route::put('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'update']);
+
+        /*
+        |--------------------------------------------------------------------------
         | Roles
         |--------------------------------------------------------------------------
         */

@@ -114,7 +114,14 @@ class DatabaseSeeder extends Seeder
      */
     private function seedAccessControl(): void
     {
-        $this->roles = Role::factory()->count(self::ROLES_COUNT)->create();
+        $superAdminRole = Role::factory()->create([
+            'name' => 'super-admin',
+            'description' => 'System Administrator'
+        ]);
+
+        $otherRoles = Role::factory()->count(self::ROLES_COUNT - 1)->create();
+        $this->roles = collect([$superAdminRole])->merge($otherRoles);
+
         $this->permissions = Permission::factory()->count(self::PERMISSIONS_COUNT)->create();
 
         $this->roles->each(function (Role $role) {
@@ -134,10 +141,21 @@ class DatabaseSeeder extends Seeder
      */
     private function seedAdminStaff(): void
     {
-        $this->adminUsers = AdminUser::factory()
-            ->count(self::ADMIN_USERS_COUNT)
+        $superAdminRole = $this->roles->where('name', 'super-admin')->first();
+
+        $superAdmin = AdminUser::factory()->create([
+            'full_name' => 'مدير النظام',
+            'email' => 'admin@admin.com',
+            'password_hash' => \Illuminate\Support\Facades\Hash::make('password'),
+            'role_id' => $superAdminRole->id,
+        ]);
+
+        $otherAdmins = AdminUser::factory()
+            ->count(self::ADMIN_USERS_COUNT - 1)
             ->recycle($this->roles)
             ->create();
+
+        $this->adminUsers = collect([$superAdmin])->merge($otherAdmins);
 
         AdminPasswordReset::factory()
             ->count(self::ADMIN_PASSWORD_RESETS_COUNT)

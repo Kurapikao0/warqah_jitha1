@@ -80,6 +80,10 @@ class RolePolicy
             return false;
         }
 
+        if ($admin->role->name === 'super-admin') {
+            return true;
+        }
+
         return $admin->role
             ->permissions()
             ->where('name', $permission)
