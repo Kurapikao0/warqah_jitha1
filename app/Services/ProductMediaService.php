@@ -64,7 +64,7 @@ class ProductMediaService
                     : ProductMediaType::Image;
 
                 $path = $file->store('product-media', 'public');
-                $url = Storage::url($path);
+                $url = asset(Storage::url($path));
 
                 $maxSortOrder++;
                 $isPrimary = false;

@@ -11,21 +11,21 @@ class AdminUserResource extends JsonResource
     {
         return [
 
-            'id'=>$this->id,
+            'id' => $this->id,
 
-            'full_name'=>$this->full_name,
+            'full_name' => $this->full_name,
 
-            'email'=>$this->email,
+            'email' => $this->email,
 
-            'phone'=>$this->phone,
+            'phone' => $this->phone,
 
-            'avatar_url'=>$this->avatar_url,
+            'avatar_url' => $this->avatar_url ? asset($this->avatar_url) : null,
 
-            'role'=>$this->whenLoaded(
+            'role' => $this->whenLoaded(
                 'role'
             ),
 
-            'created_at'=>$this->created_at,
+            'created_at' => $this->created_at,
 
         ];
     }

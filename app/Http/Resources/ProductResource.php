@@ -19,7 +19,11 @@ class ProductResource extends JsonResource
 
             'name' => $this->name,
 
+            'slug' => $this->slug,
+
             'sku' => $this->sku,
+
+            'category_id' => $this->category_id,
 
             'description' => $this->description,
 
@@ -31,13 +35,9 @@ class ProductResource extends JsonResource
 
             'is_customizable' => $this->is_customizable,
 
-            'category' => new ProductCategoryResource(
-                $this->whenLoaded('category')
-            ),
+            'category' => $this->whenLoaded('category', fn() => new ProductCategoryResource($this->category)),
 
-            'media' => ProductMediaResource::collection(
-                $this->whenLoaded('media')
-            ),
+            'media' => $this->whenLoaded('media', fn() => ProductMediaResource::collection($this->media)),
 
             'created_at' => $this->created_at,
         ];

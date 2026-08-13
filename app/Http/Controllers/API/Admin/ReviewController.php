@@ -9,6 +9,7 @@ use App\Http\Resources\ReviewResource;
 use App\Models\Review;
 use App\Services\AdminReviewService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ReviewController extends Controller
@@ -17,11 +18,19 @@ class ReviewController extends Controller
         protected AdminReviewService $reviewService
     ) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', Review::class);
 
-        $reviews = $this->reviewService->getAllReviews();
+        $filters = [
+            'search' => $request->query('search'),
+            'status' => $request->query('status'),
+            'rating' => $request->query('rating'),
+            'date_from' => $request->query('date_from'),
+            'date_to' => $request->query('date_to'),
+        ];
+
+        $reviews = $this->reviewService->getAllReviews($filters);
 
         return ReviewResource::collection($reviews);
     }
@@ -31,7 +40,7 @@ class ReviewController extends Controller
         $this->authorize('updateStatus', $review);
 
         $updatedReview = $this->reviewService->changeStatus(
-            $review, 
+            $review,
             $request->validated('status')
         );
 
@@ -46,7 +55,7 @@ class ReviewController extends Controller
         $this->authorize('reply', $review);
 
         $updatedReview = $this->reviewService->addAdminReply(
-            $review, 
+            $review,
             $request->validated('admin_reply')
         );
 

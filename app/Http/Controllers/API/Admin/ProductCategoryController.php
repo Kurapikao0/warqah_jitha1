@@ -20,6 +20,16 @@ class ProductCategoryController extends Controller
     ){
     }
 
+    protected function normalizePayload(array $data, $request): array
+    {
+        if ($request->hasFile('image')) {
+            $data['image_url'] = $request->file('image')->store('product-categories', 'public');
+        }
+
+        unset($data['image']);
+
+        return $data;
+    }
 
     public function index(): AnonymousResourceCollection
     {
@@ -36,7 +46,7 @@ class ProductCategoryController extends Controller
 
         $category =
             $this->service->store(
-                $request->validated()
+                $this->normalizePayload($request->validated(), $request)
             );
 
 
@@ -54,27 +64,8 @@ class ProductCategoryController extends Controller
 
 
     public function show(
-        ProductCategory $productCategory
+        ProductCategory $category
     ){
-
-        return new ProductCategoryResource(
-            $productCategory
-        );
-    }
-
-
-
-    public function update(
-        UpdateProductCategoryRequest $request,
-        ProductCategory $productCategory
-    ){
-
-        $category =
-            $this->service->update(
-                $productCategory,
-                $request->validated()
-            );
-
 
         return new ProductCategoryResource(
             $category
@@ -83,12 +74,31 @@ class ProductCategoryController extends Controller
 
 
 
+    public function update(
+        UpdateProductCategoryRequest $request,
+        ProductCategory $category
+    ){
+
+        $updatedCategory =
+            $this->service->update(
+                $category,
+                $this->normalizePayload($request->validated(), $request)
+            );
+
+
+        return new ProductCategoryResource(
+            $updatedCategory
+        );
+    }
+
+
+
     public function destroy(
-        ProductCategory $productCategory
+        ProductCategory $category
     ){
 
         $this->service->delete(
-            $productCategory
+            $category
         );
 
 

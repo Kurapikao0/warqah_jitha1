@@ -21,7 +21,7 @@ class AdminCustomerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->admin = AdminUser::factory()->create();
         Sanctum::actingAs($this->admin, ['*'], 'sanctum');
     }
@@ -29,8 +29,8 @@ class AdminCustomerTest extends TestCase
     #[Test]
     public function admin_can_create_a_new_customer(): void
     {
-        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL') 
-            ? CustomerCategory::INDIVIDUAL->value 
+        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL')
+            ? CustomerCategory::INDIVIDUAL->value
             : CustomerCategory::cases()[0]->value;
 
         $payload = [
@@ -84,11 +84,40 @@ class AdminCustomerTest extends TestCase
     }
 
     #[Test]
+    public function admin_can_filter_unverified_customers_only(): void
+    {
+        Customer::factory()->create([
+            'full_name' => 'مؤكد',
+            'email' => 'verified@example.com',
+            'phone' => '770000001',
+            'email_verified_at' => now(),
+        ]);
+
+        Customer::factory()->create([
+            'full_name' => 'غير مؤكد',
+            'email' => 'unverified@example.com',
+            'phone' => '770000002',
+            'email_verified_at' => null,
+        ]);
+
+        Sanctum::actingAs($this->admin, ['*'], 'sanctum');
+
+        $response = $this->getJson($this->adminCustomerUrl . '?verified=false');
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(1, 'data');
+
+        $response->assertJsonFragment(['email' => 'unverified@example.com'])
+            ->assertJsonMissing(['email' => 'verified@example.com']);
+    }
+
+    #[Test]
     public function admin_cannot_create_customer_with_duplicate_email_or_phone(): void
     {
         // Get valid category value
-        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL') 
-            ? CustomerCategory::INDIVIDUAL->value 
+        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL')
+            ? CustomerCategory::INDIVIDUAL->value
             : CustomerCategory::cases()[0]->value;
 
         // Create an existing customer

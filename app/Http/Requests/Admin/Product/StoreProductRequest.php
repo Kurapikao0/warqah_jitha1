@@ -13,10 +13,23 @@ class StoreProductRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return auth()->check();
+        return auth('admin')->check();
     }
 
-
+    protected function prepareForValidation(): void
+    {
+        if (empty($this->slug) && !empty($this->name)) {
+            $baseSlug = \Illuminate\Support\Str::slug($this->name);
+            if (empty($baseSlug)) {
+                $baseSlug = 'prd-' . strtolower(\Illuminate\Support\Str::random(6));
+            } else {
+                $baseSlug = $baseSlug . '-' . strtolower(\Illuminate\Support\Str::random(4));
+            }
+            $this->merge([
+                'slug' => $baseSlug,
+            ]);
+        }
+    }
 
     public function rules(): array
     {
@@ -28,6 +41,9 @@ class StoreProductRequest extends FormRequest
 
             'name'
                 =>'required|string|max:255',
+
+            'slug'
+                =>'required|string|max:255|unique:products,slug',
 
             'sku'
                 =>'required|string|unique:products,sku',

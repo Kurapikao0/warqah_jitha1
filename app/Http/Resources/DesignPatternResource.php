@@ -9,6 +9,12 @@ class DesignPatternResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $imageUrl = $this->preview_image_url;
+
+        if ($imageUrl && ! preg_match('/^https?:\/\//i', $imageUrl)) {
+            $imageUrl = asset('storage/' . $imageUrl);
+        }
+
         return [
 
             'id' => $this->id,
@@ -17,7 +23,9 @@ class DesignPatternResource extends JsonResource
 
             'description' => $this->description,
 
-            'preview_image_url' => $this->preview_image_url,
+            'preview_image_url' => $imageUrl,
+
+            'image_url' => $imageUrl,
 
             'created_at' => $this->created_at,
 

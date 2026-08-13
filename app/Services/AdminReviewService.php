@@ -13,9 +13,9 @@ class AdminReviewService
         protected AdminReviewRepositoryInterface $reviewRepository
     ) {}
 
-    public function getAllReviews(): LengthAwarePaginator
+    public function getAllReviews(array $filters = []): LengthAwarePaginator
     {
-        return $this->reviewRepository->getAllPaginated();
+        return $this->reviewRepository->getAllPaginated($filters);
     }
 
     public function changeStatus(Review $review, string $status): Review

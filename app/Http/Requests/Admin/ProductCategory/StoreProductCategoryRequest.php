@@ -8,7 +8,7 @@ class StoreProductCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return auth('admin')->check();
     }
 
     public function rules(): array
@@ -17,12 +17,33 @@ class StoreProductCategoryRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
+                'max:100',
+            ],
+
+            'slug' => [
+                'required',
+                'string',
+                'max:120',
+                'unique:product_categories,slug',
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+
+            'image_url' => [
+                'nullable',
+                'string',
                 'max:255',
             ],
 
-            'description' => [
+            'parent_id' => [
                 'nullable',
-                'string',
+                'integer',
+                'exists:product_categories,id',
             ],
         ];
     }

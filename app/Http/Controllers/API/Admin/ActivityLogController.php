@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ActivityLogResource;
 use App\Models\ActivityLog;
 use App\Services\ActivityLogService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ActivityLogController extends Controller
@@ -16,32 +17,25 @@ class ActivityLogController extends Controller
     ) {
     }
 
-
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
+        $filters = [
+            'search' => $request->query('search'),
+            'action' => $request->query('action'),
+            'date_from' => $request->query('date_from'),
+            'date_to' => $request->query('date_to'),
+        ];
 
-        $logs = $this->service->paginate();
+        $logs = $this->service->paginate($filters);
 
-
-        return ActivityLogResource::collection(
-            $logs
-        );
+        return ActivityLogResource::collection($logs);
     }
-
-
 
     public function show(
         ActivityLog $activityLog
     ): ActivityLogResource {
+        $log = $this->service->show($activityLog);
 
-
-        $log = $this->service->show(
-            $activityLog
-        );
-
-
-        return new ActivityLogResource(
-            $log
-        );
+        return new ActivityLogResource($log);
     }
 }

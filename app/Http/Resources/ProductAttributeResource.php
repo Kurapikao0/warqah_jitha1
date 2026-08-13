@@ -9,13 +9,23 @@ class ProductAttributeResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $inputType = $this->input_type;
+
+        if ($inputType instanceof \BackedEnum) {
+            $inputType = $inputType->value;
+        }
+
         return [
 
             'id' => $this->id,
 
             'name' => $this->name,
 
-            'input_type' => $this->input_type,
+            'display_name' => $this->name,
+
+            'input_type' => $inputType,
+
+            'type' => $inputType,
 
             'values' => ProductAttributeValueResource::collection(
                 $this->whenLoaded('values')

@@ -16,6 +16,25 @@ class DesignPatternController extends Controller
     ) {
     }
 
+    protected function normalizePayload(array $data, $request): array
+    {
+        if ($request->hasFile('image')) {
+            $data['preview_image_url'] = $request->file('image')->store('design-patterns', 'public');
+        }
+
+        if (isset($data['image_url']) && ! isset($data['preview_image_url'])) {
+            $data['preview_image_url'] = $data['image_url'];
+        }
+
+        if (isset($data['preview_image_url']) && ! isset($data['image_url'])) {
+            $data['image_url'] = $data['preview_image_url'];
+        }
+
+        unset($data['image']);
+
+        return $data;
+    }
+
     public function index()
     {
         $this->authorize('viewAny', DesignPattern::class);
@@ -31,7 +50,7 @@ class DesignPatternController extends Controller
         $this->authorize('create', DesignPattern::class);
 
         $designPattern = $this->service->create(
-            $request->validated()
+            $this->normalizePayload($request->validated(), $request)
         );
 
         return response()->json([
@@ -56,7 +75,7 @@ class DesignPatternController extends Controller
 
         $this->service->update(
             $designPattern,
-            $request->validated()
+            $this->normalizePayload($request->validated(), $request)
         );
 
         return response()->json([
