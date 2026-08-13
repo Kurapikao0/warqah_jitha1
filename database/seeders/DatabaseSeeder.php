@@ -131,11 +131,10 @@ class DatabaseSeeder extends Seeder
                 RolePermission::factory()->create([
                     'role_id' => $role->id,
                     'permission_id' => $permission->id,
-                ]);
-            }
-        });
+                ]
+            );
+        }
     }
-
     /**
      * Module 1b: Admin/back-office accounts and their activity trail.
      */
@@ -252,7 +251,7 @@ VerificationCode::insert($verificationCodes);
 
         $childCategories = ProductCategory::factory()
             ->count(self::CHILD_CATEGORIES_COUNT)
-            ->state(fn () => ['parent_id' => $rootCategories->random()->id])
+            ->state(fn() => ['parent_id' => $rootCategories->random()->id])
             ->create();
 
         $this->categories = $rootCategories->merge($childCategories);
@@ -309,7 +308,7 @@ VerificationCode::insert($verificationCodes);
         $cartOwners = $this->customers->random(min(self::CARTS_COUNT, $this->customers->count()));
 
         $this->carts = $cartOwners->map(
-            fn (Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
+            fn(Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
         );
 
         $this->carts->each(function (Cart $cart) {
@@ -354,7 +353,7 @@ VerificationCode::insert($verificationCodes);
      */
     private function seedOrders(): void
     {
-        $addresses = $this->customers->flatMap(fn (Customer $customer) => $customer->addresses);
+        $addresses = $this->customers->flatMap(fn(Customer $customer) => $customer->addresses);
 
         $this->orders = Order::factory()
             ->count(self::ORDERS_COUNT)
@@ -366,10 +365,10 @@ VerificationCode::insert($verificationCodes);
             ->recycle([$this->orders, $this->products])
             ->create();
 
-            $customers = Customer::all();
-            $products = Product::all();
-            $colors = Color::all();
-            $designPatterns = DesignPattern::all();
+        $customers = Customer::all();
+        $products = Product::all();
+        $colors = Color::all();
+        $designPatterns = DesignPattern::all();
 
         $customizedItems = OrderItem::factory()
             ->count(self::CUSTOMIZED_ORDER_ITEMS_COUNT)
@@ -418,7 +417,7 @@ VerificationCode::insert($verificationCodes);
 
         $reviewedItems = $this->orderItems->random(min(self::REVIEWED_ITEMS_COUNT, $this->orderItems->count()));
 
-        $reviews = $reviewedItems->map(fn (OrderItem $item) => Review::factory()->create([
+        $reviews = $reviewedItems->map(fn(OrderItem $item) => Review::factory()->create([
             'customer_id' => $orderCustomerMap[$item->order_id],
             'product_id' => $item->product_id,
             'order_item_id' => $item->id,

@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\RawMaterial;
+use App\Policies\RawMaterialPolicy;
+use App\Models\Role;
+use App\Policies\RolePolicy;
+use App\Models\Permission;
+use App\Policies\PermissionPolicy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -75,10 +81,16 @@ class AppServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-
+        //
         $this->app->bind(
             ProductRepositoryInterface::class,
             ProductRepository::class
+
+        $this->app->bind(
+
+            CustomizationRepositoryInterface::class,
+
+            CustomizationRepository::class
         );
 
 
@@ -87,12 +99,11 @@ class AppServiceProvider extends ServiceProvider
             CustomizationRepository::class
         );
 
-
-        $this->app->bind(
             OrderRepositoryInterface::class,
-            OrderRepository::class
-        );
 
+            OrderRepository::class
+
+        );
 
         $this->app->bind(
             CartRepositoryInterface::class,
@@ -105,24 +116,29 @@ class AppServiceProvider extends ServiceProvider
             FavoriteRepository::class
         );
 
+        $this->app->bind(
+
+            PaymentRepositoryInterface::class,
+
+            PaymentRepository::class
+
+        );
 
         $this->app->bind(
             PaymentRepositoryInterface::class,
             PaymentRepository::class
         );
 
-
-        $this->app->bind(
             OrderStatusHistoryRepositoryInterface::class,
-            OrderStatusHistoryRepository::class
-        );
 
+            OrderStatusHistoryRepository::class
+
+        );
 
         $this->app->bind(
             OrderProductionStageRepositoryInterface::class,
             OrderProductionStageRepository::class
         );
-
 
         $this->app->bind(
             OrderProductionRepositoryInterface::class,
@@ -147,7 +163,6 @@ class AppServiceProvider extends ServiceProvider
             ColorRepository::class
         );
 
-
         $this->app->bind(
             ProductAttributeRepositoryInterface::class,
             ProductAttributeRepository::class
@@ -165,11 +180,12 @@ class AppServiceProvider extends ServiceProvider
             CustomerRepository::class
         );
 
-
         $this->app->bind(
             AdminReviewRepositoryInterface::class,
             AdminReviewRepository::class
         );
+
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
 
 
         $this->app->bind(
@@ -187,21 +203,6 @@ class AppServiceProvider extends ServiceProvider
             EmailLogRepositoryInterface::class,
             EmailLogRepository::class
         );
-
-        $this->app->singleton(
-            NotificationFactory::class,
-            function (): NotificationFactory {
-
-                $factory = new NotificationFactory();
-
-                $factory->register(
-                    'welcome_email',
-                    WelcomeNotification::class
-                );
-
-                return $factory;
-            }
-        );
     }
 
 
@@ -214,12 +215,30 @@ class AppServiceProvider extends ServiceProvider
             CustomerPolicy::class
         );
 
+        Gate::policy(
+            Permission::class,
+            PermissionPolicy::class
+        );
+
+        Gate::policy(
+            Role::class,
+            RolePolicy::class
+        );
+
+        Gate::policy(
+            RawMaterial::class,
+            RawMaterialPolicy::class
+        );
+
+        // Gate::policy(
+        //     Category::class,
+        //     CategoryPolicy::class
+        // );      
 
         Gate::policy(
             Address::class,
             AddressPolicy::class
         );
-
     }
 
 }

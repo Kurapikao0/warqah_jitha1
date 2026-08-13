@@ -16,11 +16,7 @@ class UpdateRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        $role = $this->route('role');
 
-        if (!$role instanceof Role) {
-            return false;
-        }
 
         return $this->user('admin')?->can('update', $role) ?? false;
     }
@@ -40,8 +36,10 @@ class UpdateRoleRequest extends FormRequest
                 'string',
                 'min:2',
                 'max:100',
+                //  Rule::unique('roles', 'name'),
                 Rule::unique('roles', 'name')
-                    ->ignore($role instanceof Role ? $role->getKey() : null),
+                    ->ignore($this->role->id), // هذا تعديلي 
+
             ],
 
             'description' => [
@@ -112,4 +110,3 @@ class UpdateRoleRequest extends FormRequest
         }
     }
 }
-
