@@ -146,7 +146,7 @@ class DatabaseSeeder extends Seeder
         $superAdmin = AdminUser::factory()->create([
             'full_name' => 'مدير النظام',
             'email' => 'admin@admin.com',
-            'password_hash' => \Illuminate\Support\Facades\Hash::make('password'),
+            'password_hash' => \Illuminate\Support\Facades\Hash::make('p@ssword123!'),
             'role_id' => $superAdminRole->id,
         ]);
 
