@@ -131,9 +131,9 @@ class DatabaseSeeder extends Seeder
                 RolePermission::factory()->create([
                     'role_id' => $role->id,
                     'permission_id' => $permission->id,
-                ]
-            );
-        }
+                ]);
+            }
+        });
     }
     /**
      * Module 1b: Admin/back-office accounts and their activity trail.
