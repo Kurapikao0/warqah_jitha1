@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('contact_email')->default('admin@waraqh.com');
             $table->string('contact_phone')->nullable();
             $table->decimal('tax_rate', 5, 2)->default(15);
-            $table->string('default_currency')->default('SAR');
+            $table->string('default_currency')->default('YER');
             $table->boolean('maintenance_mode')->default(false);
             $table->string('maintenance_message')->nullable();
             $table->timestamps();

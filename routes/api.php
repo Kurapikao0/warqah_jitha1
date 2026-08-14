@@ -213,6 +213,7 @@ Route::prefix('admin')
 
         Route::get('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'show']);
         Route::put('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'update']);
+        Route::get('exchange-rates', [\App\Http\Controllers\API\Admin\ExchangeRateController::class, 'index']);
 
         /*
         |--------------------------------------------------------------------------

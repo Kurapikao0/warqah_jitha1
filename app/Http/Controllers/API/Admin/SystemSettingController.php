@@ -14,10 +14,10 @@ class SystemSettingController extends Controller
             'store_name' => 'Waraqh',
             'contact_email' => 'admin@waraqh.com',
             'tax_rate' => 15,
-            'default_currency' => 'SAR',
+            'default_currency' => 'YER',
             'maintenance_mode' => false,
         ]);
-        
+
         return response()->json([
             'data' => $settings
         ]);
@@ -35,17 +35,17 @@ class SystemSettingController extends Controller
             'maintenance_mode' => 'nullable|boolean',
             'maintenance_message' => 'nullable|string',
         ]);
-        
+
         $settings = SystemSetting::firstOrCreate([], [
             'store_name' => 'Waraqh',
             'contact_email' => 'admin@waraqh.com',
             'tax_rate' => 15,
-            'default_currency' => 'SAR',
+            'default_currency' => 'YER',
             'maintenance_mode' => false,
         ]);
-        
+
         $settings->update($validated);
-        
+
         return response()->json([
             'data' => $settings
         ]);
