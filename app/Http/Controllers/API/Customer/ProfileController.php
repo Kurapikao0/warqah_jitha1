@@ -10,7 +10,6 @@ use App\Http\Resources\CustomerResource;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Throwable;
 
 class ProfileController extends Controller
 {
@@ -41,7 +40,6 @@ class ProfileController extends Controller
     {
         $customer = $request->user();
 
-        try {
             $customer = $this->customerService->updateProfile(
                 $customer,
                 $request->validated()
@@ -53,15 +51,6 @@ class ProfileController extends Controller
                 'data'    => new CustomerResource($customer),
                 'errors'  => null,
             ], Response::HTTP_OK);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Profile update failed',
-                'data'    => null,
-                'errors'  => [$exception->getMessage()],
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     /**
@@ -71,7 +60,6 @@ class ProfileController extends Controller
     {
         $customer = $request->user();
 
-        try {
             $this->customerService->changePassword(
                 $customer,
                 $request->password
@@ -84,14 +72,6 @@ class ProfileController extends Controller
                 'errors'  => null,
             ], Response::HTTP_OK);
 
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Password change failed',
-                'data'    => null,
-                'errors'  => [$exception->getMessage()],
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
     }
 
     /**
@@ -118,12 +98,11 @@ class ProfileController extends Controller
      */
     public function updateAvatar(UpdateAvatarRequest $request)
     {
-        try {
             $customer = $request->user();
 
             // تم التغيير من authService إلى customerService
             $updatedCustomer = $this->customerService->updateAvatar(
-                $customer, 
+                $customer,
                 $request->file('avatar')
             );
 
@@ -134,14 +113,5 @@ class ProfileController extends Controller
                 'data'    => new CustomerResource($updatedCustomer),
                 'errors'  => null,
             ], Response::HTTP_OK);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update avatar',
-                'data'    => null,
-                'errors'  => [$exception->getMessage()],
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }    
+    }
 }

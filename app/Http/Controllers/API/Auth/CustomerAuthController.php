@@ -8,8 +8,7 @@ use App\Http\Requests\Auth\CustomerRegisterRequest;
 use App\Http\Resources\CustomerResource;
 use App\Services\AuthService;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Validation\ValidationException;
-use Throwable;
+
 
 class CustomerAuthController extends Controller
 {
@@ -26,33 +25,20 @@ class CustomerAuthController extends Controller
      */
     public function register(CustomerRegisterRequest $request)
     {
-        try {
-            $validated = $request->validated();
+        $validated = $request->validated();
 
-            // 1. تسجيل العميل عبر AuthService
-            $customer = $this->authService->register($validated);
+        $customer = $this->authService->register($validated);
 
-            // 2. إنشاء Access Token للعميل
-            $token = $customer->createToken('auth_token')->plainTextToken;
+        $token = $customer->createToken('auth_token')->plainTextToken;
 
-            // 3. إرجاع الاستجابة الموحدة
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer registered successfully',
-                'user'    => new CustomerResource($customer),
-                'token'   => $token,
-                'data'    => new CustomerResource($customer),
-                'errors'  => null
-            ], Response::HTTP_CREATED);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Registration failed',
-                'data'    => null,
-                'errors'  => [$exception->getMessage()]
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer registered successfully',
+            'user' => new CustomerResource($customer),
+            'token' => $token,
+            'data' => new CustomerResource($customer),
+            'errors' => null,
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -63,41 +49,20 @@ class CustomerAuthController extends Controller
      */
     public function login(CustomerLoginRequest $request)
     {
-        try {
-            $validated = $request->validated();
+        $validated = $request->validated();
 
-            // 1. التحقق من بيانات الدخول عن طريق AuthService
-            $customer = $this->authService->login($validated);
+        $customer = $this->authService->login($validated);
 
-            // 2. إصدار Access Token جديد
-            $token = $customer->createToken('auth_token')->plainTextToken;
+        $token = $customer->createToken('auth_token')->plainTextToken;
 
-            // 3. إرجاع الاستجابة بنسق موحد مطابق لاختبارات Postman
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer logged in successfully',
-                'user'    => new CustomerResource($customer),
-                'token'   => $token,
-                'data'    => new CustomerResource($customer),
-                'errors'  => null
-            ], Response::HTTP_OK);
-
-        } catch (ValidationException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'data'    => null,
-                'errors'  => $exception->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login failed',
-                'data'    => null,
-                'errors'  => [$exception->getMessage()]
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer logged in successfully',
+            'user' => new CustomerResource($customer),
+            'token' => $token,
+            'data' => new CustomerResource($customer),
+            'errors' => null,
+        ], Response::HTTP_OK);
     }
 
     /**
