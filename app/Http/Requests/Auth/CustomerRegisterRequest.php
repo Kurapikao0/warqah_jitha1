@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Enums\CustomerCategory;
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,8 +30,8 @@ class CustomerRegisterRequest extends FormRequest
         return [
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:customers,email'],
-            'phone_country_code' => ['required', 'string'],
-            'phone' => ['required', 'string', 'unique:customers,phone'],
+            'phone_country_code' => ['required', 'string', 'max:10'],
+            'phone' => ['required', 'string', 'max:20', new YemenPhoneRule(), 'unique:customers,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
             'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

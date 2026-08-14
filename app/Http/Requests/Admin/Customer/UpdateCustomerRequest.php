@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Customer;
 
 use App\Enums\CustomerCategory;
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,8 +22,8 @@ class UpdateCustomerRequest extends FormRequest
         return [
             'full_name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', Rule::unique('customers', 'email')->ignore($customerId)],
-            'phone_country_code' => ['sometimes', 'string'],
-            'phone' => ['sometimes', 'string', Rule::unique('customers', 'phone')->ignore($customerId)],
+            'phone_country_code' => ['sometimes', 'string', 'max:10'],
+            'phone' => ['sometimes', 'string', 'max:20', new YemenPhoneRule(), Rule::unique('customers', 'phone')->ignore($customerId)],
             'password' => ['sometimes', 'string', 'min:8'], // اختياري عند التحديث
             'category' => ['sometimes', Rule::enum(CustomerCategory::class)],
         ];
