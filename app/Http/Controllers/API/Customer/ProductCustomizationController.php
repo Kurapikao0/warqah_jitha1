@@ -79,13 +79,13 @@ $customization
 
 public function show($id)
 {
+    $customization = $this->service->find($id);
 
-return new ProductCustomizationResource(
+    $this->authorize('view', $customization);
 
-$this->service->find($id)
-
-);
-
+    return new ProductCustomizationResource(
+        $customization
+    );
 }
 
 

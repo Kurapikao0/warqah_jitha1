@@ -35,7 +35,6 @@ class CustomerRegisterRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
             'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'category' => ['sometimes', Rule::enum(CustomerCategory::class)],
         ];
     }
 
@@ -66,23 +65,6 @@ class CustomerRegisterRequest extends FormRequest
             'password.confirmed' => 'تأكيد كلمة المرور لا يطابق',
 
             'password_confirmation.required' => 'تأكيد كلمة المرور مطلوب',
-
-            'category.enum' => 'فئة العميل غير صحيحة',
         ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     *
-     * @return void
-     */
-    protected function prepareForValidation(): void
-    {
-        // إذا لم يتم تحديد category، اضبطها على الفئة الافتراضية (الأولى)
-        if (!$this->has('category') || empty($this->input('category'))) {
-            $this->merge([
-                'category' => CustomerCategory::cases()[0]->value,
-            ]);
-        }
     }
 }

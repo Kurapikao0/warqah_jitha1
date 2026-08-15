@@ -11,48 +11,55 @@ class ExchangeRateService
 {
     public function syncFromApi(): array
     {
-        $apiKey = config('services.exchange_rate_api.key');
-        $baseUrl = rtrim((string) config('services.exchange_rate_api.base_url', 'https://v6.exchangerate-api.com/v6'), '/');
-
-        if (blank($apiKey)) {
-            throw new RuntimeException('ExchangeRate-API key is not configured.');
-        }
+        $baseUrl = rtrim((string) config('services.yemen_rates_api.base_url', 'https://cygrlhmnmckoefefnsjc.supabase.co/functions/v1/public-api'), '/');
+        $city = config('services.yemen_rates_api.city', 'sanaa');
 
         $response = Http::acceptJson()
             ->timeout(15)
-            ->get("{$baseUrl}/{$apiKey}/latest/USD");
+            ->get("{$baseUrl}/latest", [
+                'city' => $city,
+            ]);
 
         if (! $response->successful()) {
-            $errorType = $response->json('error-type') ?? 'request_failed';
-            Log::warning('Exchange rate API request failed.', [
+            Log::warning('Yemen exchange rate API request failed.', [
                 'status' => $response->status(),
-                'error_type' => $errorType,
                 'body' => $response->json(),
             ]);
 
-            throw new RuntimeException("Exchange rate API request failed: {$errorType}");
+            throw new RuntimeException('Yemen exchange rate API request failed.');
         }
 
         $payload = $response->json();
-        $rates = data_get($payload, 'conversion_rates', []);
+        $cityData = data_get($payload, 'data.0.rates', []);
 
-        if (! is_array($rates) || empty($rates)) {
-            throw new RuntimeException('Exchange rate API returned no conversion rates.');
+        if (! is_array($cityData) || empty($cityData)) {
+            throw new RuntimeException('Yemen exchange rate API returned no rates.');
         }
 
         $stored = [];
 
-        foreach ($rates as $currencyCode => $rate) {
-            if (! is_numeric($rate)) {
+        foreach ($cityData as $entry) {
+            $code = data_get($entry, 'code');
+            $sell = data_get($entry, 'sell');
+            $buy = data_get($entry, 'buy');
+
+            if (! $code || ! is_numeric($sell) || ! is_numeric($buy)) {
                 continue;
             }
 
+            // نستخدم متوسط سعري البيع والشراء كسعر مرجعي واحد للعرض
+            $averageRate = ((float) $sell + (float) $buy) / 2;
+
             $stored[] = ExchangeRate::create([
-                'base_currency' => 'USD',
-                'target_currency' => strtoupper((string) $currencyCode),
-                'rate' => (float) $rate,
+                'base_currency' => strtoupper((string) $code),
+                'target_currency' => 'YER',
+                'rate' => $averageRate,
                 'fetched_at' => now(),
             ]);
+        }
+
+        if (empty($stored)) {
+            throw new RuntimeException('No valid currency rates found in API response.');
         }
 
         return $stored;
@@ -61,31 +68,32 @@ class ExchangeRateService
     public function getLatestRates(): array
     {
         $latestRecords = ExchangeRate::query()
-            ->where('base_currency', 'USD')
+            ->where('target_currency', 'YER')
             ->orderByDesc('fetched_at')
             ->get()
-            ->groupBy('target_currency')
+            ->groupBy('base_currency')
             ->map(fn ($items) => $items->first())
             ->values();
 
         $rates = [];
 
         foreach ($latestRecords as $record) {
-            $rates[$record->target_currency] = (float) $record->rate;
+            $rates[$record->base_currency] = (float) $record->rate;
         }
 
         $latest = ExchangeRate::query()
-            ->where('base_currency', 'USD')
+            ->where('target_currency', 'YER')
             ->latest('fetched_at')
             ->first();
 
         $lastUpdatedAt = $latest?->fetched_at ?? null;
 
         return [
-            'base_currency' => 'USD',
+            'base_currency' => 'YER',
             'rates' => $rates,
             'last_updated_at' => $lastUpdatedAt ? $lastUpdatedAt->toISOString() : null,
             'is_stale' => $lastUpdatedAt === null || $lastUpdatedAt->diffInHours(now()) > 24,
         ];
     }
 }
+

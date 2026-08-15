@@ -61,6 +61,10 @@ CartItem $cartItem
 )
 {
 
+abort_if(
+    $cartItem->cart?->customer_id !== auth()->id(),
+    403
+);
 
 $this->service
 ->updateItem(
@@ -87,6 +91,10 @@ CartItem $cartItem
 )
 {
 
+abort_if(
+    $cartItem->cart?->customer_id !== auth()->id(),
+    403
+);
 
 $this->service
 ->removeItem($cartItem);

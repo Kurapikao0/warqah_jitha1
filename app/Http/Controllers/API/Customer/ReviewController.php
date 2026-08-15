@@ -99,7 +99,7 @@ class ReviewController extends Controller
         UpdateReviewRequest $request,
         Review $review
     ): JsonResponse {
-
+        $this->authorize('update', $review);
 
         $review = $this->service->update(
             $review,
@@ -121,7 +121,7 @@ class ReviewController extends Controller
     public function destroy(
         Review $review
     ): JsonResponse {
-
+        $this->authorize('delete', $review);
 
         $this->service->delete(
             $review
