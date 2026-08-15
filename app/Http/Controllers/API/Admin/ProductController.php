@@ -26,13 +26,13 @@ public function __construct(
 
 
 
-public function index()
+public function index(Request $request)
 {
-
-return ProductResource::collection(
-    $this->service->getAll()
-);
-
+    return ProductResource::collection(
+        $this->service->getAll(
+            $request->query('search')
+        )
+    );
 }
 
 

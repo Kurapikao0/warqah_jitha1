@@ -9,6 +9,29 @@ use App\Enums\ProductAttributeInputType;
 
 class UpdateProductAttributeRequest extends FormRequest
 {
+    public function prepareForValidation(): void
+    {
+        $data = $this->all();
+
+        if (! array_key_exists('name', $data) && array_key_exists('display_name', $data)) {
+            $data['name'] = $data['display_name'];
+        }
+
+        if (! array_key_exists('display_name', $data) && array_key_exists('name', $data)) {
+            $data['display_name'] = $data['name'];
+        }
+
+        if (! array_key_exists('input_type', $data) && array_key_exists('type', $data)) {
+            $data['input_type'] = $data['type'];
+        }
+
+        if (! array_key_exists('type', $data) && array_key_exists('input_type', $data)) {
+            $data['type'] = $data['input_type'];
+        }
+
+        $this->replace($data);
+    }
+
     public function authorize(): bool
     {
         return auth('admin')->check();
@@ -19,10 +42,10 @@ class UpdateProductAttributeRequest extends FormRequest
         return [
 
             'name' => [
-                'required',
+                'sometimes',
                 'string',
-                Rule::unique('product_attributes')
-                    ->ignore($this->productAttribute),
+                Rule::unique('product_attributes', 'name')
+                    ->ignore($this->route('product_attribute')),
             ],
 
             'input_type' => [

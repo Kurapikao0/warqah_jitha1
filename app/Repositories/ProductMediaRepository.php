@@ -37,4 +37,27 @@ class ProductMediaRepository implements ProductMediaRepositoryInterface
     ): bool {
         return $media->delete();
     }
+
+    public function reorder(
+        int $productId,
+        array $orderedIds
+    ): void {
+        foreach ($orderedIds as $index => $mediaId) {
+            ProductMedia::where('id', $mediaId)
+                ->where('product_id', $productId)
+                ->update(['sort_order' => $index + 1]);
+        }
+    }
+
+    public function setPrimary(
+        int $productId,
+        int $mediaId
+    ): void {
+        ProductMedia::where('product_id', $productId)
+            ->update(['is_primary' => false]);
+
+        ProductMedia::where('id', $mediaId)
+            ->where('product_id', $productId)
+            ->update(['is_primary' => true]);
+    }
 }

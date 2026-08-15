@@ -19,10 +19,10 @@ class ProductService
 
 
 
-    public function getAll()
-    {
-        return $this->repository->all();
-    }
+    public function getAll(?string $search = null)
+{
+    return $this->repository->all($search);
+}
 
 
 

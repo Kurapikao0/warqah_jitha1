@@ -9,30 +9,39 @@ class ActivityLogResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $adminUser = $this->adminUser;
+        $action = (string) $this->action;
+
+        if (str_contains($action, 'created')) {
+            $normalizedAction = 'created';
+        } elseif (str_contains($action, 'updated')) {
+            $normalizedAction = 'updated';
+        } elseif (str_contains($action, 'deleted')) {
+            $normalizedAction = 'deleted';
+        } else {
+            $normalizedAction = 'updated';
+        }
+
+        $meta = is_array($this->meta) ? $this->meta : [];
+        $description = $meta['description'] ?? $this->action;
+
         return [
-
             'id' => $this->id,
-
-            'action' => $this->action,
-
+            'user_id' => $adminUser?->id,
+            'user_name' => $adminUser?->full_name ?? '—',
+            'action' => $normalizedAction,
+            'subject_type' => $this->entity_type,
+            'subject_id' => $this->entity_id,
             'entity_type' => $this->entity_type,
-
             'entity_id' => $this->entity_id,
-
-            'meta' => $this->meta,
-
-            'admin_user' => $this->whenLoaded(
-                'adminUser',
-                function () {
-                    return [
-                        'id' => $this->adminUser->id,
-                        'name' => $this->adminUser->full_name,
-                    ];
-                }
-            ),
-
+            'description' => $description,
+            'meta' => $meta,
+            'admin_user' => $adminUser ? [
+                'id' => $adminUser->id,
+                'name' => $adminUser->full_name,
+                'avatar_url' => $adminUser->avatar_url ? asset($adminUser->avatar_url) : null,
+            ] : null,
             'created_at' => $this->created_at,
-
         ];
     }
 }

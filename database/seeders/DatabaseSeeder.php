@@ -1,7 +1,8 @@
 <?php
 
 namespace Database\Seeders;
-
+use LogicException ;
+use App\Enums\VerificationPurpose;
 use App\Models\ActivityLog;
 use App\Models\Address;
 use App\Models\AdminNotification;
@@ -113,168 +114,47 @@ class DatabaseSeeder extends Seeder
      */
     private function seedAccessControl(): void
     {
-        /**
-         * Create roles
-         */
-        $this->roles = collect();
+        $superAdminRole = Role::factory()->create([
+            'name' => 'super-admin',
+            'description' => 'System Administrator'
+        ]);
 
+        $otherRoles = Role::factory()->count(self::ROLES_COUNT - 1)->create();
+        $this->roles = collect([$superAdminRole])->merge($otherRoles);
 
-        $this->roles->push(
-            Role::factory()->create([
-                'name' => 'Super Admin',
-                'description' => 'Full system access'
-            ])
-        );
+        $this->permissions = Permission::factory()->count(self::PERMISSIONS_COUNT)->create();
 
+        $this->roles->each(function (Role $role) {
+            $assigned = $this->permissions->random(min(random_int(4, 8), $this->permissions->count()));
 
-        Role::factory()
-            ->count(self::ROLES_COUNT - 1)
-            ->create()
-            ->each(function ($role) {
-                $this->roles->push($role);
-            });
-
-
-        /**
-         * Fixed permissions with modules
-         */
-        $permissions = [
-
-            // Admin Users
-            [
-                'name' => 'admin_users.view',
-                'module' => 'admin_users',
-            ],
-            [
-                'name' => 'admin_users.create',
-                'module' => 'admin_users',
-            ],
-            [
-                'name' => 'admin_users.update',
-                'module' => 'admin_users',
-            ],
-            [
-                'name' => 'admin_users.delete',
-                'module' => 'admin_users',
-            ],
-
-
-            // Notifications
-            [
-                'name' => 'notifications.view',
-                'module' => 'notifications',
-            ],
-            [
-                'name' => 'notifications.read',
-                'module' => 'notifications',
-            ],
-
-
-            // Orders
-            [
-                'name' => 'orders.view',
-                'module' => 'orders',
-            ],
-            [
-                'name' => 'orders.create',
-                'module' => 'orders',
-            ],
-            [
-                'name' => 'orders.update',
-                'module' => 'orders',
-            ],
-            [
-                'name' => 'orders.delete',
-                'module' => 'orders',
-            ],
-
-
-            // Products
-            [
-                'name' => 'products.view',
-                'module' => 'products',
-            ],
-            [
-                'name' => 'products.create',
-                'module' => 'products',
-            ],
-            [
-                'name' => 'products.update',
-                'module' => 'products',
-            ],
-            [
-                'name' => 'products.delete',
-                'module' => 'products',
-            ],
-
-
-            // Customers
-            [
-                'name' => 'customers.view',
-                'module' => 'customers',
-            ],
-            [
-                'name' => 'customers.update',
-                'module' => 'customers',
-            ],
-
-
-            // Reports
-            [
-                'name' => 'reports.view',
-                'module' => 'reports',
-            ],
-        ];
-
-
-        $this->permissions = collect($permissions)
-            ->map(function ($permission) {
-
-                return Permission::firstOrCreate(
-                    [
-                        'name' => $permission['name'],
-                    ],
-                    [
-                        'module' => $permission['module'],
-                    ]
-                );
-            });
-
-
-        /**
-         * Give all permissions to first role
-         * (Super Admin)
-         */
-        $adminRole = $this->roles->where('name', 'Super Admin')->first();
-
-        if (!$adminRole) {
-            $adminRole = $this->roles->first();
-        }
-
-
-        foreach ($this->permissions as $permission) {
-
-            RolePermission::updateOrCreate(
-                [
-                    'role_id' => $adminRole->id,
+            foreach ($assigned as $permission) {
+                RolePermission::factory()->create([
+                    'role_id' => $role->id,
                     'permission_id' => $permission->id,
-                ]
-            );
-        }
+                ]);
+            }
+        });
     }
     /**
      * Module 1b: Admin/back-office accounts and their activity trail.
      */
     private function seedAdminStaff(): void
     {
-        
-          $this->adminUsers = AdminUser::factory()
-           ->count(self::ADMIN_USERS_COUNT)
-          ->recycle($this->roles)
-          ->create();
-         
+        $superAdminRole = $this->roles->where('name', 'super-admin')->first();
 
+        $superAdmin = AdminUser::factory()->create([
+            'full_name' => 'مدير النظام',
+            'email' => 'admin@admin.com',
+            'password_hash' => \Illuminate\Support\Facades\Hash::make('p@ssword123!'),
+            'role_id' => $superAdminRole->id,
+        ]);
 
+        $otherAdmins = AdminUser::factory()
+            ->count(self::ADMIN_USERS_COUNT - 1)
+            ->recycle($this->roles)
+            ->create();
+
+        $this->adminUsers = collect([$superAdmin])->merge($otherAdmins);
 
         AdminPasswordReset::factory()
             ->count(self::ADMIN_PASSWORD_RESETS_COUNT)
@@ -311,10 +191,40 @@ class DatabaseSeeder extends Seeder
             ->has(Address::factory()->count(self::ADDRESSES_PER_CUSTOMER), 'addresses')
             ->create();
 
-        VerificationCode::factory()
-            ->count(self::VERIFICATION_CODES_COUNT)
-            ->recycle($this->customers)
-            ->create();
+        $verificationPurposes = [
+            VerificationPurpose::SignupEmailVerification,
+            VerificationPurpose::PasswordResetEmailLink,
+            VerificationPurpose::ChangeEmailVerification,
+        ];
+
+        $verificationCodes = $this->customers
+            ->take(self::VERIFICATION_CODES_COUNT)
+            ->map(function (Customer $customer, int $index) use ($verificationPurposes) {
+                $purpose = $verificationPurposes[$index % count($verificationPurposes)];
+
+                return [
+                    'customer_id' => $customer->id,
+                    'purpose' => $purpose->value,
+                    'code_or_token' => match ($purpose) {
+                        VerificationPurpose::SignupEmailVerification,
+                        VerificationPurpose::ChangeEmailVerification => (string) random_int(100000, 999999),
+
+                        VerificationPurpose::PasswordResetEmailLink => bin2hex(random_bytes(32)),
+
+                        default => throw new LogicException("Unsupported verification purpose: {$purpose->value}"),
+                    },
+                    'contact_value' => $customer->email,
+                    'expires_at' => now()->addMinutes(10),
+                    'consumed_at' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })
+            ->all();
+
+VerificationCode::insert($verificationCodes);
+
+VerificationCode::insert($verificationCodes);
 
         CustomerNotification::factory()
             ->count(self::CUSTOMER_NOTIFICATIONS_COUNT)

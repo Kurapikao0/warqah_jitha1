@@ -9,7 +9,6 @@ use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use App\Services\CustomerService;
 use Illuminate\Http\Request;
-use Throwable;
 
 class CustomerController extends Controller
 {
@@ -51,7 +50,7 @@ class CustomerController extends Controller
     {
         $this->authorize('create', Customer::class);
 
-        try {
+
             $validated = $request->validated();
 
             // ✅ Service سيتعامل مع تشفير password إلى password_hash
@@ -63,15 +62,6 @@ class CustomerController extends Controller
                 'data' => new CustomerResource($customer),
                 'errors' => null
             ], 201);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create customer',
-                'data' => null,
-                'errors' => [$exception->getMessage()]
-            ], 500);
-        }
     }
 
     /**
@@ -96,7 +86,6 @@ class CustomerController extends Controller
     {
         $this->authorize('update', $customer);
 
-        try {
             $validated = $request->validated();
 
             // ✅ Service سيتعامل مع تشفير password إلى password_hash
@@ -108,15 +97,6 @@ class CustomerController extends Controller
                 'data' => new CustomerResource($customer),
                 'errors' => null
             ]);
-
-        } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer update failed',
-                'data' => null,
-                'errors' => [$exception->getMessage()]
-            ], 500);
-        }
     }
 
     /**

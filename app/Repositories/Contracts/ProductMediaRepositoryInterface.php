@@ -20,4 +20,14 @@ interface ProductMediaRepositoryInterface
     public function delete(
         ProductMedia $media
     ): bool;
+
+    public function reorder(
+        int $productId,
+        array $orderedIds
+    ): void;
+
+    public function setPrimary(
+        int $productId,
+        int $mediaId
+    ): void;
 }

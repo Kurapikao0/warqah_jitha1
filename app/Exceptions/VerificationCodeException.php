@@ -1,11 +1,1 @@
-<?php
-
-declare(strict_types=1);
-
-namespace App\Exceptions;
-
-use RuntimeException;
-
-final class VerificationCodeException extends RuntimeException
-{
-}
+php artisan route:list --path=api

@@ -1,60 +1,45 @@
 <?php
 
-namespace App\Http\Resources;
+declare(strict_types=1);
 
+namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\ProductCategoryResource;
-
 
 class ProductResource extends JsonResource
 {
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
 
+            'name' => $this->name,
 
-public function toArray(Request $request): array
-{
+            'slug' => $this->slug,
 
+            'sku' => $this->sku,
 
-return [
+            'category_id' => $this->category_id,
 
-'id'=>$this->id,
+            'description' => $this->description,
 
-'name'=>$this->name,
+            'price' => $this->price,
 
-'sku'=>$this->sku,
+            'stock_quantity' => $this->stock_quantity,
 
+            'status' => $this->status,
 
-'description'=>$this->description,
+            'is_customizable' => $this->is_customizable,
 
+            'category' => $this->whenLoaded('category', fn() => new ProductCategoryResource($this->category)),
 
-'price'=>$this->price,
+            'media' => $this->whenLoaded('media', fn() => ProductMediaResource::collection($this->media)),
 
-
-'stock'=>$this->stock_quantity,
-
-
-'status'=>$this->status,
-
-
-'is_customizable'=>$this->is_customizable,
-
-
-'category'=>new ProductCategoryResource(
-    $this->whenLoaded('category')
-),
-
-
-'media'=>$this->whenLoaded('media'),
-
-
-'created_at'=>$this->created_at
-
-
-];
-
-
-}
-
-
+            'created_at' => $this->created_at,
+        ];
+    }
 }

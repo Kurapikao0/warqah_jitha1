@@ -13,9 +13,9 @@ class AdminReviewService
         protected AdminReviewRepositoryInterface $reviewRepository
     ) {}
 
-    public function getAllReviews(): LengthAwarePaginator
+    public function getAllReviews(array $filters = []): LengthAwarePaginator
     {
-        return $this->reviewRepository->getAllPaginated();
+        return $this->reviewRepository->getAllPaginated($filters);
     }
 
     public function changeStatus(Review $review, string $status): Review
@@ -29,6 +29,13 @@ class AdminReviewService
     {
         return DB::transaction(function () use ($review, $reply) {
             return $this->reviewRepository->addReply($review, $reply);
+        });
+    }
+
+    public function deleteReview(Review $review): bool
+    {
+        return DB::transaction(function () use ($review) {
+            return $this->reviewRepository->delete($review);
         });
     }
 }

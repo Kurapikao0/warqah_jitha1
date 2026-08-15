@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User\Profile;
 
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -39,6 +40,8 @@ class UpdateProfileRequest extends FormRequest
             'phone' => [
                 'sometimes',
                 'string',
+                'max:20',
+                new YemenPhoneRule(),
                 Rule::unique('customers', 'phone')->ignore($customer->id),
             ],
 

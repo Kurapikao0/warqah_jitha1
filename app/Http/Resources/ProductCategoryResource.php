@@ -10,6 +10,12 @@ class ProductCategoryResource extends JsonResource
 
     public function toArray(Request $request): array
     {
+        $imageUrl = $this->image_url;
+
+        if ($imageUrl && ! preg_match('/^https?:\/\//i', $imageUrl)) {
+            $imageUrl = asset('storage/' . $imageUrl);
+        }
+
         return [
 
             'id'=>$this->id,
@@ -18,7 +24,7 @@ class ProductCategoryResource extends JsonResource
 
             'slug'=>$this->slug,
 
-            'image_url'=>$this->image_url,
+            'image_url'=>$imageUrl,
 
             'parent_id'=>$this->parent_id,
 

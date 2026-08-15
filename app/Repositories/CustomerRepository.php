@@ -40,9 +40,11 @@ class CustomerRepository implements CustomerRepositoryInterface
                 }
             )
             ->when(
-                isset($filters['verified']),
+                array_key_exists('verified', $filters) && $filters['verified'] !== '' && $filters['verified'] !== null,
                 function ($query) use ($filters) {
-                    if ($filters['verified']) {
+                    $verified = filter_var($filters['verified'], FILTER_VALIDATE_BOOLEAN);
+
+                    if ($verified) {
                         $query->whereNotNull('email_verified_at');
                     } else {
                         $query->whereNull('email_verified_at');

@@ -34,8 +34,12 @@ class ReviewPolicy
         return $customer->id === $review->customer_id;
     }
 
-    public function delete(Customer $customer, Review $review): bool
+    public function delete(AdminUser|Customer $user, Review $review): bool
     {
-        return $customer->id === $review->customer_id;
+        if ($user instanceof AdminUser) {
+            return true;
+        }
+
+        return $user->id === $review->customer_id;
     }
 }

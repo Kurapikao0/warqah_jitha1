@@ -8,12 +8,32 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\DesignPatternResource;
 use App\Http\Requests\DesignPattern\StoreDesignPatternRequest;
 use App\Http\Requests\DesignPattern\UpdateDesignPatternRequest;
+use Illuminate\Http\Request;
 
 class DesignPatternController extends Controller
 {
     public function __construct(
         protected DesignPatternService $service
     ) {
+    }
+
+    protected function normalizePayload(array $data, Request $request): array
+    {
+        if ($request->hasFile('image')) {
+            $data['preview_image_url'] = $request->file('image')->store('design-patterns', 'public');
+        }
+
+        if (isset($data['image_url']) && ! isset($data['preview_image_url'])) {
+            $data['preview_image_url'] = $data['image_url'];
+        }
+
+        if (isset($data['preview_image_url']) && ! isset($data['image_url'])) {
+            $data['image_url'] = $data['preview_image_url'];
+        }
+
+        unset($data['image']);
+
+        return $data;
     }
 
     public function index()
@@ -31,7 +51,7 @@ class DesignPatternController extends Controller
         $this->authorize('create', DesignPattern::class);
 
         $designPattern = $this->service->create(
-            $request->validated()
+            $this->normalizePayload($request->validated(), $request)
         );
 
         return response()->json([
@@ -56,7 +76,7 @@ class DesignPatternController extends Controller
 
         $this->service->update(
             $designPattern,
-            $request->validated()
+            $this->normalizePayload($request->validated(), $request)
         );
 
         return response()->json([

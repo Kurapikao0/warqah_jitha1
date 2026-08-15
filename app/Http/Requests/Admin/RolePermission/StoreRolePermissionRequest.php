@@ -16,7 +16,17 @@ class StoreRolePermissionRequest extends FormRequest
     {
         return [
             'permission_id' => [
-                'required',
+                'nullable',
+                'required_without:permission_ids',
+                'exists:permissions,id',
+            ],
+            'permission_ids' => [
+                'nullable',
+                'required_without:permission_id',
+                'array',
+            ],
+            'permission_ids.*' => [
+                'integer',
                 'exists:permissions,id',
             ],
         ];

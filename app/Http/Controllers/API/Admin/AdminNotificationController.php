@@ -23,7 +23,11 @@ class AdminNotificationController extends Controller
     public function index(
         AdminUser $adminUser
     ): AnonymousResourceCollection {
-
+        // TODO: عزل افتراضي آمن — قد يحتاج تعديل مستقبلًا إذا احتاج Super Admin رؤية إشعارات كل المدراء، يحتاج قرار من صاحبة المشروع
+        abort_if(
+            $adminUser->id !== auth('admin')->id(),
+            403
+        );
 
         return AdminNotificationResource::collection(
             $this->service->paginate(
@@ -37,7 +41,11 @@ class AdminNotificationController extends Controller
     public function read(
         AdminNotification $notification
     ): JsonResponse {
-
+        // TODO: عزل افتراضي آمن — قد يحتاج تعديل مستقبلًا إذا احتاج Super Admin رؤية إشعارات كل المدراء، يحتاج قرار من صاحبة المشروع
+        abort_if(
+            $notification->admin_user_id !== auth('admin')->id(),
+            403
+        );
 
         $notification =
             $this->service->markAsRead(

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Address;
 
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAddressRequest extends FormRequest
@@ -29,7 +30,8 @@ class UpdateAddressRequest extends FormRequest
             'phone' => [
                 'sometimes',
                 'string',
-                'max:20'
+                'max:20',
+                new YemenPhoneRule()
             ],
 
 

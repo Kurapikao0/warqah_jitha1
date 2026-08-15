@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CustomerLoginRequest extends FormRequest
@@ -14,7 +15,7 @@ class CustomerLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone'    => ['required', 'string'],
+            'phone'    => ['required', 'string', 'max:20', new YemenPhoneRule()],
             'password' => ['required', 'string'],
         ];
     }

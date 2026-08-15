@@ -80,6 +80,9 @@ class AdminUserPolicy
         string $permission
     ): bool {
 
+        if ($admin->role?->name === 'super-admin') {
+            return true;
+        }
 
         return $admin
             ->role

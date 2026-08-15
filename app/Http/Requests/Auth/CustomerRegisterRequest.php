@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Enums\CustomerCategory;
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,12 +30,11 @@ class CustomerRegisterRequest extends FormRequest
         return [
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:customers,email'],
-            'phone_country_code' => ['required', 'string'],
-            'phone' => ['required', 'string', 'unique:customers,phone'],
+            'phone_country_code' => ['required', 'string', 'max:10'],
+            'phone' => ['required', 'string', 'max:20', new YemenPhoneRule(), 'unique:customers,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
             'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'category' => ['sometimes', Rule::enum(CustomerCategory::class)],
         ];
     }
 
@@ -65,23 +65,6 @@ class CustomerRegisterRequest extends FormRequest
             'password.confirmed' => 'تأكيد كلمة المرور لا يطابق',
 
             'password_confirmation.required' => 'تأكيد كلمة المرور مطلوب',
-
-            'category.enum' => 'فئة العميل غير صحيحة',
         ];
-    }
-
-    /**
-     * Prepare the data for validation.
-     *
-     * @return void
-     */
-    protected function prepareForValidation(): void
-    {
-        // إذا لم يتم تحديد category، اضبطها على الفئة الافتراضية (الأولى)
-        if (!$this->has('category') || empty($this->input('category'))) {
-            $this->merge([
-                'category' => CustomerCategory::cases()[0]->value,
-            ]);
-        }
     }
 }

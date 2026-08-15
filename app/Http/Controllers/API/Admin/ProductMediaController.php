@@ -8,6 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductMediaResource;
 use App\Http\Requests\ProductMedia\StoreProductMediaRequest;
 use App\Http\Requests\ProductMedia\UpdateProductMediaRequest;
+use App\Http\Requests\ProductMedia\UploadProductMediaRequest;
+use App\Http\Requests\ProductMedia\ReorderProductMediaRequest;
+use App\Http\Requests\ProductMedia\SetPrimaryProductMediaRequest;
+use Illuminate\Http\JsonResponse;
 
 class ProductMediaController extends Controller
 {
@@ -43,43 +47,99 @@ class ProductMediaController extends Controller
     }
 
     public function show(
-        ProductMedia $productMedia
+        ProductMedia $product_medium
     ) {
-        $this->authorize('view', $productMedia);
+        $this->authorize('view', $product_medium);
 
         return new ProductMediaResource(
-            $productMedia->load('product')
+            $product_medium->load('product')
         );
     }
 
     public function update(
         UpdateProductMediaRequest $request,
-        ProductMedia $productMedia
+        ProductMedia $product_medium
     ) {
-        $this->authorize('update', $productMedia);
+        $this->authorize('update', $product_medium);
 
         $this->service->update(
-            $productMedia,
+            $product_medium,
             $request->validated()
         );
 
         return response()->json([
             'message' => 'Media updated successfully.',
             'data' => new ProductMediaResource(
-                $productMedia->fresh()->load('product')
+                $product_medium->fresh()->load('product')
             )
         ]);
     }
 
     public function destroy(
-        ProductMedia $productMedia
-    ) {
-        $this->authorize('delete', $productMedia);
+        ProductMedia $product_medium
+    ): JsonResponse {
+        $this->authorize('delete', $product_medium);
 
-        $this->service->delete($productMedia);
+        $this->service->delete($product_medium);
 
         return response()->json([
-            'message' => 'Media deleted successfully.'
+            'message' => 'Media deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Upload one or more media files for a product.
+     * POST /admin/product-media/upload
+     */
+    public function upload(UploadProductMediaRequest $request): JsonResponse
+    {
+        $this->authorize('create', ProductMedia::class);
+
+        $mediaItems = $this->service->upload(
+            (int) $request->input('product_id'),
+            $request->file('media', [])
+        );
+
+        return response()->json([
+            'message' => 'Media uploaded successfully.',
+            'data'    => ProductMediaResource::collection(collect($mediaItems)),
+        ], 201);
+    }
+
+    /**
+     * Reorder media items for a product.
+     * PUT /admin/product-media/reorder
+     */
+    public function reorder(ReorderProductMediaRequest $request): JsonResponse
+    {
+        $productId  = (int) $request->input('product_id');
+        $orderedIds = $request->input('orderedIds', $request->input('ordered_ids', []));
+
+        $this->service->reorder($productId, $orderedIds);
+
+        return response()->json([
+            'message' => 'Media reordered successfully.',
+        ]);
+    }
+
+    /**
+     * Set a media item as primary for its product.
+     * PUT /admin/product-media/{productMedia}/primary
+     */
+    public function setPrimary(
+        SetPrimaryProductMediaRequest $request,
+        ProductMedia $productMedia
+    ): JsonResponse {
+        $this->authorize('update', $productMedia);
+
+        $this->service->setPrimary(
+            (int) $productMedia->product_id,
+            (int) $productMedia->id
+        );
+
+        return response()->json([
+            'message' => 'Primary media updated successfully.',
+            'data'    => new ProductMediaResource($productMedia->fresh()),
         ]);
     }
 }

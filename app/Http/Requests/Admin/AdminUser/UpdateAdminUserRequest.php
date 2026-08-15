@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\AdminUser;
 
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,6 +16,8 @@ class UpdateAdminUserRequest extends FormRequest
 
     public function rules(): array
     {
+        $adminUser = $this->route('adminUser') ?? $this->route('admin_user');
+
         return [
 
             'role_id' => [
@@ -37,7 +40,7 @@ class UpdateAdminUserRequest extends FormRequest
                     'admin_users',
                     'email'
                 )->ignore(
-                    $this->adminUser
+                    $adminUser
                 ),
             ],
 
@@ -45,7 +48,14 @@ class UpdateAdminUserRequest extends FormRequest
             'phone' => [
                 'nullable',
                 'string',
-                'max:50',
+                'max:20',
+                new YemenPhoneRule(),
+                Rule::unique(
+                    'admin_users',
+                    'phone'
+                )->ignore(
+                    $adminUser
+                ),
             ],
 
 

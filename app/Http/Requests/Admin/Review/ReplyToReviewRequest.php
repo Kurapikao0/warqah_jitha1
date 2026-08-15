@@ -8,7 +8,7 @@ class ReplyToReviewRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth('sanctum')->check();
+        return auth('admin')->check() || auth()->check();
     }
 
     public function rules(): array

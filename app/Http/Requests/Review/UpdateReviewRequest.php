@@ -27,21 +27,6 @@ class UpdateReviewRequest extends FormRequest
                 'nullable',
                 'string'
             ],
-
-            'status' => [
-                'sometimes',
-                'string'
-            ],
-
-            'admin_reply' => [
-                'nullable',
-                'string'
-            ],
-
-            'admin_reply_at' => [
-                'nullable',
-                'date'
-            ],
         ];
     }
 }

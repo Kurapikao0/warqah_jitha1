@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\AdminUser;
 
+use App\Rules\YemenPhoneRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAdminUserRequest extends FormRequest
@@ -39,7 +40,8 @@ class StoreAdminUserRequest extends FormRequest
             'phone' => [
                 'nullable',
                 'string',
-                'max:50',
+                'max:20',
+                new YemenPhoneRule(),
             ],
 
 
