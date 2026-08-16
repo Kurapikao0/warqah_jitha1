@@ -4,6 +4,8 @@ namespace App\Http\Requests\Admin\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use App\Enums\ProductStatus;
+use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest
 {
@@ -48,8 +50,7 @@ class StoreProductRequest extends FormRequest
 
             'is_customizable' => 'boolean',
 
-            'status' => 'required|string',
-
+            'status' => ['required', Rule::enum(ProductStatus::class)],
         ];
 
     }

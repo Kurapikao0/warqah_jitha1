@@ -632,16 +632,18 @@ Route::prefix('customer')
         | Addresses
         |--------------------------------------------------------------------------
         */
-
+        Route::match([
+            'put', 'patch'],
+            '{address}/default',
+            [AddressController::class, 'setDefault']
+        );
+        
         Route::apiResource(
             'addresses',
             AddressController::class
         );
 
-        Route::put(
-            'addresses/{address}/default',
-            [AddressController::class, 'setDefault']
-        );
+
 
         /*
         |--------------------------------------------------------------------------
