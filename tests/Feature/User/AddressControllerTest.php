@@ -47,7 +47,7 @@ class AddressControllerTest extends TestCase
     {
         $payload = [
             'recipient_name' => 'أحمد علي',
-            'phone'          => '967770000000',
+            'phone'          => '770000000',
             'country'        => 'اليمن',
             'city'           => 'صنعاء',
             'district'       => 'السبعين',

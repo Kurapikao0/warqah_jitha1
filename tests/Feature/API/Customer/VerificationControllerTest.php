@@ -65,7 +65,7 @@ class VerificationControllerTest extends TestCase
             : new VerificationCode();
 
         $this->mock(VerificationCodeService::class, function (MockInterface $mock) use ($verificationModel) {
-            $mock->shouldReceive('generateCode')
+            $mock->shouldReceive('generate')
                 ->once()
                 ->andReturn($verificationModel);
         });

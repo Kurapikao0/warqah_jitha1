@@ -10,7 +10,7 @@ class UpdateCustomDesignRequestRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth('sanctum')->check() && auth('sanctum')->user() instanceof AdminUser;
+        return auth('admin')->check() && auth('admin')->user() instanceof AdminUser;
     }
 
     public function rules(): array

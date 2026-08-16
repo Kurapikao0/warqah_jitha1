@@ -19,8 +19,8 @@ class CustomerAuthAndProfileTest extends TestCase
         $payload = [
             'full_name'             => 'Ahmed Ali',
             'email'                 => 'ahmed@example.com',
-            'phone'                 => '96890000000',
-            'phone_country_code'    => '+968',
+            'phone'                 => '770000000',
+            'phone_country_code'    => '+967',
             'password'              => 'password123',
             'password_confirmation' => 'password123',
         ];
@@ -37,7 +37,7 @@ class CustomerAuthAndProfileTest extends TestCase
 
         $this->assertDatabaseHas('customers', [
             'email' => 'ahmed@example.com',
-            'phone' => '96890000000',
+            'phone' => '770000000',
         ]);
     }
 
@@ -45,12 +45,12 @@ class CustomerAuthAndProfileTest extends TestCase
     public function it_can_login_customer()
     {
         $customer = Customer::factory()->create([
-            'phone'         => '96890000000',
+            'phone'         => '770000000',
             'password_hash' => bcrypt('password123'),
         ]);
 
         $payload = [
-            'phone'    => '96890000000',
+            'phone'    => '770000000',
             'password' => 'password123',
         ];
 

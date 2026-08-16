@@ -47,6 +47,10 @@ class RolePermissionController extends Controller
                 $role,
                 (array) $request->input('permission_ids', [])
             );
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions updated successfully.',
+            ], Response::HTTP_OK);
         } else {
             $permission = Permission::findOrFail(
                 $request->permission_id

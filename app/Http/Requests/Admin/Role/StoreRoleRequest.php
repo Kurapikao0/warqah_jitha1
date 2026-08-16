@@ -14,11 +14,7 @@ class StoreRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // هذا تعديلي
-        // استخدام guard الصريح أو الـ Null-safe operator يمنع Error 500
-        // $user = $this->user('sanctum') ?? $this->user();
-
-        // return $user?->can('create-roles') ?? true;
+        return true; 
     }
 
     /**

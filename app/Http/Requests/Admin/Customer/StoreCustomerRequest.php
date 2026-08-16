@@ -13,8 +13,8 @@ class StoreCustomerRequest extends FormRequest
     public function authorize(): bool
     {
         // تأكد من أنك Admin User
-        return auth('sanctum')->check() &&
-                auth('sanctum')->user() instanceof AdminUser;
+        return auth('admin')->check() &&
+                auth('admin')->user() instanceof AdminUser;
     }
 
     public function rules(): array

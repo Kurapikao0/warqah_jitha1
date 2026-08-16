@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services;
 
+use App\Enums\VerificationPurpose;
 use App\Models\Customer;
 use App\Models\VerificationCode;
 use App\Services\VerificationCodeService;
@@ -26,8 +27,12 @@ class VerificationCodeServiceTest extends TestCase
     {
         $customer = Customer::factory()->create();
 
-        // تأكد أن الدالة داخل VerificationCodeService تحمل هذا الاسم
-        $verificationCode = $this->service->generateCode($customer);
+        // الدالة الفعلية بالخدمة اسمها generate() وتحتاج purpose و contactValue
+        $verificationCode = $this->service->generate(
+            $customer,
+            VerificationPurpose::SignupEmailVerification,
+            $customer->email
+        );
 
         $this->assertDatabaseHas('verification_codes', [
             'id'          => $verificationCode->id,

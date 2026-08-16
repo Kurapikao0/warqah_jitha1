@@ -320,14 +320,9 @@ Route::prefix('admin')
         );
 
         Route::apiResource(
-            'categories',
-            ProductCategoryController::class
-        );
-
-        Route::apiResource(
             'product-categories',
             ProductCategoryController::class
-        );
+        )->parameters(['product-categories' => 'category']);
 
         // Specialized Product Media routes — must be declared BEFORE apiResource
         // so 'upload' and 'reorder' static segments take priority over {productMedia}.
@@ -634,10 +629,10 @@ Route::prefix('customer')
         */
         Route::match([
             'put', 'patch'],
-            '{address}/default',
+            'addresses/{address}/default',
             [AddressController::class, 'setDefault']
         );
-        
+
         Route::apiResource(
             'addresses',
             AddressController::class
