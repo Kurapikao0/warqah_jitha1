@@ -19,13 +19,13 @@ class StoreOrderProductionStageRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'unique:order_production_stages,name'
+                'unique:order_production_stages,name',
             ],
 
             'sort_order' => [
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
         ];

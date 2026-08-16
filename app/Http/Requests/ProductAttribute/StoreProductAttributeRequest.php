@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\ProductAttribute;
 
+use App\Enums\ProductAttributeInputType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
-use App\Enums\ProductAttributeInputType;
 
 class StoreProductAttributeRequest extends FormRequest
 {

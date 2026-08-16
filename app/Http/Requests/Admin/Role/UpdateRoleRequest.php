@@ -18,6 +18,7 @@ class UpdateRoleRequest extends FormRequest
     {
 
         $role = $this->route('role');
+
         return $this->user('admin')?->can('update', $role) ?? false;
     }
 

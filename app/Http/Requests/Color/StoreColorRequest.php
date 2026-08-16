@@ -19,12 +19,12 @@ class StoreColorRequest extends FormRequest
                 'required',
                 'string',
                 'max:100',
-                'unique:colors,name'
+                'unique:colors,name',
             ],
 
             'hex_code' => [
                 'required',
-                'regex:/^#([A-Fa-f0-9]{6})$/'
+                'regex:/^#([A-Fa-f0-9]{6})$/',
             ],
 
         ];

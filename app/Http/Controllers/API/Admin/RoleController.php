@@ -16,8 +16,7 @@ class RoleController extends Controller
 {
     public function __construct(
         protected RoleService $roleService
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of roles.

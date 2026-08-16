@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class DesignPatternFactory extends Factory
 {
     protected $model = DesignPattern::class;
+
     /**
      * Define the model's default state.
      *

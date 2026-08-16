@@ -6,7 +6,6 @@ use App\Models\ProductCategory;
 
 class ProductCategoryRepository
 {
-
     public function paginate()
     {
         return ProductCategory::with('parent')
@@ -14,12 +13,10 @@ class ProductCategoryRepository
             ->paginate();
     }
 
-
     public function create(array $data): ProductCategory
     {
         return ProductCategory::create($data);
     }
-
 
     public function update(
         ProductCategory $category,
@@ -30,7 +27,6 @@ class ProductCategoryRepository
 
         return $category;
     }
-
 
     public function delete(
         ProductCategory $category

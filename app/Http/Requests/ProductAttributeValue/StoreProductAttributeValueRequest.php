@@ -15,20 +15,20 @@ class StoreProductAttributeValueRequest extends FormRequest
     {
         return [
 
-            'product_id'=>[
+            'product_id' => [
                 'required',
-                'exists:products,id'
+                'exists:products,id',
             ],
 
-            'attribute_id'=>[
+            'attribute_id' => [
                 'required',
-                'exists:product_attributes,id'
+                'exists:product_attributes,id',
             ],
 
-            'value'=>[
+            'value' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
         ];

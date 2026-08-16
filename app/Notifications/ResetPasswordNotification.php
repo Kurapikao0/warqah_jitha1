@@ -15,8 +15,7 @@ final class ResetPasswordNotification extends Notification implements EmailNotif
 
     public function __construct(
         private readonly string $token,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -37,7 +36,7 @@ final class ResetPasswordNotification extends Notification implements EmailNotif
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($this->notificationSubject())
             ->view(
                 'emails.customer.password-reset',

@@ -6,20 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ChangePasswordRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
     }
-
-
 
     public function rules(): array
     {
 
         return [
 
-            'password'=>[
+            'password' => [
 
                 'required',
 
@@ -27,12 +24,11 @@ class ChangePasswordRequest extends FormRequest
 
                 'min:8',
 
-                'confirmed'
+                'confirmed',
 
-            ]
+            ],
 
         ];
 
     }
-
 }

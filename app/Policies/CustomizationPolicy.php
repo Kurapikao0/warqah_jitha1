@@ -2,9 +2,10 @@
 
 namespace App\Policies;
 
+use App\Enums\ProductCustomizationRequestStatus;
 use App\Models\Customer;
 use App\Models\ProductCustomizationRequest;
-use App\Enums\ProductCustomizationRequestStatus;
+
 class CustomizationPolicy
 {
     /**
@@ -24,8 +25,7 @@ class CustomizationPolicy
         ProductCustomizationRequest $customization
     ): bool {
 
-        return
-            $customization->customer_id === $customer->id;
+        return $customization->customer_id === $customer->id;
 
     }
 

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class OrderStatusHistoryFactory extends Factory
 {
     protected $model = OrderStatusHistory::class;
+
     /**
      * Define the model's default state.
      *

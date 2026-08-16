@@ -12,13 +12,12 @@ final class SendAdminCreatedEmailListener
 {
     public function __construct(
         protected EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(
         AdminCreated $event
     ): void {
-        $notification = new AdminCreatedNotification();
+        $notification = new AdminCreatedNotification;
 
         $this->emailNotificationService->dispatch(
             user: $event->adminUser,

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ReviewImageFactory extends Factory
 {
     protected $model = ReviewImage::class;
+
     /**
      * Define the model's default state.
      *

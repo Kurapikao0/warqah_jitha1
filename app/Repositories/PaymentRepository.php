@@ -2,61 +2,48 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Payment;
 use App\Repositories\Contracts\PaymentRepositoryInterface;
 
-
-
 class PaymentRepository implements PaymentRepositoryInterface
 {
-
-
     public function getAll()
     {
 
         return Payment::with([
 
             'order',
-            'order.customer'
+            'order.customer',
 
         ])
-        ->latest()
-        ->paginate(20);
+            ->latest()
+            ->paginate(20);
 
     }
-
-
-
 
     public function getCustomerPayments($customerId)
     {
 
         return Payment::with([
 
-            'order'
+            'order',
 
         ])
-        ->whereHas(
-            'order',
-            function($query) use($customerId){
+            ->whereHas(
+                'order',
+                function ($query) use ($customerId) {
 
-                $query->where(
-                    'customer_id',
-                    $customerId
-                );
+                    $query->where(
+                        'customer_id',
+                        $customerId
+                    );
 
-            }
-        )
-        ->latest()
-        ->paginate(15);
-
+                }
+            )
+            ->latest()
+            ->paginate(15);
 
     }
-
-
-
-
 
     public function findById($id)
     {
@@ -64,16 +51,12 @@ class PaymentRepository implements PaymentRepositoryInterface
         return Payment::with([
 
             'order',
-            'order.items'
+            'order.items',
 
         ])
-        ->findOrFail($id);
+            ->findOrFail($id);
 
     }
-
-
-
-
 
     public function create(array $data)
     {
@@ -82,15 +65,10 @@ class PaymentRepository implements PaymentRepositoryInterface
 
     }
 
-
-
-
-
     public function update(
         Payment $payment,
         array $data
-    )
-    {
+    ) {
 
         $payment->update($data);
 
@@ -98,31 +76,30 @@ class PaymentRepository implements PaymentRepositoryInterface
 
     }
 
-/*public function findCustomerPayment(
-    int $customerId,
-    int $paymentId
-)
-{
-    return Payment::whereHas('order', function ($query) use ($customerId) {
+    /*public function findCustomerPayment(
+        int $customerId,
+        int $paymentId
+    )
+    {
+        return Payment::whereHas('order', function ($query) use ($customerId) {
 
-        $query->where(
-            'customer_id',
-            $customerId
-        );
+            $query->where(
+                'customer_id',
+                $customerId
+            );
 
-    })
-    ->with('order')
-    ->findOrFail($paymentId);
-}*/
-    public function findCustomerPayment(
-    int $customerId,
-    int $paymentId
-)
-{
-    return Payment::with('order')
-        ->whereHas('order', function ($q) use ($customerId) {
-            $q->where('customer_id', $customerId);
         })
+        ->with('order')
         ->findOrFail($paymentId);
-}
+    }*/
+    public function findCustomerPayment(
+        int $customerId,
+        int $paymentId
+    ) {
+        return Payment::with('order')
+            ->whereHas('order', function ($q) use ($customerId) {
+                $q->where('customer_id', $customerId);
+            })
+            ->findOrFail($paymentId);
+    }
 }

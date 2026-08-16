@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class PaymentFactory extends Factory
 {
     protected $model = Payment::class;
+
     /**
      * Define the model's default state.
      *

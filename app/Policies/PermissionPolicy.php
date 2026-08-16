@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Models\AdminUser;
 use App\Models\Permission;
+use App\Models\Role;
 
 class PermissionPolicy
 {
@@ -59,12 +60,12 @@ class PermissionPolicy
      * Determine whether the admin has the required permission.
      */
     protected function can(
-    AdminUser $admin,
-    string $permission
+        AdminUser $admin,
+        string $permission
     ): bool {
         $role = $admin->role;
 
-        if (! $role instanceof \App\Models\Role) {
+        if (! $role instanceof Role) {
             return false;
         }
 

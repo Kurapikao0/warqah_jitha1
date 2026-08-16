@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductAttributeFactory extends Factory
 {
     protected $model = ProductAttribute::class;
+
     /**
      * Define the model's default state.
      *

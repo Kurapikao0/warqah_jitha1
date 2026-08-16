@@ -15,7 +15,6 @@ class OrderProductionRepository implements OrderProductionRepositoryInterface
             ->get();
     }
 
-
     public function updateOrderStage(
         Order $order,
         int $stageId
@@ -26,7 +25,6 @@ class OrderProductionRepository implements OrderProductionRepositoryInterface
 
         return $order->refresh();
     }
-
 
     public function createHistory(
         Order $order,

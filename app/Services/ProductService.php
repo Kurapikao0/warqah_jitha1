@@ -2,44 +2,30 @@
 
 namespace App\Services;
 
-
 use App\Models\Product;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-
-
+use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
-
     public function __construct(
         protected ProductRepositoryInterface $repository
-    )
-    {}
-
-
+    ) {}
 
     public function getAll(?string $search = null)
-{
-    return $this->repository->all($search);
-}
-
-
-
+    {
+        return $this->repository->all($search);
+    }
 
     public function getById($id)
     {
         return $this->repository->findById($id);
     }
 
-
-
-
-
     public function create(array $data)
     {
 
-        return DB::transaction(function() use($data){
+        return DB::transaction(function () use ($data) {
 
             return $this->repository
                 ->create($data);
@@ -48,17 +34,12 @@ class ProductService
 
     }
 
-
-
-
     public function update(
         Product $product,
         array $data
-    )
-    {
+    ) {
 
-        return DB::transaction(function()
-        use($product,$data){
+        return DB::transaction(function () use ($product, $data) {
 
             return $this->repository
                 ->update(
@@ -70,15 +51,10 @@ class ProductService
 
     }
 
-
-
-
-
     public function delete(Product $product)
     {
 
-        return DB::transaction(function()
-        use($product){
+        return DB::transaction(function () use ($product) {
 
             return $this->repository
                 ->delete($product);
@@ -86,7 +62,4 @@ class ProductService
         });
 
     }
-
-
-
 }

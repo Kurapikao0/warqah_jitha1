@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class RawMaterialFactory extends Factory
 {
     protected $model = RawMaterial::class;
+
     /**
      * Define the model's default state.
      *

@@ -10,13 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class AddressService
 {
-
     public function __construct(
         protected AddressRepositoryInterface $addressRepository
-    ) {
-    }
-
-
+    ) {}
 
     /**
      * Get customer addresses
@@ -30,10 +26,6 @@ class AddressService
 
     }
 
-
-
-
-
     /**
      * Create address
      */
@@ -42,12 +34,10 @@ class AddressService
         array $data
     ): Address {
 
-
         return DB::transaction(function () use (
             $customer,
             $data
         ) {
-
 
             if (
                 ($data['is_default'] ?? false) === true
@@ -60,29 +50,22 @@ class AddressService
 
             }
 
-
-
             return $this->addressRepository
                 ->create(
                     $customer,
                     $data
                 );
 
-
         });
 
     }
-
-
-
-
 
     /**
      * Update address
      */
     public function update(
-    Address $address,
-    array $data
+        Address $address,
+        array $data
     ): Address {
 
         return DB::transaction(function () use (
@@ -111,11 +94,12 @@ class AddressService
         });
 
     }
+
     /**
      * Set default address
      */
-public function setDefault(
-    Address $address
+    public function setDefault(
+        Address $address
     ): Address {
 
         return DB::transaction(function () use ($address) {
@@ -139,10 +123,6 @@ public function setDefault(
 
     }
 
-
-
-
-
     /**
      * Delete address
      */
@@ -154,13 +134,4 @@ public function setDefault(
             ->delete($address);
 
     }
-
-
-
-
-
-
-
-
-
 }

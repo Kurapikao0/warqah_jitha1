@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CartItemFactory extends Factory
 {
     protected $model = CartItem::class;
+
     /**
      * Define the model's default state.
      *

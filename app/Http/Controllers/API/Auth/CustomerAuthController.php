@@ -7,21 +7,20 @@ use App\Http\Requests\Auth\CustomerLoginRequest;
 use App\Http\Requests\Auth\CustomerRegisterRequest;
 use App\Http\Resources\CustomerResource;
 use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 
 class CustomerAuthController extends Controller
 {
     public function __construct(
         protected AuthService $authService
-    ) {
-    }
+    ) {}
 
     /**
      * Register new customer
      *
-     * @param CustomerRegisterRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function register(CustomerRegisterRequest $request)
     {
@@ -44,8 +43,7 @@ class CustomerAuthController extends Controller
     /**
      * Login customer via phone and password
      *
-     * @param CustomerLoginRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function login(CustomerLoginRequest $request)
     {
@@ -68,7 +66,7 @@ class CustomerAuthController extends Controller
     /**
      * Logout customer.
      */
-    public function logout(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 

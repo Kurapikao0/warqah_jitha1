@@ -44,7 +44,7 @@ class OrderProductionStage extends Model
             '>',
             $this->sort_order
         )
-        ->orderBy('sort_order')
-        ->first();
+            ->orderBy('sort_order')
+            ->first();
     }
 }

@@ -11,15 +11,15 @@ class AdminPasswordResetResource extends JsonResource
     {
         return [
 
-            'id'=>$this->id,
+            'id' => $this->id,
 
-            'contact_value'=>$this->contact_value,
+            'contact_value' => $this->contact_value,
 
-            'expires_at'=>$this->expires_at,
+            'expires_at' => $this->expires_at,
 
-            'consumed_at'=>$this->consumed_at,
+            'consumed_at' => $this->consumed_at,
 
-            'created_at'=>$this->created_at,
+            'created_at' => $this->created_at,
 
         ];
     }

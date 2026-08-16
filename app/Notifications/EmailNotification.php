@@ -57,4 +57,3 @@ final class EmailNotification extends Notification
         return $this->notification->toArray($this->owner);
     }
 }
-

@@ -16,12 +16,9 @@ class FavoriteResource extends JsonResource
 
             'id' => $this->id,
 
-
             'customer_id' => $this->customer_id,
 
-
             'product_id' => $this->product_id,
-
 
             /*
             |--------------------------------------------------------------------------
@@ -32,7 +29,6 @@ class FavoriteResource extends JsonResource
             'product' => new ProductResource(
                 $this->whenLoaded('product')
             ),
-
 
             /*
             |--------------------------------------------------------------------------

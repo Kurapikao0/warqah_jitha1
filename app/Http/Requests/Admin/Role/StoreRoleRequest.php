@@ -14,11 +14,11 @@ class StoreRoleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; //هذا تعديلي 
+        return true; // هذا تعديلي
         // استخدام guard الصريح أو الـ Null-safe operator يمنع Error 500
         // $user = $this->user('sanctum') ?? $this->user();
 
-        //return $user?->can('create-roles') ?? true;
+        // return $user?->can('create-roles') ?? true;
     }
 
     /**
@@ -26,8 +26,6 @@ class StoreRoleRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-
-
     public function rules(): array
     {
         return [
@@ -55,15 +53,7 @@ class StoreRoleRequest extends FormRequest
         ];
     }
 
-
-
-
-
-
-
-
-
-    /** 
+    /**
      * public function rules(): array
      *  {
      *   return [

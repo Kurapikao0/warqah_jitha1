@@ -16,7 +16,7 @@ class SetPrimaryProductMediaRequest extends FormRequest
         return [
             'product_id' => [
                 'nullable',
-                'exists:products,id'
+                'exists:products,id',
             ],
         ];
     }

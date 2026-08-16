@@ -16,7 +16,5 @@ final class PasswordChanged implements ShouldDispatchAfterCommit
 
     public function __construct(
         public readonly Customer $customer,
-    ) {
-    }
+    ) {}
 }
-

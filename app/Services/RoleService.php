@@ -12,8 +12,7 @@ class RoleService
 {
     public function __construct(
         protected RoleRepository $roleRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Return paginated roles with permissions.
@@ -89,7 +88,7 @@ class RoleService
         if ($role->adminUsers()->exists()) {
             throw ValidationException::withMessages([
                 'role' => [
-                    'This role cannot be deleted because it is assigned to one or more administrators.'
+                    'This role cannot be deleted because it is assigned to one or more administrators.',
                 ],
             ]);
         }

@@ -20,12 +20,12 @@ class UpdateColorRequest extends FormRequest
                 'required',
                 'string',
                 Rule::unique('colors')
-                    ->ignore($this->color)
+                    ->ignore($this->color),
             ],
 
             'hex_code' => [
                 'required',
-                'regex:/^#([A-Fa-f0-9]{6})$/'
+                'regex:/^#([A-Fa-f0-9]{6})$/',
             ],
 
         ];

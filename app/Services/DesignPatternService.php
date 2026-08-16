@@ -2,16 +2,15 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use App\Models\DesignPattern;
 use App\Repositories\Contracts\DesignPatternRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class DesignPatternService
 {
     public function __construct(
         protected DesignPatternRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function all()
     {

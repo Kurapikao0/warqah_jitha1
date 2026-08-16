@@ -11,11 +11,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ActivityLogController extends Controller
 {
-
     public function __construct(
         protected ActivityLogService $service
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): AnonymousResourceCollection
     {

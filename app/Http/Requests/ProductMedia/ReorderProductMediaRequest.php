@@ -16,23 +16,23 @@ class ReorderProductMediaRequest extends FormRequest
         return [
             'product_id' => [
                 'required',
-                'exists:products,id'
+                'exists:products,id',
             ],
             'orderedIds' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'orderedIds.*' => [
                 'integer',
-                'exists:product_media,id'
+                'exists:product_media,id',
             ],
             'ordered_ids' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'ordered_ids.*' => [
                 'integer',
-                'exists:product_media,id'
+                'exists:product_media,id',
             ],
         ];
     }

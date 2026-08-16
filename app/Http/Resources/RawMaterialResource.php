@@ -18,23 +18,17 @@ class RawMaterialResource extends JsonResource
 
             'unit' => $this->unit,
 
-            'quantity_available' =>
-                $this->quantity_available,
+            'quantity_available' => $this->quantity_available,
 
-            'reorder_point' =>
-                $this->reorder_point,
+            'reorder_point' => $this->reorder_point,
 
-            'status' =>
-                $this->status,
+            'status' => $this->status,
 
-            'product' =>
-                $this->whenLoaded('product'),
+            'product' => $this->whenLoaded('product'),
 
-            'created_at' =>
-                $this->created_at,
+            'created_at' => $this->created_at,
 
-            'updated_at' =>
-                $this->updated_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

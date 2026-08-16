@@ -9,18 +9,14 @@ use App\Http\Resources\ProductCategoryResource;
 use App\Models\ProductCategory;
 use App\Services\ProductCategoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Request;
-
-
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProductCategoryController extends Controller
 {
-
     public function __construct(
         protected ProductCategoryService $service
-    ){
-    }
+    ) {}
 
     protected function normalizePayload(array $data, Request $request): array
     {
@@ -41,7 +37,6 @@ class ProductCategoryController extends Controller
         );
     }
 
-
     public function store(
         StoreProductCategoryRequest $request
     ): JsonResponse {
@@ -51,35 +46,30 @@ class ProductCategoryController extends Controller
                 $this->normalizePayload($request->validated(), $request)
             );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'data'=>new ProductCategoryResource(
+            'data' => new ProductCategoryResource(
                 $category
-            )
+            ),
 
-        ],201);
+        ], 201);
     }
-
-
 
     public function show(
         ProductCategory $category
-    ){
+    ) {
 
         return new ProductCategoryResource(
             $category
         );
     }
 
-
-
     public function update(
         UpdateProductCategoryRequest $request,
         ProductCategory $category
-    ){
+    ) {
 
         $updatedCategory =
             $this->service->update(
@@ -87,28 +77,24 @@ class ProductCategoryController extends Controller
                 $this->normalizePayload($request->validated(), $request)
             );
 
-
         return new ProductCategoryResource(
             $updatedCategory
         );
     }
 
-
-
     public function destroy(
         ProductCategory $category
-    ){
+    ) {
 
         $this->service->delete(
             $category
         );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Category deleted successfully.'
+            'message' => 'Category deleted successfully.',
 
         ]);
     }

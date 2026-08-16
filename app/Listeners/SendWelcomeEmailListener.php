@@ -12,13 +12,12 @@ final class SendWelcomeEmailListener
 {
     public function __construct(
         protected EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(
         CustomerRegistered $event
     ): void {
-        $notification = new WelcomeNotification();
+        $notification = new WelcomeNotification;
 
         $this->emailNotificationService->dispatch(
             user: $event->customer,
@@ -28,4 +27,3 @@ final class SendWelcomeEmailListener
         );
     }
 }
-

@@ -40,7 +40,7 @@ class UpdateDesignPatternRequest extends FormRequest
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'image' => [

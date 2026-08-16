@@ -7,24 +7,17 @@ use App\Models\Customer;
 
 class AddressPolicy
 {
-
-
     /**
      * View address
      */
     public function view(
         Customer $customer,
         Address $address
-    ): bool
-    {
+    ): bool {
 
         return $address->customer_id === $customer->id;
 
     }
-
-
-
-
 
     /**
      * Update address
@@ -32,16 +25,11 @@ class AddressPolicy
     public function update(
         Customer $customer,
         Address $address
-    ): bool
-    {
+    ): bool {
 
         return $address->customer_id === $customer->id;
 
     }
-
-
-
-
 
     /**
      * Delete address
@@ -49,16 +37,11 @@ class AddressPolicy
     public function delete(
         Customer $customer,
         Address $address
-    ): bool
-    {
+    ): bool {
 
         return $address->customer_id === $customer->id;
 
     }
-
-
-
-
 
     /**
      * Set default address
@@ -66,12 +49,9 @@ class AddressPolicy
     public function setDefault(
         Customer $customer,
         Address $address
-    ): bool
-    {
+    ): bool {
 
         return $address->customer_id === $customer->id;
 
     }
-
-
 }

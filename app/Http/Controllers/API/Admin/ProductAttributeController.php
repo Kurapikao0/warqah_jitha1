@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\ProductAttribute;
-use App\Services\ProductAttributeService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductAttributeResource;
 use App\Http\Requests\ProductAttribute\StoreProductAttributeRequest;
 use App\Http\Requests\ProductAttribute\UpdateProductAttributeRequest;
+use App\Http\Resources\ProductAttributeResource;
+use App\Models\ProductAttribute;
+use App\Services\ProductAttributeService;
 
 class ProductAttributeController extends Controller
 {
     public function __construct(
         protected ProductAttributeService $service
-    ) {
-    }
+    ) {}
 
     public function index()
     {

@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\ProductAttributeValue;
-use App\Services\ProductAttributeValueService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductAttributeValueResource;
 use App\Http\Requests\ProductAttributeValue\StoreProductAttributeValueRequest;
 use App\Http\Requests\ProductAttributeValue\UpdateProductAttributeValueRequest;
+use App\Http\Resources\ProductAttributeValueResource;
+use App\Models\ProductAttributeValue;
+use App\Services\ProductAttributeValueService;
 
 class ProductAttributeValueController extends Controller
 {
     public function __construct(
         protected ProductAttributeValueService $service
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -39,7 +38,7 @@ class ProductAttributeValueController extends Controller
             'data' => new ProductAttributeValueResource(
                 $attributeValue->load([
                     'product',
-                    'attribute'
+                    'attribute',
                 ])
             ),
         ], 201);
@@ -53,7 +52,7 @@ class ProductAttributeValueController extends Controller
         return new ProductAttributeValueResource(
             $productAttributeValue->load([
                 'product',
-                'attribute'
+                'attribute',
             ])
         );
     }
@@ -76,7 +75,7 @@ class ProductAttributeValueController extends Controller
                     ->fresh()
                     ->load([
                         'product',
-                        'attribute'
+                        'attribute',
                     ])
             ),
         ]);

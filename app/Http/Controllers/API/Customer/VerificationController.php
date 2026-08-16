@@ -15,14 +15,13 @@ class VerificationController extends Controller
 {
     public function __construct(
         protected VerificationCodeService $verificationCodeService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate verification code/token.
      */
     public function generate(
-    GenerateVerificationCodeRequest $request
+        GenerateVerificationCodeRequest $request
     ): JsonResponse {
         $user = $request->user();
 
@@ -52,7 +51,7 @@ class VerificationController extends Controller
 
         return response()->json([
             'message' => 'Verification generated successfully.',
-            'data'    => new VerificationCodeResource($verification),
+            'data' => new VerificationCodeResource($verification),
         ], 201);
     }
 

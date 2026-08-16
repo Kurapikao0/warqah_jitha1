@@ -2,63 +2,41 @@
 
 namespace App\Http\Resources;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-
-
 class PaymentResource extends JsonResource
 {
+    public function toArray(Request $request): array
+    {
 
+        return [
 
-public function toArray(Request $request): array
-{
+            'id' => $this->id,
 
+            'order' => [
 
-return [
+                'id' => $this->order?->id,
 
+                'number' => $this->order?->order_number,
 
-'id'=>$this->id,
+            ],
 
+            'method' => $this->payment_method,
 
-'order'=>[
+            'amount' => $this->amount,
 
-'id'=>$this->order?->id,
+            /*'transaction_reference'=>
+        $this->transaction_reference,*/
 
-'number'=>$this->order?->order_number
+            'status' => $this->status,
 
-],
+            /*'proof_image'=>
+        $this->proof_image,*/
 
+            'created_at' => $this->created_at,
 
+        ];
 
-'method'=>$this->payment_method,
-
-
-'amount'=>$this->amount,
-
-
-/*'transaction_reference'=>
-$this->transaction_reference,*/
-
-
-
-'status'=>$this->status,
-
-
-
-/*'proof_image'=>
-$this->proof_image,*/
-
-
-
-'created_at'=>$this->created_at
-
-
-];
-
-
-}
-
-
+    }
 }

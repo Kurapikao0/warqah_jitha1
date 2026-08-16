@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\Color;
-use App\Services\ColorService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ColorResource;
 use App\Http\Requests\Color\StoreColorRequest;
 use App\Http\Requests\Color\UpdateColorRequest;
+use App\Http\Resources\ColorResource;
+use App\Models\Color;
+use App\Services\ColorService;
 
 class ColorController extends Controller
 {
     public function __construct(
         protected ColorService $service
-    ) {
-    }
+    ) {}
 
     public function index()
     {

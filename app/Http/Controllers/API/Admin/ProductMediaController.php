@@ -2,23 +2,22 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\ProductMedia;
-use App\Services\ProductMediaService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ProductMediaResource;
+use App\Http\Requests\ProductMedia\ReorderProductMediaRequest;
+use App\Http\Requests\ProductMedia\SetPrimaryProductMediaRequest;
 use App\Http\Requests\ProductMedia\StoreProductMediaRequest;
 use App\Http\Requests\ProductMedia\UpdateProductMediaRequest;
 use App\Http\Requests\ProductMedia\UploadProductMediaRequest;
-use App\Http\Requests\ProductMedia\ReorderProductMediaRequest;
-use App\Http\Requests\ProductMedia\SetPrimaryProductMediaRequest;
+use App\Http\Resources\ProductMediaResource;
+use App\Models\ProductMedia;
+use App\Services\ProductMediaService;
 use Illuminate\Http\JsonResponse;
 
 class ProductMediaController extends Controller
 {
     public function __construct(
         protected ProductMediaService $service
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -42,7 +41,7 @@ class ProductMediaController extends Controller
             'message' => 'Media created successfully.',
             'data' => new ProductMediaResource(
                 $media->load('product')
-            )
+            ),
         ], 201);
     }
 
@@ -71,7 +70,7 @@ class ProductMediaController extends Controller
             'message' => 'Media updated successfully.',
             'data' => new ProductMediaResource(
                 $product_medium->fresh()->load('product')
-            )
+            ),
         ]);
     }
 
@@ -102,7 +101,7 @@ class ProductMediaController extends Controller
 
         return response()->json([
             'message' => 'Media uploaded successfully.',
-            'data'    => ProductMediaResource::collection(collect($mediaItems)),
+            'data' => ProductMediaResource::collection(collect($mediaItems)),
         ], 201);
     }
 
@@ -112,7 +111,7 @@ class ProductMediaController extends Controller
      */
     public function reorder(ReorderProductMediaRequest $request): JsonResponse
     {
-        $productId  = (int) $request->input('product_id');
+        $productId = (int) $request->input('product_id');
         $orderedIds = $request->input('orderedIds', $request->input('ordered_ids', []));
 
         $this->service->reorder($productId, $orderedIds);
@@ -139,7 +138,7 @@ class ProductMediaController extends Controller
 
         return response()->json([
             'message' => 'Primary media updated successfully.',
-            'data'    => new ProductMediaResource($productMedia->fresh()),
+            'data' => new ProductMediaResource($productMedia->fresh()),
         ]);
     }
 }

@@ -2,61 +2,44 @@
 
 namespace App\Http\Controllers\API\Customer;
 
-
-use App\Services\OrderService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\OrderResource;
 use App\Http\Requests\Order\StoreOrderRequest;
-use Illuminate\Http\Request;
-
+use App\Http\Resources\OrderResource;
+use App\Services\OrderService;
 
 class OrderController extends Controller
 {
-
-
     public function __construct(
-    protected OrderService $service
-    )
-    {}
-
-
-
+        protected OrderService $service
+    ) {}
 
     public function index()
     {
 
-    return OrderResource::collection(
+        return OrderResource::collection(
 
-    $this->service
-    ->customerOrders(auth('customer')->id())
+            $this->service
+                ->customerOrders(auth('customer')->id())
 
-    );
+        );
 
     }
-
-
-
 
     public function store(StoreOrderRequest $request)
     {
 
+        $data = $request->validated();
 
-    $data=$request->validated();
+        $data['customer_id'] = auth('customer')->id();
 
+        $order =
+        $this->service->create($data);
 
-    $data['customer_id'] = auth('customer')->id();
+        $this->authorize('view', $order);
 
-
-    $order =
-    $this->service->create($data);
-
-    $this->authorize('view', $order);
-
-    return new OrderResource($order);
-
+        return new OrderResource($order);
 
     }
-
 
     public function show($id)
     {
@@ -66,7 +49,7 @@ class OrderController extends Controller
             $id
         );
         $this->authorize('view', $order);
+
         return new OrderResource($order);
     }
-
 }

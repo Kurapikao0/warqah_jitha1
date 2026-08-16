@@ -16,8 +16,7 @@ final class SendVerificationOtpListener
     public function __construct(
         protected VerificationCodeService $verificationCodeService,
         protected EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(
         CustomerRegistered $event
@@ -51,4 +50,3 @@ final class SendVerificationOtpListener
         ]);
     }
 }
-

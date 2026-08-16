@@ -2,13 +2,10 @@
 
 namespace App\Repositories\Contracts;
 
-
 use App\Models\ProductCustomizationRequest;
-
 
 interface CustomizationRepositoryInterface
 {
-
     public function getAll();
 
     public function findById(int $id);
@@ -23,5 +20,4 @@ interface CustomizationRepositoryInterface
     public function delete(
         ProductCustomizationRequest $request
     );
-
 }

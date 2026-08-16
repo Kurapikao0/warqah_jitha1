@@ -10,22 +10,16 @@ use App\Models\ReviewImage;
 use App\Services\ReviewImageService;
 use Illuminate\Http\JsonResponse;
 
-
 class ReviewImageController extends Controller
 {
-
     public function __construct(
         protected ReviewImageService $service
-    ) {
-    }
-
-
+    ) {}
 
     public function store(
         UploadReviewImageRequest $request,
         Review $review
     ): ReviewImageResource {
-
 
         // التأكد أن التقييم يخص العميل الحالي
         abort_if(
@@ -33,26 +27,18 @@ class ReviewImageController extends Controller
             403
         );
 
-
-
         $image = $this->service->upload(
             $review,
             $request->file('image')
         );
 
-
         return new ReviewImageResource($image);
 
     }
 
-
-
-
-
     public function destroy(
         ReviewImage $reviewImage
     ): JsonResponse {
-
 
         // التأكد أن الصورة تخص العميل الحالي
         abort_if(
@@ -60,16 +46,11 @@ class ReviewImageController extends Controller
             403
         );
 
-
-
         $this->service->delete($reviewImage);
 
-
-
         return response()->json([
-            'message'=>'Review image deleted successfully'
+            'message' => 'Review image deleted successfully',
         ]);
 
     }
-
 }

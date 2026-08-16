@@ -15,10 +15,10 @@ class UpdateProductAttributeValueRequest extends FormRequest
     {
         return [
 
-            'value'=>[
+            'value' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
 
         ];

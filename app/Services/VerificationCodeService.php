@@ -90,15 +90,13 @@ class VerificationCodeService
 
             match ($purpose) {
                 VerificationPurpose::SignupEmailVerification,
-                VerificationPurpose::ChangeEmailVerification =>
-                    $customer->update([
-                        'email_verified_at' => now(),
-                    ]),
+                VerificationPurpose::ChangeEmailVerification => $customer->update([
+                    'email_verified_at' => now(),
+                ]),
 
-                VerificationPurpose::SignupPhoneVerification =>
-                    $customer->update([
-                        'phone_verified_at' => now(),
-                    ]),
+                VerificationPurpose::SignupPhoneVerification => $customer->update([
+                    'phone_verified_at' => now(),
+                ]),
 
                 default => null,
             };
@@ -127,11 +125,9 @@ class VerificationCodeService
             VerificationPurpose::SignupEmailVerification,
             VerificationPurpose::SignupPhoneVerification,
             VerificationPurpose::PasswordResetPhoneOtp,
-            VerificationPurpose::ChangeEmailVerification
-                => (string) random_int(100000, 999999),
+            VerificationPurpose::ChangeEmailVerification => (string) random_int(100000, 999999),
 
-            VerificationPurpose::PasswordResetEmailLink
-                => Str::random(64),
+            VerificationPurpose::PasswordResetEmailLink => Str::random(64),
         };
     }
 
@@ -142,11 +138,9 @@ class VerificationCodeService
             VerificationPurpose::SignupEmailVerification,
             VerificationPurpose::SignupPhoneVerification,
             VerificationPurpose::PasswordResetPhoneOtp,
-            VerificationPurpose::ChangeEmailVerification
-                => 10,
+            VerificationPurpose::ChangeEmailVerification => 10,
 
-            VerificationPurpose::PasswordResetEmailLink
-                => 30,
+            VerificationPurpose::PasswordResetEmailLink => 30,
         };
     }
 }

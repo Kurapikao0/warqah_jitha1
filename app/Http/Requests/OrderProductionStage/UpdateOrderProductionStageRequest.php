@@ -20,13 +20,13 @@ class UpdateOrderProductionStageRequest extends FormRequest
                 'required',
                 'string',
                 Rule::unique('order_production_stages')
-                    ->ignore($this->orderProductionStage)
+                    ->ignore($this->orderProductionStage),
             ],
 
             'sort_order' => [
                 'required',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
         ];
@@ -36,39 +36,25 @@ class UpdateOrderProductionStageRequest extends FormRequest
     {
         return [
 
-            'name.required'
-            =>
-            'اسم مرحلة الإنتاج مطلوب.',
+            'name.required' => 'اسم مرحلة الإنتاج مطلوب.',
 
-            'sort_order.required'
-            =>
-            'ترتيب مرحلة الإنتاج مطلوب.',
+            'sort_order.required' => 'ترتيب مرحلة الإنتاج مطلوب.',
 
-            'sort_order.integer'
-            =>
-            'ترتيب المرحلة يجب أن يكون رقماً.',
+            'sort_order.integer' => 'ترتيب المرحلة يجب أن يكون رقماً.',
 
-            'sort_order.min'
-            =>
-            'ترتيب المرحلة يجب أن يكون أكبر من صفر.',
+            'sort_order.min' => 'ترتيب المرحلة يجب أن يكون أكبر من صفر.',
 
         ];
     }
-
 
     public function attributes(): array
     {
         return [
 
-            'name'
-            =>
-            'اسم المرحلة',
+            'name' => 'اسم المرحلة',
 
-            'sort_order'
-            =>
-            'ترتيب المرحلة',
+            'sort_order' => 'ترتيب المرحلة',
 
         ];
     }
-
 }

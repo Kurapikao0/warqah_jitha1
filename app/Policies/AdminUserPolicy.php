@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\AdminUser;
+use App\Models\Role;
 
 class AdminUserPolicy
 {
-
     public function viewAny(AdminUser $admin): bool
     {
         return $this->can(
@@ -14,7 +14,6 @@ class AdminUserPolicy
             'admin_users.view'
         );
     }
-
 
     public function view(
         AdminUser $admin,
@@ -27,8 +26,6 @@ class AdminUserPolicy
         );
     }
 
-
-
     public function create(
         AdminUser $admin
     ): bool {
@@ -38,8 +35,6 @@ class AdminUserPolicy
             'admin_users.create'
         );
     }
-
-
 
     public function update(
         AdminUser $admin,
@@ -52,20 +47,16 @@ class AdminUserPolicy
         );
     }
 
-
-
     public function delete(
         AdminUser $admin,
         AdminUser $model
     ): bool {
 
-
-        if(
+        if (
             AdminUser::count() <= 1
-        ){
+        ) {
             return false;
         }
-
 
         return $this->can(
             $admin,
@@ -73,17 +64,14 @@ class AdminUserPolicy
         );
     }
 
-
-
     protected function can(
-    AdminUser $admin,
-    string $permission
+        AdminUser $admin,
+        string $permission
     ): bool {
 
         $role = $admin->role;
 
-        if (! $role instanceof \App\Models\Role)
-        {
+        if (! $role instanceof Role) {
             return false;
         }
 

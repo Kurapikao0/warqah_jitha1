@@ -12,8 +12,7 @@ final class SendEmailChangedEmail
 {
     public function __construct(
         private readonly EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(EmailChanged $event): void
     {

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Review\UpdateReviewStatusRequest;
 use App\Http\Requests\Admin\Review\ReplyToReviewRequest;
+use App\Http\Requests\Admin\Review\UpdateReviewStatusRequest;
 use App\Http\Resources\ReviewResource;
 use App\Models\Review;
 use App\Services\AdminReviewService;
@@ -46,7 +46,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => 'تم تحديث حالة المراجعة بنجاح.',
-            'data'    => new ReviewResource($updatedReview),
+            'data' => new ReviewResource($updatedReview),
         ], 200);
     }
 
@@ -61,7 +61,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'message' => 'تم إضافة رد الأدمن بنجاح.',
-            'data'    => new ReviewResource($updatedReview),
+            'data' => new ReviewResource($updatedReview),
         ], 200);
     }
 

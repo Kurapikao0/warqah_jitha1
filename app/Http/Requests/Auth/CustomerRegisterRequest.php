@@ -2,17 +2,14 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Enums\CustomerCategory;
 use App\Rules\YemenPhoneRule;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class CustomerRegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -23,7 +20,7 @@ class CustomerRegisterRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -31,10 +28,10 @@ class CustomerRegisterRequest extends FormRequest
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:customers,email'],
             'phone_country_code' => ['required', 'string', 'max:10'],
-            'phone' => ['required', 'string', 'max:20', new YemenPhoneRule(), 'unique:customers,phone'],
+            'phone' => ['required', 'string', 'max:20', new YemenPhoneRule, 'unique:customers,phone'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
-            'avatar'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ];
     }
 

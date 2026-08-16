@@ -2,15 +2,11 @@
 
 namespace App\Http\Requests\Admin\Product;
 
-
 use Illuminate\Foundation\Http\FormRequest;
-
-
+use Illuminate\Support\Str;
 
 class StoreProductRequest extends FormRequest
 {
-
-
     public function authorize(): bool
     {
         return auth('admin')->check();
@@ -18,12 +14,12 @@ class StoreProductRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if (empty($this->slug) && !empty($this->name)) {
-            $baseSlug = \Illuminate\Support\Str::slug($this->name);
+        if (empty($this->slug) && ! empty($this->name)) {
+            $baseSlug = Str::slug($this->name);
             if (empty($baseSlug)) {
-                $baseSlug = 'prd-' . strtolower(\Illuminate\Support\Str::random(6));
+                $baseSlug = 'prd-'.strtolower(Str::random(6));
             } else {
-                $baseSlug = $baseSlug . '-' . strtolower(\Illuminate\Support\Str::random(4));
+                $baseSlug = $baseSlug.'-'.strtolower(Str::random(4));
             }
             $this->merge([
                 'slug' => $baseSlug,
@@ -36,52 +32,38 @@ class StoreProductRequest extends FormRequest
 
         return [
 
-            'category_id'
-                =>'required|exists:product_categories,id',
+            'category_id' => 'required|exists:product_categories,id',
 
-            'name'
-                =>'required|string|max:255',
+            'name' => 'required|string|max:255',
 
-            'slug'
-                =>'required|string|max:255|unique:products,slug',
+            'slug' => 'required|string|max:255|unique:products,slug',
 
-            'sku'
-                =>'required|string|unique:products,sku',
+            'sku' => 'required|string|unique:products,sku',
 
-            'description'
-                =>'nullable|string',
+            'description' => 'nullable|string',
 
-            'price'
-                =>'required|numeric|min:0',
+            'price' => 'required|numeric|min:0',
 
-            'stock_quantity'
-                =>'required|integer|min:0',
+            'stock_quantity' => 'required|integer|min:0',
 
-            'is_customizable'
-                =>'boolean',
+            'is_customizable' => 'boolean',
 
-            'status'
-                =>'required|string'
+            'status' => 'required|string',
 
         ];
 
     }
-
-
 
     public function messages(): array
     {
 
         return [
 
-            'sku.unique'
-            =>'Product SKU already exists',
+            'sku.unique' => 'Product SKU already exists',
 
-            'price.numeric'
-            =>'Price must be numeric'
+            'price.numeric' => 'Price must be numeric',
 
         ];
 
     }
-
 }

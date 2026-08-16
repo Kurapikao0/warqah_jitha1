@@ -2,103 +2,65 @@
 
 namespace App\Services;
 
-
-use App\Models\Cart;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\CartRepositoryInterface;
-
-
+use Illuminate\Support\Facades\DB;
 
 class CartService
 {
+    public function __construct(
+        protected CartRepositoryInterface $repository
+    ) {}
 
+    public function getCart($customerId)
+    {
 
-public function __construct(
-protected CartRepositoryInterface $repository
-)
-{}
+        $cart =
+        $this->repository
+            ->getCustomerCart($customerId);
 
+        if (! $cart) {
 
+            $cart =
+            $this->repository
+                ->createCart($customerId);
 
+        }
 
+        return $cart;
 
-public function getCart($customerId)
-{
+    }
 
+    public function addItem(
+        array $data
+    ) {
 
-$cart =
-$this->repository
-->getCustomerCart($customerId);
+        return DB::transaction(function () use ($data) {
 
+            return $this->repository
+                ->addItem($data);
 
+        });
 
-if(!$cart)
-{
+    }
 
-$cart =
-$this->repository
-->createCart($customerId);
+    public function updateItem(
+        $item,
+        array $data
+    ) {
 
-}
+        return $this->repository
+            ->updateItem(
+                $item,
+                $data
+            );
 
+    }
 
-return $cart;
+    public function removeItem($item)
+    {
 
-}
+        return $this->repository
+            ->removeItem($item);
 
-
-
-
-public function addItem(
-array $data
-)
-{
-
-return DB::transaction(function()
-use($data){
-
-
-return $this->repository
-->addItem($data);
-
-
-});
-
-
-}
-
-
-
-
-
-
-public function updateItem(
-$item,
-array $data
-)
-{
-
-
-return $this->repository
-->updateItem(
-$item,
-$data
-);
-
-
-}
-
-
-
-
-
-public function removeItem($item)
-{
-
-return $this->repository
-->removeItem($item);
-
-}
-
-
+    }
 }

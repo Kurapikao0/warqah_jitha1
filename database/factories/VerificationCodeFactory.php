@@ -24,9 +24,9 @@ class VerificationCodeFactory extends Factory
     {
         return [
             'customer_id' => Customer::factory(), // ينشئ عميل تلقائياً ويأخذ id الخاص به
-            'code'        => (string) rand(100000, 999999),
-            'expires_at'  => now()->addMinutes(10),
-            'is_used'     => false,
+            'code' => (string) rand(100000, 999999),
+            'expires_at' => now()->addMinutes(10),
+            'is_used' => false,
         ];
     }
 }

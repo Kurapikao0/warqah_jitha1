@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\OrderProductionStage;
-use App\Services\OrderProductionStageService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\OrderProductionStageResource;
 use App\Http\Requests\OrderProductionStage\StoreOrderProductionStageRequest;
 use App\Http\Requests\OrderProductionStage\UpdateOrderProductionStageRequest;
+use App\Http\Resources\OrderProductionStageResource;
+use App\Models\OrderProductionStage;
+use App\Services\OrderProductionStageService;
 
 class OrderProductionStageController extends Controller
 {
     public function __construct(
         protected OrderProductionStageService $service
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -33,7 +32,8 @@ class OrderProductionStageController extends Controller
         return new OrderProductionStageResource($stage);
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         return new OrderProductionStageResource(
             $this->service->find($id)
         );
@@ -48,8 +48,8 @@ class OrderProductionStageController extends Controller
         $request->validated()
     );*/
         $stage = $this->service->update(
-                $productionStage,
-                $request->validated()
+            $productionStage,
+            $request->validated()
         );
 
         return new OrderProductionStageResource(
@@ -63,7 +63,7 @@ class OrderProductionStageController extends Controller
         $this->service->delete($productionStage);
 
         return response()->json([
-            'message' => 'Stage deleted successfully.'
+            'message' => 'Stage deleted successfully.',
         ], 200);
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class AddressFactory extends Factory
 {
     protected $model = Address::class;
+
     /**
      * Define the model's default state.
      *
@@ -30,7 +31,7 @@ class AddressFactory extends Factory
             'postal_code' => $this->faker->postcode(),
             'is_default' => $this->faker->boolean(),
             'created_at' => now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ];
     }
 }

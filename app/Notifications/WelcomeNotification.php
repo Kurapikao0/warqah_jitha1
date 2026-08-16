@@ -13,7 +13,6 @@ final class WelcomeNotification extends Notification implements EmailNotificatio
 {
     use Queueable;
 
-
     public function via(object $notifiable): array
     {
         return [
@@ -21,18 +20,15 @@ final class WelcomeNotification extends Notification implements EmailNotificatio
         ];
     }
 
-
     public function notificationType(): string
     {
         return 'welcome_email';
     }
 
-
     public function notificationSubject(): string
     {
         return 'مرحباً بك في ورقة وجذع 🌿';
     }
-
 
     public function toMail(object $notifiable): MailMessage
     {
@@ -49,7 +45,6 @@ final class WelcomeNotification extends Notification implements EmailNotificatio
                 ]
             );
     }
-
 
     public function toArray(object $notifiable): array
     {

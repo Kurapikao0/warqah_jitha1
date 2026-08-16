@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\API\Customer;
 
 use App\Http\Controllers\Controller;
-use App\Services\CartService;
 use App\Http\Resources\CartResource;
+use App\Services\CartService;
 use Illuminate\Http\Response;
 
 class CartController extends Controller
@@ -18,7 +18,7 @@ class CartController extends Controller
         $cart = $this->service->getCart(auth()->id());
 
         return response()->json([
-            'data' => new CartResource($cart)
-        ], Response::HTTP_OK); // 
+            'data' => new CartResource($cart),
+        ], Response::HTTP_OK); //
     }
 }

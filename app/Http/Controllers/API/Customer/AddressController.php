@@ -12,16 +12,11 @@ use App\Services\AddressService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-
 class AddressController extends Controller
 {
-
     public function __construct(
         protected AddressService $addressService
-    ) {
-    }
-
-
+    ) {}
 
     /**
      * Display customer addresses
@@ -30,37 +25,28 @@ class AddressController extends Controller
         Request $request
     ): JsonResponse {
 
-
         /** @var Customer $customer */
         $customer = $request->user();
-
-
 
         $addresses =
             $this->addressService
                 ->getCustomerAddresses($customer);
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Addresses retrieved successfully',
+            'message' => 'Addresses retrieved successfully',
 
-            'data'=>AddressResource::collection(
+            'data' => AddressResource::collection(
                 $addresses
             ),
 
-            'errors'=>null
+            'errors' => null,
 
         ]);
 
     }
-
-
-
-
 
     /**
      * Store new address
@@ -69,11 +55,8 @@ class AddressController extends Controller
         StoreAddressRequest $request
     ): JsonResponse {
 
-
         /** @var Customer $customer */
         $customer = $request->user();
-
-
 
         $address =
             $this->addressService
@@ -82,27 +65,21 @@ class AddressController extends Controller
                     $request->validated()
                 );
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Address created successfully',
+            'message' => 'Address created successfully',
 
-            'data'=>new AddressResource(
+            'data' => new AddressResource(
                 $address
             ),
 
-            'errors'=>null
+            'errors' => null,
 
-        ],201);
+        ], 201);
 
     }
-
-
-
-
 
     /**
      * Show address
@@ -111,33 +88,26 @@ class AddressController extends Controller
         Address $address
     ): JsonResponse {
 
-
         $this->authorize(
             'view',
             $address
         );
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Address retrieved successfully',
+            'message' => 'Address retrieved successfully',
 
-            'data'=>new AddressResource(
+            'data' => new AddressResource(
                 $address
             ),
 
-            'errors'=>null
+            'errors' => null,
 
         ]);
 
     }
-
-
-
-
 
     /**
      * Update address
@@ -147,13 +117,10 @@ class AddressController extends Controller
         Address $address
     ): JsonResponse {
 
-
         $this->authorize(
             'update',
             $address
         );
-
-
 
         $address =
             $this->addressService
@@ -162,27 +129,21 @@ class AddressController extends Controller
                     $request->validated()
                 );
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Address updated successfully',
+            'message' => 'Address updated successfully',
 
-            'data'=>new AddressResource(
+            'data' => new AddressResource(
                 $address
             ),
 
-            'errors'=>null
+            'errors' => null,
 
         ]);
 
     }
-
-
-
-
 
     /**
      * Delete address
@@ -191,36 +152,27 @@ class AddressController extends Controller
         Address $address
     ): JsonResponse {
 
-
         $this->authorize(
             'delete',
             $address
         );
 
-
-
         $this->addressService
             ->delete($address);
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Address deleted successfully',
+            'message' => 'Address deleted successfully',
 
-            'data'=>null,
+            'data' => null,
 
-            'errors'=>null
+            'errors' => null,
 
         ]);
 
     }
-
-
-
-
 
     /**
      * Set default address
@@ -229,35 +181,28 @@ class AddressController extends Controller
         Address $address
     ): JsonResponse {
 
-
         $this->authorize(
             'setDefault',
             $address
         );
 
-
-
         $address =
             $this->addressService
                 ->setDefault($address);
 
-
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Default address updated successfully',
+            'message' => 'Default address updated successfully',
 
-            'data'=>new AddressResource(
+            'data' => new AddressResource(
                 $address
             ),
 
-            'errors'=>null
+            'errors' => null,
 
         ]);
 
     }
-
-
 }

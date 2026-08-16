@@ -16,9 +16,7 @@ class AdminUserController extends Controller
 {
     public function __construct(
         protected AdminUserService $service
-    ) {
-    }
-
+    ) {}
 
     public function index(): AnonymousResourceCollection
     {
@@ -27,83 +25,67 @@ class AdminUserController extends Controller
             AdminUser::class
         );
 
-
         return AdminUserResource::collection(
             $this->service->paginate()
         );
     }
 
-
-
     public function store(
         StoreAdminUserRequest $request
     ): JsonResponse {
-
 
         $this->authorize(
             'create',
             AdminUser::class
         );
 
-
         $adminUser =
             $this->service->create(
                 $request->validated()
             );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Admin user created successfully.',
+            'message' => 'Admin user created successfully.',
 
-            'data'=>new AdminUserResource(
+            'data' => new AdminUserResource(
                 $adminUser->load('role')
-            )
+            ),
 
         ], Response::HTTP_CREATED);
     }
 
-
-
-
     public function show(
         AdminUser $adminUser
     ): JsonResponse {
-
 
         $this->authorize(
             'view',
             $adminUser
         );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'data'=>new AdminUserResource(
+            'data' => new AdminUserResource(
                 $adminUser->load('role')
-            )
+            ),
 
         ]);
     }
-
-
-
 
     public function update(
         UpdateAdminUserRequest $request,
         AdminUser $adminUser
     ): JsonResponse {
 
-
         $this->authorize(
             'update',
             $adminUser
         );
-
 
         $adminUser =
             $this->service->update(
@@ -111,44 +93,37 @@ class AdminUserController extends Controller
                 $request->validated()
             );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Admin user updated successfully.',
+            'message' => 'Admin user updated successfully.',
 
-            'data'=>new AdminUserResource(
+            'data' => new AdminUserResource(
                 $adminUser->load('role')
-            )
+            ),
 
         ]);
     }
 
-
-
-
     public function destroy(
         AdminUser $adminUser
     ): JsonResponse {
-
 
         $this->authorize(
             'delete',
             $adminUser
         );
 
-
         $this->service->delete(
             $adminUser
         );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Admin user deleted successfully.'
+            'message' => 'Admin user deleted successfully.',
 
         ]);
     }

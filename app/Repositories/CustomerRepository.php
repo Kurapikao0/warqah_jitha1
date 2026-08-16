@@ -20,7 +20,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                 'reviews',
                 'favorites',
                 'notifications',
-                'cart'
+                'cart',
             ])
             ->when(
                 isset($filters['search']),
@@ -28,8 +28,8 @@ class CustomerRepository implements CustomerRepositoryInterface
                     $search = $filters['search'];
                     $query->where(function ($q) use ($search) {
                         $q->where('full_name', 'LIKE', "%{$search}%")
-                          ->orWhere('email', 'LIKE', "%{$search}%")
-                          ->orWhere('phone', 'LIKE', "%{$search}%");
+                            ->orWhere('email', 'LIKE', "%{$search}%")
+                            ->orWhere('phone', 'LIKE', "%{$search}%");
                     });
                 }
             )
@@ -71,9 +71,9 @@ class CustomerRepository implements CustomerRepositoryInterface
             'reviews',
             'favorites',
             'notifications',
-            'cart'
+            'cart',
         ])
-        ->find($id);
+            ->find($id);
     }
 
     /**
@@ -122,7 +122,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         string $status
     ): Customer {
         $customer->update([
-            'status' => $status
+            'status' => $status,
         ]);
 
         return $customer->fresh();
@@ -135,7 +135,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         Customer $customer
     ): Customer {
         $customer->update([
-            'email_verified_at' => now()
+            'email_verified_at' => now(),
         ]);
 
         return $customer->fresh();
@@ -153,7 +153,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             'reviews',
             'favorites',
             'notifications',
-            'cart'
+            'cart',
         ]);
     }
 }

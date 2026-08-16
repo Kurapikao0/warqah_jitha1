@@ -14,8 +14,7 @@ class AdminUserService
 {
     public function __construct(
         protected AdminUserRepository $repository
-    ) {
-    }
+    ) {}
 
     public function paginate()
     {

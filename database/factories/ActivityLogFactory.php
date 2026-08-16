@@ -3,16 +3,16 @@
 namespace Database\Factories;
 
 use App\Models\ActivityLog;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\AdminUser;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends Factory<ActivityLog>
  */
 class ActivityLogFactory extends Factory
 {
-
     protected $model = ActivityLog::class;
+
     /**
      * Define the model's default state.
      *

@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Models\ProductAttributeValue;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class ProductAttributeValueService
 {
     public function __construct(
         protected ProductAttributeValueRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function all()
     {

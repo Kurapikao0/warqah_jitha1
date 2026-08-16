@@ -49,7 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ValidationException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -66,7 +66,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ModelNotFoundException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -86,7 +86,7 @@ return Application::configure(basePath: dirname(__DIR__))
             QueryException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -111,7 +111,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Throwable $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 

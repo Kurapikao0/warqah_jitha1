@@ -7,7 +7,6 @@ namespace App\Jobs;
 use App\Enums\EmailStatus;
 use App\Models\AdminUser;
 use App\Models\Customer;
-use App\Models\EmailLog;
 use App\Notifications\EmailNotification;
 use App\Repositories\Contracts\EmailLogRepositoryInterface;
 use Illuminate\Bus\Queueable;
@@ -32,8 +31,7 @@ final class SendEmailNotificationJob implements ShouldQueue
 
     public function __construct(
         public readonly int $emailLogId,
-    ) {
-    }
+    ) {}
 
     public function handle(
         EmailLogRepositoryInterface $emailLogRepository,

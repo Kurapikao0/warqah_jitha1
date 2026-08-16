@@ -15,7 +15,7 @@ class CustomerLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone'    => ['required', 'string', 'max:20', new YemenPhoneRule()],
+            'phone' => ['required', 'string', 'max:20', new YemenPhoneRule],
             'password' => ['required', 'string'],
         ];
     }
@@ -23,7 +23,7 @@ class CustomerLoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phone.required'    => 'رقم الهاتف مطلوب',
+            'phone.required' => 'رقم الهاتف مطلوب',
             'password.required' => 'كلمة المرور مطلوبة',
         ];
     }

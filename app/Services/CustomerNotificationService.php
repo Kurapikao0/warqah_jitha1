@@ -10,9 +10,7 @@ class CustomerNotificationService
 {
     public function __construct(
         protected CustomerNotificationRepository $repository
-    ) {
-    }
-
+    ) {}
 
     public function getAll(
         int $customerId
@@ -21,7 +19,6 @@ class CustomerNotificationService
         return $this->repository
             ->allByCustomer($customerId);
     }
-
 
     public function getById(
         int $id,
@@ -32,7 +29,6 @@ class CustomerNotificationService
             ->find($id, $customerId);
     }
 
-
     public function markAsRead(
         CustomerNotification $notification
     ): CustomerNotification {
@@ -40,7 +36,6 @@ class CustomerNotificationService
         return $this->repository
             ->markAsRead($notification);
     }
-
 
     public function delete(
         CustomerNotification $notification

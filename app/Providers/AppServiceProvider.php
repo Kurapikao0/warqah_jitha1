@@ -7,19 +7,18 @@ use App\Models\Customer;
 use App\Models\Permission;
 use App\Models\RawMaterial;
 use App\Models\Role;
-
 use App\Policies\AddressPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RawMaterialPolicy;
 use App\Policies\RolePolicy;
-
 use App\Repositories\AddressRepository;
 use App\Repositories\AdminReviewRepository;
 use App\Repositories\AuthRepository;
 use App\Repositories\CartRepository;
 use App\Repositories\ColorRepository;
 use App\Repositories\Contracts\AddressRepositoryInterface;
+use App\Repositories\Contracts\AdminReviewRepositoryInterface;
 use App\Repositories\Contracts\AuthRepositoryInterface;
 use App\Repositories\Contracts\CartRepositoryInterface;
 use App\Repositories\Contracts\ColorRepositoryInterface;
@@ -37,7 +36,6 @@ use App\Repositories\Contracts\ProductAttributeRepositoryInterface;
 use App\Repositories\Contracts\ProductAttributeValueRepositoryInterface;
 use App\Repositories\Contracts\ProductMediaRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use App\Repositories\Contracts\AdminReviewRepositoryInterface;
 use App\Repositories\CustomerRepository;
 use App\Repositories\CustomizationRepository;
 use App\Repositories\DesignPatternRepository;
@@ -52,7 +50,6 @@ use App\Repositories\ProductAttributeRepository;
 use App\Repositories\ProductAttributeValueRepository;
 use App\Repositories\ProductMediaRepository;
 use App\Repositories\ProductRepository;
-
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 

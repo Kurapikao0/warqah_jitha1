@@ -2,153 +2,127 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Order;
-use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Models\OrderItem;
-
+use App\Repositories\Contracts\OrderRepositoryInterface;
 
 class OrderRepository implements OrderRepositoryInterface
 {
+    public function getAll()
+    {
 
+        return Order::with([
 
-public function getAll()
-{
+            'customer',
 
-return Order::with([
+            'items.product',
 
-'customer',
+            'payment',
 
-'items.product',
+            'currentProductionStage',
 
-'payment',
+        ])
+            ->latest()
+            ->paginate(20);
 
-'currentProductionStage'
+    }
 
-])
-->latest()
-->paginate(20);
+    public function getCustomerOrders($customerId)
+    {
 
+        return Order::with([
 
-}
+            'items.product',
 
+            'payment',
 
+        ])
+            ->where(
+                'customer_id',
+                $customerId
+            )
+            ->latest()
+            ->paginate(15);
 
+    }
 
-public function getCustomerOrders($customerId)
-{
+    public function findById($id)
+    {
 
+        return Order::with([
 
-return Order::with([
+            'customer',
 
-'items.product',
+            'items.product',
 
-'payment'
+            'payment',
 
-])
+            'statusHistory',
 
-->where(
-'customer_id',
-$customerId
-)
+            'productionStageHistory',
 
-->latest()
+        ])
+            ->findOrFail($id);
 
-->paginate(15);
+    }
 
+    public function create(array $data)
+    {
 
-}
+        return Order::create($data);
 
+    }
 
+    public function createItem(array $data): OrderItem
+    {
+        return OrderItem::create($data);
+    }
 
+    public function update(
+        Order $order,
+        array $data
+    ) {
 
-public function findById($id)
-{
+        $order->update($data);
 
+        return $order->refresh();
+    }
 
-return Order::with([
-
-'customer',
-
-'items.product',
-
-'payment',
-
-'statusHistory',
-
-'productionStageHistory'
-
-])
-
-->findOrFail($id);
-
-
-}
-
-
-
-
-public function create(array $data)
-{
-
-return Order::create($data);
-
-}
-
-public function createItem(array $data): OrderItem
-{
-    return OrderItem::create($data);
-}
-
-
-
-public function update(
-Order $order,
-array $data
-)
-{
-
-$order->update($data);
-
-return $order->refresh();
-}
-
-public function findCustomerOrder(
-    int $customerId,
-    int $orderId
-)
-{
-    return Order::with([
-        'items.product',
-        'payment',
-        'statusHistory',
-        'productionStageHistory',
-    ])
-    ->where('customer_id', $customerId)
-    ->findOrFail($orderId);
-}
+    public function findCustomerOrder(
+        int $customerId,
+        int $orderId
+    ) {
+        return Order::with([
+            'items.product',
+            'payment',
+            'statusHistory',
+            'productionStageHistory',
+        ])
+            ->where('customer_id', $customerId)
+            ->findOrFail($orderId);
+    }
 
     public function statistics()
-{
-    return [
+    {
+        return [
 
-        'total_orders' => Order::count(),
+            'total_orders' => Order::count(),
 
-        'pending' => Order::where(
-            'status',
-            'received'
-        )->count(),
+            'pending' => Order::where(
+                'status',
+                'received'
+            )->count(),
 
-        'production' => Order::where(
-            'status',
-            'in_production'
-        )->count(),
+            'production' => Order::where(
+                'status',
+                'in_production'
+            )->count(),
 
-        'completed' => Order::where(
-            'status',
-            'completed'
-        )->count(),
+            'completed' => Order::where(
+                'status',
+                'completed'
+            )->count(),
 
-    ];
-}
+        ];
+    }
 }

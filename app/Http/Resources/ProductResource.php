@@ -35,9 +35,9 @@ class ProductResource extends JsonResource
 
             'is_customizable' => $this->is_customizable,
 
-            'category' => $this->whenLoaded('category', fn() => new ProductCategoryResource($this->category)),
+            'category' => $this->whenLoaded('category', fn () => new ProductCategoryResource($this->category)),
 
-            'media' => $this->whenLoaded('media', fn() => ProductMediaResource::collection($this->media)),
+            'media' => $this->whenLoaded('media', fn () => ProductMediaResource::collection($this->media)),
 
             'created_at' => $this->created_at,
         ];

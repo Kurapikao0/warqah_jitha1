@@ -34,12 +34,12 @@ class StoreDesignPatternRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'unique:design_patterns,name'
+                'unique:design_patterns,name',
             ],
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'image' => [

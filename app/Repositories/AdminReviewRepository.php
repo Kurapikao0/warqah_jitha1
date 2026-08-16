@@ -58,7 +58,7 @@ class AdminReviewRepository implements AdminReviewRepositoryInterface
     public function addReply(Review $review, string $reply): Review
     {
         $review->update([
-            'admin_reply'    => $reply,
+            'admin_reply' => $reply,
             'admin_reply_at' => now(),
         ]);
 

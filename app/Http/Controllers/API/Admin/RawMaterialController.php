@@ -14,8 +14,7 @@ class RawMaterialController extends Controller
 {
     public function __construct(
         protected RawMaterialService $service
-    ) {
-    }
+    ) {}
 
     /**
      * عرض قائمة المواد الخام
@@ -43,7 +42,7 @@ class RawMaterialController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم إنشاء المادة الخام بنجاح',
-            'data'    => new RawMaterialResource($rawMaterial),
+            'data' => new RawMaterialResource($rawMaterial),
         ], 201);
     }
 
@@ -56,7 +55,7 @@ class RawMaterialController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => new RawMaterialResource($rawMaterial->loadMissing('product')),
+            'data' => new RawMaterialResource($rawMaterial->loadMissing('product')),
         ]);
     }
 
@@ -77,7 +76,7 @@ class RawMaterialController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'تم تحديث المادة الخام بنجاح',
-            'data'    => new RawMaterialResource($updatedRawMaterial),
+            'data' => new RawMaterialResource($updatedRawMaterial),
         ]);
     }
 

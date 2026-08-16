@@ -25,12 +25,12 @@ class OrderProductionStageRepository implements OrderProductionStageRepositoryIn
     public function update(
         OrderProductionStage $stage,
         array $data
-    ): OrderProductionStage
-    {
+    ): OrderProductionStage {
         $stage->update($data);
 
         return $stage->refresh();
     }
+
     public function delete(OrderProductionStage $stage): bool
     {
         return (bool) $stage->delete();

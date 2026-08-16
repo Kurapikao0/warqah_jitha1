@@ -14,12 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PermissionController extends Controller
 {
-
     public function __construct(
         protected PermissionService $permissionService
-    ) {
-    }
-
+    ) {}
 
     public function index(): AnonymousResourceCollection
     {
@@ -28,71 +25,57 @@ class PermissionController extends Controller
             Permission::class
         );
 
-
         return PermissionResource::collection(
             $this->permissionService->paginate()
         );
     }
 
-
-
     public function store(
         StorePermissionRequest $request
     ): JsonResponse {
-
 
         $this->authorize(
             'create',
             Permission::class
         );
 
-
         $permission =
             $this->permissionService
                 ->store($request->validated());
 
-
         return response()->json([
-            'success'=>true,
-            'message'=>'Permission created successfully.',
-            'data'=>new PermissionResource($permission)
+            'success' => true,
+            'message' => 'Permission created successfully.',
+            'data' => new PermissionResource($permission),
         ], Response::HTTP_CREATED);
     }
-
-
 
     public function show(
         Permission $permission
     ): JsonResponse {
-
 
         $this->authorize(
             'view',
             $permission
         );
 
-
         return response()->json([
-            'success'=>true,
-            'data'=>new PermissionResource(
+            'success' => true,
+            'data' => new PermissionResource(
                 $permission
-            )
+            ),
         ]);
     }
-
-
 
     public function update(
         UpdatePermissionRequest $request,
         Permission $permission
     ): JsonResponse {
 
-
         $this->authorize(
             'update',
             $permission
         );
-
 
         $permission =
             $this->permissionService
@@ -101,34 +84,28 @@ class PermissionController extends Controller
                     $request->validated()
                 );
 
-
         return response()->json([
-            'success'=>true,
-            'message'=>'Permission updated successfully.',
-            'data'=>new PermissionResource($permission)
+            'success' => true,
+            'message' => 'Permission updated successfully.',
+            'data' => new PermissionResource($permission),
         ]);
     }
-
-
 
     public function destroy(
         Permission $permission
     ): JsonResponse {
-
 
         $this->authorize(
             'delete',
             $permission
         );
 
-
         $this->permissionService
             ->delete($permission);
 
-
         return response()->json([
-            'success'=>true,
-            'message'=>'Permission deleted successfully.'
+            'success' => true,
+            'message' => 'Permission deleted successfully.',
         ]);
     }
 }

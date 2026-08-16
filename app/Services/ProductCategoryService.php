@@ -7,24 +7,19 @@ use App\Repositories\ProductCategoryRepository;
 
 class ProductCategoryService
 {
-
     public function __construct(
         protected ProductCategoryRepository $repository
-    ) {
-    }
-
+    ) {}
 
     public function paginate()
     {
         return $this->repository->paginate();
     }
 
-
     public function store(array $data)
     {
         return $this->repository->create($data);
     }
-
 
     public function update(
         ProductCategory $category,
@@ -36,7 +31,6 @@ class ProductCategoryService
             $data
         );
     }
-
 
     public function delete(
         ProductCategory $category
