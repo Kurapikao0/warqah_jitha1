@@ -23,7 +23,7 @@ class AdminUserControllerTest extends TestCase
 
         // 1. إنشاء المستخدم الحالي وتوثيق دخوله
         $this->admin = AdminUser::factory()->create();
-        Sanctum::actingAs($this->admin, ['*']);
+        Sanctum::actingAs($this->admin, ['*'], 'admin');
 
         // 2. تجاوز فحص الصلاحيات للمرور المباشر إلى الـ Logic
         Gate::before(fn () => true);
@@ -59,7 +59,7 @@ class AdminUserControllerTest extends TestCase
             'full_name' => 'New Admin User',
             'email'     => 'newadmin@example.com',
             'password'  => 'password123',
-            'phone'     => '1234567890',
+            'phone'     => '771234567',
         ];
 
         // Act
@@ -67,11 +67,11 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_CREATED)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Admin user created successfully.',
-                 ])
-                 ->assertJsonStructure(['data' => ['id', 'full_name', 'email', 'role']]);
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Admin user created successfully.',
+                ])
+                ->assertJsonStructure(['data' => ['id', 'full_name', 'email', 'role']]);
 
         $this->assertDatabaseHas('admin_users', [
             'email'     => 'newadmin@example.com',
@@ -118,7 +118,7 @@ class AdminUserControllerTest extends TestCase
         $targetAdmin = AdminUser::factory()->create();
         $updateData = [
             'full_name' => 'Updated Name',
-            'phone'     => '0987654321',
+            'phone'     => '731234567',
         ];
 
         // Act
@@ -126,15 +126,15 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Admin user updated successfully.',
-                 ]);
+                ->assertJson([
+                    'success' => true,
+                    'message' => 'Admin user updated successfully.',
+                ]);
 
         $this->assertDatabaseHas('admin_users', [
             'id'        => $targetAdmin->id,
             'full_name' => 'Updated Name',
-            'phone'     => '0987654321',
+            'phone'     => '731234567',
         ]);
     }
 

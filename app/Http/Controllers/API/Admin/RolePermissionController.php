@@ -64,8 +64,8 @@ class RolePermissionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Permissions updated successfully.',
-        ], Response::HTTP_OK);
+            'message' => 'Permission assigned successfully.',
+        ], Response::HTTP_CREATED);
     }
 
     public function destroy(

@@ -12,7 +12,7 @@ class ActivityLogResource extends JsonResource
         $adminUser = $this->adminUser;
         $action = (string) $this->action;
 
-        if (str_contains($action, 'created')) {
+        /*if (str_contains($action, 'created')) {
             $normalizedAction = 'created';
         } elseif (str_contains($action, 'updated')) {
             $normalizedAction = 'updated';
@@ -20,7 +20,7 @@ class ActivityLogResource extends JsonResource
             $normalizedAction = 'deleted';
         } else {
             $normalizedAction = 'updated';
-        }
+        }*/
 
         $meta = is_array($this->meta) ? $this->meta : [];
         $description = $meta['description'] ?? $this->action;
@@ -29,7 +29,7 @@ class ActivityLogResource extends JsonResource
             'id' => $this->id,
             'user_id' => $adminUser?->id,
             'user_name' => $adminUser?->full_name ?? '—',
-            'action' => $normalizedAction,
+            'action' => $action,
             'subject_type' => $this->entity_type,
             'subject_id' => $this->entity_id,
             'entity_type' => $this->entity_type,

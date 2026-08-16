@@ -25,6 +25,7 @@ class UpdateProductMediaRequest extends FormRequest
             'url' => [
                 'sometimes',
                 'url',
+                'max:255'
             ],
 
             'sort_order' => [

@@ -23,7 +23,7 @@ class PermissionControllerTest extends TestCase
 
         // 1. إنشاء وتوثيق دفق المستخدم الحالي
         $this->admin = AdminUser::factory()->create();
-        Sanctum::actingAs($this->admin, ['*']);
+        Sanctum::actingAs($this->admin, ['*'], 'admin');
 
         // 2. تجاوز فحص الصلاحيات للمرور المباشر للـ Controller
         Gate::before(fn () => true);

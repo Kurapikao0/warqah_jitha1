@@ -23,7 +23,7 @@ class AdminPasswordResetControllerTest extends TestCase
 
         // 1. إنشاء المستخدم الحالي وتوثيق دخوله
         $this->admin = AdminUser::factory()->create();
-        Sanctum::actingAs($this->admin, ['*']);
+        Sanctum::actingAs($this->admin, ['*'], 'admin');
 
         // 2. تجاوز فحص الصلاحيات للمرور المباشر إلى الـ Logic
         Gate::before(fn () => true);
