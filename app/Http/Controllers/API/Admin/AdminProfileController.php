@@ -15,8 +15,8 @@ class AdminProfileController extends Controller
         $user = $request->user();
 
         $parts = explode(' ', (string) $user->full_name, 2);
-        $firstName = $parts[0] ?? '';
-        $lastName = $parts[1] ?? '';
+        $firstName = $parts[0] ;
+        $lastName = $parts[1] ;
 
         return response()->json([
             'data' => [

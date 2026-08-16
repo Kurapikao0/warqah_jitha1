@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Customer;
 use App\Models\ProductCustomizationRequest;
-
+use App\Enums\ProductCustomizationRequestStatus;
 class CustomizationPolicy
 {
     /**
@@ -49,7 +49,7 @@ class CustomizationPolicy
         return
             $customization->customer_id === $customer->id
             &&
-            $customization->status === 'pending';
+            $customization->status === ProductCustomizationRequestStatus::PendingApproval;
 
     }
 
@@ -64,7 +64,7 @@ class CustomizationPolicy
         return
             $customization->customer_id === $customer->id
             &&
-            $customization->status === 'pending';
+            $customization->status === ProductCustomizationRequestStatus::PendingApproval;
 
     }
 }

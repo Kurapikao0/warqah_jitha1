@@ -70,7 +70,7 @@ class CustomerAuthController extends Controller
      */
     public function logout(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->user()->currentAccessToken()?->delete();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,

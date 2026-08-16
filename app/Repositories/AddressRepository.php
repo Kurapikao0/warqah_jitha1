@@ -42,15 +42,16 @@ class AddressRepository implements AddressRepositoryInterface
 
 
     public function create(
-        Customer $customer,
-        array $data
+    Customer $customer,
+    array $data
     ): Address
     {
-
-        return $customer
+        /** @var Address $address */
+        $address = $customer
             ->addresses()
             ->create($data);
 
+        return $address;
     }
 
 
@@ -136,6 +137,6 @@ class AddressRepository implements AddressRepositoryInterface
                 'is_default'=>false
             ]);
 
-    }    
+    }
 
 }

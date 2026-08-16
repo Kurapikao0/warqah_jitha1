@@ -81,31 +81,26 @@ class AddressService
      * Update address
      */
     public function update(
-        Address $address,
-        array $data
+    Address $address,
+    array $data
     ): Address {
-
 
         return DB::transaction(function () use (
             $address,
             $data
         ) {
 
-
             if (
                 isset($data['is_default']) &&
                 $data['is_default'] === true
             ) {
+                $customer = $address->customer;
 
-
-                $this->addressRepository
-                    ->clearDefaultAddresses(
-                        $address->customer
-                    );
-
+                if ($customer instanceof Customer) {
+                    $this->addressRepository
+                        ->clearDefaultAddresses($customer);
+                }
             }
-
-
 
             return $this->addressRepository
                 ->update(
@@ -113,6 +108,32 @@ class AddressService
                     $data
                 );
 
+        });
+
+    }
+    /**
+     * Set default address
+     */
+public function setDefault(
+    Address $address
+    ): Address {
+
+        return DB::transaction(function () use ($address) {
+
+            $customer = $address->customer;
+
+            if ($customer instanceof Customer) {
+                $this->addressRepository
+                    ->clearDefaultAddresses($customer);
+            }
+
+            return $this->addressRepository
+                ->update(
+                    $address,
+                    [
+                        'is_default' => true,
+                    ]
+                );
 
         });
 
@@ -138,36 +159,8 @@ class AddressService
 
 
 
-    /**
-     * Set default address
-     */
-    public function setDefault(
-        Address $address
-    ): Address {
 
 
-        return DB::transaction(function () use ($address) {
-
-
-            $this->addressRepository
-                ->clearDefaultAddresses(
-                    $address->customer
-                );
-
-
-
-            return $this->addressRepository
-                ->update(
-                    $address,
-                    [
-                        'is_default'=>true
-                    ]
-                );
-
-
-        });
-
-    }
 
 
 }

@@ -16,222 +16,47 @@ class OrderService
 {
 
 
-public function __construct(
-protected OrderRepositoryInterface $repository
-)
-{}
+    public function __construct(
+    protected OrderRepositoryInterface $repository
+    )
+    {}
 
 
 
 
-public function all()
-{
+    public function all()
+    {
 
-return $this->repository->getAll();
+    return $this->repository->getAll();
 
-}
+    }
 
-public function statistics()
-{
-    return $this->repository->statistics();
-}
+    public function statistics()
+    {
+        return $this->repository->statistics();
+    }
 
 
 
-public function customerOrders($customerId)
-{
+    public function customerOrders(int $customerId)
+    {
 
-return $this->repository
-->getCustomerOrders($customerId);
+    return $this->repository
+    ->getCustomerOrders($customerId);
 
-}
+    }
 
 
 
 
 
-public function find($id)
-{
+    public function find(int $id)
+    {
 
-return $this->repository
-->findById($id);
+    return $this->repository
+    ->findById($id);
 
-}
-
-/*public function create(array $data)
-{
-
-
-return DB::transaction(function()
-use($data){
-
-
-$order =
-$this->repository
-->create($data);
-
-
-
-$order->statusHistory()
-->create([
-
-'status' => OrderStatus::Received
-'note'=>'Order created',
-
-]);
-
-
-
-return $order;
-
-
-});
-
-
-}*/
-
-
-
-/*public function create(array $data)
-{
-    return DB::transaction(function () use ($data) {
-
-        $address = Address::where(
-            'id',
-            $data['address_id']
-        )
-        ->where(
-            'customer_id',
-            auth()->id()
-        )
-        ->firstOrFail();
-
-        $subtotal = 0;
-
-        $items = [];
-
-        foreach ($data['items'] as $item) {
-
-            $product = Product::findOrFail(
-                $item['product_id']
-            );
-
-            $linePrice =
-                $product->price *
-                $item['quantity'];
-
-            $subtotal += $linePrice;
-
-            $items[] = [
-
-                'product' => $product,
-
-                'quantity' => $item['quantity'],
-
-                'customization_id' =>
-                    $item['customization_id']
-                    ?? null,
-
-                'unit_price' =>
-                    $product->price,
-
-            ];
-        }
-
-        $shipping = 0;
-
-        $order = $this->repository->create([
-
-            'order_number' =>
-                'ORD-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(4)),
-
-            'customer_id' =>
-                auth()->id(),
-
-            'address_id' =>
-                $address->id,
-
-            'shipping_recipient_name' =>
-                $address->recipient_name,
-
-            'shipping_phone' =>
-                $address->phone,
-
-            'shipping_address_full' =>
-                trim(
-                    $address->street . ', ' .
-                    $address->district
-                ),
-
-            'shipping_city' =>
-                $address->city,
-
-            'shipping_country' =>
-                $address->country,
-
-            'order_type' =>
-                $data['order_type'],
-
-            'status' =>
-                OrderStatus::Received,
-
-            'subtotal' =>
-                $subtotal,
-
-            'shipping_fee' =>
-                $shipping,
-
-            'total_amount' =>
-                $subtotal + $shipping,
-
-        ]);
-
-        foreach ($items as $item) {
-
-            $this->repository->createItem([
-
-                'order_id' =>
-                    $order->id,
-
-                'product_id' =>
-                    $item['product']->id,
-
-                'product_customization_request_id' =>
-                    $item['customization_id'],
-
-                'quantity' =>
-                    $item['quantity'],
-
-                'unit_price' =>
-                    $item['unit_price'],
-
-                'is_customized' =>
-                    $item['customization_id'] != null,
-
-            ]);
-        }
-
-        $order->statusHistory()->create([
-
-            'status' =>
-                OrderStatus::Received,
-
-            'note' =>
-                'Order Created',
-
-            'changed_by' =>
-                auth()->id(),
-
-        ]);
-
-        return $order->load([
-            'items.product',
-            'payment',
-            'customer'
-        ]);
-    });
-}*/
-
+    }
 
     public function create(array $data)
     {
@@ -341,59 +166,59 @@ return $order;
     }
 
 
-public function updateStatus(
-Order $order,
-array $data
-)
-{
+    public function updateStatus(
+    Order $order,
+    array $data
+    )
+    {
 
 
-return DB::transaction(function()
-use($order,$data){
-
-
-
-/*$order->update([
-
-'status'=>$data['status']
-
-]);*/
-$order->update([
-    'status' => OrderStatus::from($data['status'])
-]);
-
-
-$order->statusHistory()
-->create([
-
-'status' => OrderStatus::from($data['status']),
-'note'=>$data['note'] ?? null,
-
-'changed_by' => auth('admin')->id(),
-]);
+    return DB::transaction(function()
+    use($order,$data){
 
 
 
-return $order;
+    /*$order->update([
+
+    'status'=>$data['status']
+
+    ]);*/
+    $order->update([
+        'status' => OrderStatus::from($data['status'])
+    ]);
 
 
-});
+    $order->statusHistory()
+    ->create([
+
+    'status' => OrderStatus::from($data['status']),
+    'note'=>$data['note'] ?? null,
+
+    'changed_by' => auth('admin')->id(),
+    ]);
 
 
-}
 
-public function findCustomerOrder(
-    int $customerId,
-    int $orderId )
-{
-    return $this->repository
-        ->findCustomerOrder(
-            $customerId,
-            $orderId
-        );
-} 
-public function delete(Order $order)
-{
-    return $order->delete();
-}
+    return $order;
+
+
+    });
+
+
+    }
+
+    public function findCustomerOrder(
+        int $customerId,
+        int $orderId )
+    {
+        return $this->repository
+            ->findCustomerOrder(
+                $customerId,
+                $orderId
+            );
+    }
+    public function delete(Order $order)
+    {
+        return $order->delete();
+    }
 }

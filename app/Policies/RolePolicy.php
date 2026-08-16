@@ -76,15 +76,17 @@ class RolePolicy
      */
     protected function can(AdminUser $admin, string $permission): bool
     {
-        if (!$admin->role) {
+        $role = $admin->role;
+
+        if (! $role instanceof Role) {
             return false;
         }
 
-        if ($admin->role->name === 'super-admin') {
+        if ($role->name === 'super-admin') {
             return true;
         }
 
-        return $admin->role
+        return $role
             ->permissions()
             ->where('name', $permission)
             ->exists();

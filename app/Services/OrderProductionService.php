@@ -27,12 +27,10 @@ class OrderProductionService
 
             $currentStage = $order->currentProductionStage;
 
-
-            $nextStage = $currentStage
+            $nextStage = $currentStage instanceof OrderProductionStage
                 ? $currentStage->next()
                 : OrderProductionStage::orderBy('sort_order')->first();
-
-
+                
             if (!$nextStage) {
                 return null;
             }

@@ -16,45 +16,27 @@ class FavoriteRepository implements FavoriteRepositoryInterface
      * Toggle Favorite
      */
     public function toggle(
-        $customerId,
-        $productId
-    )
+    int $customerId,
+    int $productId
+    ): bool
     {
+        $favorite = Favorite::where([
+            'customer_id' => $customerId,
+            'product_id' => $productId,
+        ])->first();
 
-
-        $favorite =
-            Favorite::where([
-                'customer_id'=>$customerId,
-                'product_id'=>$productId
-            ])
-            ->first();
-
-
-
-        if($favorite)
-        {
-
+        if ($favorite) {
             $favorite->delete();
 
             return false;
-
         }
 
-
-
         Favorite::create([
-
-            'customer_id'=>$customerId,
-
-            'product_id'=>$productId
-
+            'customer_id' => $customerId,
+            'product_id' => $productId,
         ]);
 
-
-
         return true;
-
-
     }
 
 
@@ -92,21 +74,14 @@ class FavoriteRepository implements FavoriteRepositoryInterface
      * Remove Favorite
      */
     public function remove(
-        $customerId,
-        $productId
-    )
+    int $customerId,
+    int $productId
+    ): bool
     {
-
-        return Favorite::where([
-
-            'customer_id'=>$customerId,
-
-            'product_id'=>$productId
-
-        ])
-        ->delete();
-
-
+        return (bool) Favorite::where([
+            'customer_id' => $customerId,
+            'product_id' => $productId,
+        ])->delete();
     }
 
 

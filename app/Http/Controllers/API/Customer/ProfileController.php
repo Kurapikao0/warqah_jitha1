@@ -81,7 +81,7 @@ class ProfileController extends Controller
     {
         $customer = $request->user();
 
-        if ($customer && $customer->currentAccessToken()) {
+        if ($customer) {
             $customer->currentAccessToken()->delete();
         }
 

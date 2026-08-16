@@ -76,21 +76,24 @@ class AdminUserPolicy
 
 
     protected function can(
-        AdminUser $admin,
-        string $permission
+    AdminUser $admin,
+    string $permission
     ): bool {
 
-        if ($admin->role?->name === 'super-admin') {
+        $role = $admin->role;
+
+        if (! $role instanceof \App\Models\Role)
+        {
+            return false;
+        }
+
+        if ($role->name === 'super-admin') {
             return true;
         }
 
-        return $admin
-            ->role
+        return $role
             ->permissions()
-            ->where(
-                'name',
-                $permission
-            )
+            ->where('name', $permission)
             ->exists();
     }
 }

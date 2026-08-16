@@ -22,7 +22,7 @@ class VerificationController extends Controller
      * Generate verification code/token.
      */
     public function generate(
-        GenerateVerificationCodeRequest $request
+    GenerateVerificationCodeRequest $request
     ): JsonResponse {
         $user = $request->user();
 
@@ -42,7 +42,13 @@ class VerificationController extends Controller
             ], 404);
         }
 
-        $verification = $this->verificationCodeService->generateCode($customer);
+        $purpose = VerificationPurpose::from($request->purpose);
+
+        $verification = $this->verificationCodeService->generate(
+            $customer,
+            $purpose,
+            $request->contact_value
+        );
 
         return response()->json([
             'message' => 'Verification generated successfully.',

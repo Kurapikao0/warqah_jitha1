@@ -80,14 +80,6 @@ Route::get('/test-admin-auth', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test', function (): \Illuminate\Http\JsonResponse {
-    return response()->json([
-        'status' => true,
-        'message' => 'API is working',
-    ]);
-});
-
-
 /*
 |--------------------------------------------------------------------------
 | Customer Authentication - Canonical Routes
@@ -102,7 +94,7 @@ Route::prefix('customer')->group(function (): void {
     Route::post(
         'register',
         [CustomerAuthController::class, 'register']
-    );
+    )->middleware('throttle:5,1');
 
     Route::post(
         'login',
@@ -117,7 +109,7 @@ Route::prefix('customer')->group(function (): void {
     Route::post(
         'password/reset',
         [PasswordResetController::class, 'resetPassword']
-    );
+    )->middleware('throttle:5,1');
 });
 
 
@@ -133,7 +125,7 @@ Route::prefix('customer')->group(function (): void {
 Route::post(
     'register',
     [CustomerAuthController::class, 'register']
-);
+)->middleware('throttle:5,1');
 
 Route::post(
     'login',

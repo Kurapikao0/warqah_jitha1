@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\Customer;
 use App\Models\CustomDesignRequest;
+use App\Enums\CustomDesignRequestStatus;
 
 class CustomDesignRequestPolicy
 {
@@ -28,22 +29,28 @@ class CustomDesignRequestPolicy
     }
 
     public function update(AdminUser|Customer $user, CustomDesignRequest $customDesignRequest): bool
-    {
-        if ($user instanceof AdminUser) {
-            return true;
-        }
-
-        return $customDesignRequest->customer_id === $user->id
-            && !in_array($customDesignRequest->status, ['converted', 'rejected']);
+{
+    if ($user instanceof AdminUser) {
+        return true;
     }
 
-    public function delete(AdminUser|Customer $user, CustomDesignRequest $customDesignRequest): bool
-    {
-        if ($user instanceof AdminUser) {
-            return true;
-        }
+    return $customDesignRequest->customer_id === $user->id
+        && !in_array($customDesignRequest->status, [
+            CustomDesignRequestStatus::Converted,
+            CustomDesignRequestStatus::Rejected,
+        ], true);
+}
 
-        return $customDesignRequest->customer_id === $user->id
-            && !in_array($customDesignRequest->status, ['converted', 'rejected']);
+public function delete(AdminUser|Customer $user, CustomDesignRequest $customDesignRequest): bool
+{
+    if ($user instanceof AdminUser) {
+        return true;
     }
+
+    return $customDesignRequest->customer_id === $user->id
+        && !in_array($customDesignRequest->status, [
+            CustomDesignRequestStatus::Converted,
+            CustomDesignRequestStatus::Rejected,
+        ], true);
+}
 }
