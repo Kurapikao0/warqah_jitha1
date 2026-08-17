@@ -4,6 +4,7 @@ namespace Tests\Feature\API\Admin;
 
 use App\Models\AdminUser;
 use App\Models\Role;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\Sanctum;
@@ -40,13 +41,13 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => ['id', 'full_name', 'email']
-                     ],
-                     'links',
-                     'meta'
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'full_name', 'email'],
+                ],
+                'links',
+                'meta',
+            ]);
     }
 
     #[Test]
@@ -55,11 +56,11 @@ class AdminUserControllerTest extends TestCase
         // Arrange
         $role = Role::factory()->create();
         $payload = [
-            'role_id'   => $role->id,
+            'role_id' => $role->id,
             'full_name' => 'New Admin User',
-            'email'     => 'newadmin@example.com',
-            'password'  => 'password123',
-            'phone'     => '771234567',
+            'email' => 'newadmin@example.com',
+            'password' => 'password123',
+            'phone' => '771234567',
         ];
 
         // Act
@@ -67,16 +68,16 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_CREATED)
-                ->assertJson([
-                    'success' => true,
-                    'message' => 'Admin user created successfully.',
-                ])
-                ->assertJsonStructure(['data' => ['id', 'full_name', 'email', 'role']]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Admin user created successfully.',
+            ])
+            ->assertJsonStructure(['data' => ['id', 'full_name', 'email', 'role']]);
 
         $this->assertDatabaseHas('admin_users', [
-            'email'     => 'newadmin@example.com',
+            'email' => 'newadmin@example.com',
             'full_name' => 'New Admin User',
-            'role_id'   => $role->id,
+            'role_id' => $role->id,
         ]);
     }
 
@@ -88,7 +89,7 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-                 ->assertJsonValidationErrors(['role_id', 'full_name', 'email', 'password']);
+            ->assertJsonValidationErrors(['role_id', 'full_name', 'email', 'password']);
     }
 
     #[Test]
@@ -102,13 +103,13 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'data'    => [
-                         'id'    => $targetAdmin->id,
-                         'email' => $targetAdmin->email,
-                     ]
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'id' => $targetAdmin->id,
+                    'email' => $targetAdmin->email,
+                ],
+            ]);
     }
 
     #[Test]
@@ -118,7 +119,7 @@ class AdminUserControllerTest extends TestCase
         $targetAdmin = AdminUser::factory()->create();
         $updateData = [
             'full_name' => 'Updated Name',
-            'phone'     => '731234567',
+            'phone' => '731234567',
         ];
 
         // Act
@@ -126,15 +127,15 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                ->assertJson([
-                    'success' => true,
-                    'message' => 'Admin user updated successfully.',
-                ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Admin user updated successfully.',
+            ]);
 
         $this->assertDatabaseHas('admin_users', [
-            'id'        => $targetAdmin->id,
+            'id' => $targetAdmin->id,
             'full_name' => 'Updated Name',
-            'phone'     => '731234567',
+            'phone' => '731234567',
         ]);
     }
 
@@ -142,7 +143,7 @@ class AdminUserControllerTest extends TestCase
     public function it_fails_validation_when_updating_with_existing_email_of_another_user(): void
     {
         // Arrange
-        $otherAdmin  = AdminUser::factory()->create(['email' => 'other@example.com']);
+        $otherAdmin = AdminUser::factory()->create(['email' => 'other@example.com']);
         $targetAdmin = AdminUser::factory()->create();
 
         // Act
@@ -152,7 +153,7 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-                 ->assertJsonValidationErrors(['email']);
+            ->assertJsonValidationErrors(['email']);
     }
 
     #[Test]
@@ -166,13 +167,13 @@ class AdminUserControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Admin user deleted successfully.'
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Admin user deleted successfully.',
+            ]);
 
         // الفحص يدعم كل من Soft Deletes أو الحذف النهائي في حال عدم تفعيله
-        if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(AdminUser::class))) {
+        if (in_array(SoftDeletes::class, class_uses_recursive(AdminUser::class))) {
             $this->assertSoftDeleted('admin_users', ['id' => $targetAdmin->id]);
         } else {
             $this->assertDatabaseMissing('admin_users', ['id' => $targetAdmin->id]);

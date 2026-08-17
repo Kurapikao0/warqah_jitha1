@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Enums\ReviewStatus;
 use App\Models\AdminUser;
 use App\Models\Customer;
 use App\Models\Review;
-use App\Enums\ReviewStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\Test;
@@ -60,7 +60,7 @@ class ReviewTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('reviews', [
-            'id'     => $review->id,
+            'id' => $review->id,
             'status' => ReviewStatus::Published->value,
         ]);
     }
@@ -81,7 +81,7 @@ class ReviewTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('reviews', [
-            'id'          => $review->id,
+            'id' => $review->id,
             'admin_reply' => 'شكراً لمشاركتك وتقييمك الرائع!',
         ]);
     }

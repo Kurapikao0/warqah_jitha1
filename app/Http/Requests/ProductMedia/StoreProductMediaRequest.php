@@ -30,7 +30,7 @@ class StoreProductMediaRequest extends FormRequest
             'url' => [
                 'required',
                 'url',
-                'max:255'
+                'max:255',
             ],
 
             'sort_order' => [

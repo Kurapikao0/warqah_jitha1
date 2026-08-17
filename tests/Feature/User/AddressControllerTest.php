@@ -4,7 +4,6 @@ namespace Tests\Feature\User;
 
 use App\Models\Address;
 use App\Models\Customer;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -14,6 +13,7 @@ class AddressControllerTest extends TestCase
     use RefreshDatabase;
 
     protected Customer $customer;
+
     // البادئة الصحيحة بناءً على routes/api.php
     protected string $baseUri = '/api/customer/addresses';
 
@@ -34,12 +34,12 @@ class AddressControllerTest extends TestCase
         $response = $this->getJson($this->baseUri);
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'success',
-                    'message',
-                    'data',
-                    'errors'
-                ]);
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data',
+                'errors',
+            ]);
     }
 
     #[Test]
@@ -47,25 +47,25 @@ class AddressControllerTest extends TestCase
     {
         $payload = [
             'recipient_name' => 'أحمد علي',
-            'phone'          => '770000000',
-            'country'        => 'اليمن',
-            'city'           => 'صنعاء',
-            'district'       => 'السبعين',
-            'street'         => 'شارع حدة',
-            'postal_code'    => '12345',
-            'is_default'     => true,
+            'phone' => '770000000',
+            'country' => 'اليمن',
+            'city' => 'صنعاء',
+            'district' => 'السبعين',
+            'street' => 'شارع حدة',
+            'postal_code' => '12345',
+            'is_default' => true,
         ];
 
         $response = $this->postJson($this->baseUri, $payload);
 
         $response->assertStatus(201)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Address created successfully',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Address created successfully',
+            ]);
 
         $this->assertDatabaseHas('addresses', [
-            'customer_id'    => $this->customer->id,
+            'customer_id' => $this->customer->id,
             'recipient_name' => 'أحمد علي',
         ]);
     }
@@ -83,27 +83,27 @@ class AddressControllerTest extends TestCase
     {
         $address = Address::factory()->create([
             'customer_id' => $this->customer->id,
-            'city'        => 'صنعاء',
+            'city' => 'صنعاء',
         ]);
 
         $payload = [
             'recipient_name' => $address->recipient_name,
-            'phone'          => $address->phone,
-            'country'        => $address->country,
-            'city'           => 'عدن',
-            'street'         => 'شارع المعلا',
+            'phone' => $address->phone,
+            'country' => $address->country,
+            'city' => 'عدن',
+            'street' => 'شارع المعلا',
         ];
 
         $response = $this->putJson("{$this->baseUri}/{$address->id}", $payload);
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Address updated successfully',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Address updated successfully',
+            ]);
 
         $this->assertDatabaseHas('addresses', [
-            'id'   => $address->id,
+            'id' => $address->id,
             'city' => 'عدن',
         ]);
     }
@@ -117,10 +117,10 @@ class AddressControllerTest extends TestCase
 
         // الـ Controller يرجع 200 مع JSON وليس 204
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Address deleted successfully',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Address deleted successfully',
+            ]);
 
         $this->assertSoftDeleted($address);
     }
@@ -130,15 +130,15 @@ class AddressControllerTest extends TestCase
     {
         $address = Address::factory()->create([
             'customer_id' => $this->customer->id,
-            'is_default'  => false,
+            'is_default' => false,
         ]);
 
         $response = $this->patchJson("{$this->baseUri}/{$address->id}/default");
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Default address updated successfully',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Default address updated successfully',
+            ]);
     }
 }

@@ -47,7 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
          * Keep the existing Laravel auth contract:
          * HTTP 401 for unauthenticated API requests.
          */
-        $exceptions->render(function (                     // ← البلوك الجديد كامل، تحطه هنا
+        $exceptions->render(function (// ← البلوك الجديد كامل، تحطه هنا
             AuthenticationException $exception,             //   قبل بلوك ValidationException القديم
             Request $request
         ) {

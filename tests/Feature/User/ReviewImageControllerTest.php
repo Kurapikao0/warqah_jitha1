@@ -15,6 +15,7 @@ class ReviewImageControllerTest extends TestCase
     use RefreshDatabase;
 
     protected Customer $customer;
+
     protected Review $review;
 
     protected function setUp(): void
@@ -43,7 +44,7 @@ class ReviewImageControllerTest extends TestCase
         $response = $this->postJson(
             "/api/customer/reviews/{$this->review->id}/images",
             [
-                'image' => $file
+                'image' => $file,
             ]
         );
 
@@ -52,15 +53,15 @@ class ReviewImageControllerTest extends TestCase
                 'data' => [
                     'id',
                     'review_id',
-                    'image_url'
-                ]
+                    'image_url',
+                ],
             ]);
 
         $this->assertDatabaseHas('review_images', [
-            'review_id' => $this->review->id
+            'review_id' => $this->review->id,
         ]);
 
-        Storage::disk('public')->assertExists('reviews/' . $file->hashName());
+        Storage::disk('public')->assertExists('reviews/'.$file->hashName());
     }
 
     /**
@@ -91,7 +92,7 @@ class ReviewImageControllerTest extends TestCase
         $response = $this->postJson(
             "/api/customer/reviews/{$this->review->id}/images",
             [
-                'image' => $file
+                'image' => $file,
             ]
         );
 
@@ -111,7 +112,7 @@ class ReviewImageControllerTest extends TestCase
         $response = $this->postJson(
             "/api/customer/reviews/{$this->review->id}/images",
             [
-                'image' => $file
+                'image' => $file,
             ]
         );
 
@@ -131,7 +132,7 @@ class ReviewImageControllerTest extends TestCase
 
         $reviewImage = ReviewImage::factory()->create([
             'review_id' => $this->review->id,
-            'image_url' => $filePath
+            'image_url' => $filePath,
         ]);
 
         $response = $this->deleteJson(
@@ -140,11 +141,11 @@ class ReviewImageControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJson([
-                'message' => 'Review image deleted successfully'
+                'message' => 'Review image deleted successfully',
             ]);
 
         $this->assertDatabaseMissing('review_images', [
-            'id' => $reviewImage->id
+            'id' => $reviewImage->id,
         ]);
 
         Storage::disk('public')->assertMissing($filePath);
@@ -161,7 +162,7 @@ class ReviewImageControllerTest extends TestCase
         $response = $this->postJson(
             "/api/customer/reviews/{$this->review->id}/images",
             [
-                'image' => $file
+                'image' => $file,
             ]
         );
 
@@ -174,7 +175,7 @@ class ReviewImageControllerTest extends TestCase
     public function test_guest_cannot_delete_review_image()
     {
         $reviewImage = ReviewImage::factory()->create([
-            'review_id' => $this->review->id
+            'review_id' => $this->review->id,
         ]);
 
         $response = $this->deleteJson(

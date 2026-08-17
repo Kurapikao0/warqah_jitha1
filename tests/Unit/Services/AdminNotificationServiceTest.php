@@ -45,7 +45,7 @@ class AdminNotificationServiceTest extends TestCase
     public function test_can_mark_notification_as_read(): void
     {
         $adminUser = AdminUser::factory()->create();
-        
+
         $notification = AdminNotification::factory()->create([
             'admin_user_id' => $adminUser->id,
             'is_read' => false,

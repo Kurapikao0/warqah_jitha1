@@ -13,26 +13,18 @@ class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
-
     private string $profileUrl = '/api/customer/profile';
-
-
 
     #[Test]
     public function customer_can_view_his_profile(): void
     {
         $customer = Customer::factory()->create();
 
-
         Sanctum::actingAs($customer, ['*'], 'customer');
-
-
 
         $response = $this->getJson(
             $this->profileUrl
         );
-
-
 
         $response->assertStatus(200)
             ->assertJson([
@@ -47,19 +39,12 @@ class ProfileTest extends TestCase
             ]);
     }
 
-
-
-
     #[Test]
     public function customer_can_update_his_profile(): void
     {
         $customer = Customer::factory()->create();
 
-
-
         Sanctum::actingAs($customer, ['*'], 'customer');
-
-
 
         $payload = [
 
@@ -71,22 +56,16 @@ class ProfileTest extends TestCase
 
         ];
 
-
-
         $response = $this->putJson(
             $this->profileUrl,
             $payload
         );
-
-
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Profile updated successfully',
             ]);
-
-
 
         $this->assertDatabaseHas('customers', [
 
@@ -99,10 +78,6 @@ class ProfileTest extends TestCase
         ]);
     }
 
-
-
-
-
     #[Test]
     public function customer_can_change_password(): void
     {
@@ -114,11 +89,7 @@ class ProfileTest extends TestCase
 
         ]);
 
-
-
         Sanctum::actingAs($customer, ['*'], 'customer');
-
-
 
         $payload = [
 
@@ -130,8 +101,6 @@ class ProfileTest extends TestCase
 
         ];
 
-
-
         $response = $this->putJson(
 
             '/api/customer/profile/password',
@@ -140,19 +109,13 @@ class ProfileTest extends TestCase
 
         );
 
-
-
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Password changed successfully',
             ]);
 
-
-
         $customer->refresh();
-
-
 
         $this->assertTrue(
 
@@ -167,20 +130,12 @@ class ProfileTest extends TestCase
         );
     }
 
-
-
-
-
     #[Test]
     public function customer_can_logout(): void
     {
         $customer = Customer::factory()->create();
 
-
-
         Sanctum::actingAs($customer, ['*'], 'customer');
-
-
 
         $response = $this->postJson(
 
@@ -188,18 +143,12 @@ class ProfileTest extends TestCase
 
         );
 
-
-
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
                 'message' => 'Logged out successfully.',
             ]);
     }
-
-
-
-
 
     #[Test]
     public function unauthenticated_customer_cannot_access_profile(): void
@@ -211,10 +160,7 @@ class ProfileTest extends TestCase
 
         );
 
-
-
         $response->assertStatus(401);
 
     }
-
 }

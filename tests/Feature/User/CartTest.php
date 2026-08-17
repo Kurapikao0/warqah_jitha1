@@ -35,19 +35,19 @@ class CartTest extends TestCase
     }
 
     #[Test]
-public function authenticated_customer_can_view_their_cart(): void
-{
-    Sanctum::actingAs($this->customer, ['*'], 'customer');
+    public function authenticated_customer_can_view_their_cart(): void
+    {
+        Sanctum::actingAs($this->customer, ['*'], 'customer');
 
-    // إنشاء سلة للعميل
-    Cart::factory()->create([
-        'customer_id' => $this->customer->id,
-    ]);
+        // إنشاء سلة للعميل
+        Cart::factory()->create([
+            'customer_id' => $this->customer->id,
+        ]);
 
-    $response = $this->getJson('/api/customer/cart');
+        $response = $this->getJson('/api/customer/cart');
 
-    $response->assertStatus(200);
-}
+        $response->assertStatus(200);
+    }
 
     #[Test]
     public function authenticated_customer_can_add_product_to_cart(): void
@@ -60,7 +60,7 @@ public function authenticated_customer_can_view_their_cart(): void
 
         $payload = [
             'product_id' => $product->id,
-            'quantity'   => 2,
+            'quantity' => 2,
         ];
 
         $response = $this->postJson('/api/customer/cart/items', $payload);
@@ -69,7 +69,7 @@ public function authenticated_customer_can_view_their_cart(): void
 
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $product->id,
-            'quantity'   => 2,
+            'quantity' => 2,
         ]);
     }
 
@@ -81,9 +81,9 @@ public function authenticated_customer_can_view_their_cart(): void
         $cart = Cart::factory()->create(['customer_id' => $this->customer->id]);
         $product = Product::factory()->create();
         $cartItem = CartItem::factory()->create([
-            'cart_id'    => $cart->id,
+            'cart_id' => $cart->id,
             'product_id' => $product->id,
-            'quantity'   => 1,
+            'quantity' => 1,
         ]);
 
         $payload = [
@@ -95,7 +95,7 @@ public function authenticated_customer_can_view_their_cart(): void
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('cart_items', [
-            'id'       => $cartItem->id,
+            'id' => $cartItem->id,
             'quantity' => 5,
         ]);
     }
@@ -108,7 +108,7 @@ public function authenticated_customer_can_view_their_cart(): void
         $cart = Cart::factory()->create(['customer_id' => $this->customer->id]);
         $product = Product::factory()->create();
         $cartItem = CartItem::factory()->create([
-            'cart_id'    => $cart->id,
+            'cart_id' => $cart->id,
             'product_id' => $product->id,
         ]);
 

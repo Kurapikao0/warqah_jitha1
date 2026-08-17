@@ -435,7 +435,7 @@ Route::prefix('admin')
         Route::apiResource(
             'orders',
             AdminOrder::class
-        );
+        )->names('admin.orders');
 
         Route::put(
             'orders/{order}/status',
@@ -578,7 +578,7 @@ Route::prefix('customer')
         )->except([
             'update',
             'destroy',
-        ]);
+        ])->names('customer.orders');
 
         /*
         |--------------------------------------------------------------------------
@@ -637,8 +637,6 @@ Route::prefix('customer')
             'addresses',
             AddressController::class
         );
-
-
 
         /*
         |--------------------------------------------------------------------------

@@ -41,13 +41,13 @@ class ActivityLogControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => ['id', 'action', 'entity_type', 'created_at']
-                     ],
-                     'links',
-                     'meta',
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'action', 'entity_type', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
     }
 
     #[Test]
@@ -63,7 +63,7 @@ class ActivityLogControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJsonPath('data.id', $log->id)
-                 ->assertJsonPath('data.action', $log->action);
+            ->assertJsonPath('data.id', $log->id)
+            ->assertJsonPath('data.action', $log->action);
     }
 }

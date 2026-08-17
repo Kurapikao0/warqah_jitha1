@@ -46,7 +46,7 @@ class AdminPasswordResetController extends Controller
     public function destroy(
         AdminPasswordReset $reset
     ): JsonResponse {
-        
+
         $this->authorize(
             'update',
             $reset->adminUser

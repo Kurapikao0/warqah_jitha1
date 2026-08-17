@@ -16,6 +16,7 @@ class AdminCustomerTest extends TestCase
     use RefreshDatabase;
 
     private AdminUser $admin;
+
     private string $adminCustomerUrl = '/api/admin/customers';
 
     protected function setUp(): void
@@ -29,7 +30,7 @@ class AdminCustomerTest extends TestCase
     #[Test]
     public function admin_can_create_a_new_customer(): void
     {
-        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL')
+        $categoryValue = defined(CustomerCategory::class.'::INDIVIDUAL')
             ? CustomerCategory::INDIVIDUAL->value
             : CustomerCategory::cases()[0]->value;
 
@@ -87,7 +88,7 @@ class AdminCustomerTest extends TestCase
     public function admin_cannot_create_customer_with_duplicate_email_or_phone(): void
     {
         // Get valid category value
-        $categoryValue = defined(CustomerCategory::class . '::INDIVIDUAL')
+        $categoryValue = defined(CustomerCategory::class.'::INDIVIDUAL')
             ? CustomerCategory::INDIVIDUAL->value
             : CustomerCategory::cases()[0]->value;
 

@@ -40,11 +40,11 @@ class AdminPasswordResetControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_CREATED)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Password reset code generated.',
-                 ])
-                 ->assertJsonStructure(['data']);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Password reset code generated.',
+            ])
+            ->assertJsonStructure(['data']);
 
         $this->assertDatabaseHas('admin_password_resets', [
             'admin_user_id' => $targetAdmin->id,
@@ -58,8 +58,8 @@ class AdminPasswordResetControllerTest extends TestCase
         // Arrange: إنشاء رمز صالح بضبط صريح للـ Carbon Date في المستقبل (addDay)
         $resetCode = AdminPasswordReset::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'consumed_at'   => null,
-            'expires_at'    => now()->addDay(),
+            'consumed_at' => null,
+            'expires_at' => now()->addDay(),
         ]);
 
         // Act
@@ -67,10 +67,10 @@ class AdminPasswordResetControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Reset token consumed.',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Reset token consumed.',
+            ]);
 
         // التأكد من أن حقل consumed_at تم تحديثه في قاعدة البيانات
         $this->assertNotNull($resetCode->fresh()->consumed_at);
@@ -82,7 +82,7 @@ class AdminPasswordResetControllerTest extends TestCase
         // Arrange: رمز تم استهلاكه سابقاً
         $resetCode = AdminPasswordReset::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'consumed_at'   => now()->subMinute(),
+            'consumed_at' => now()->subMinute(),
         ]);
 
         // Act
@@ -90,10 +90,10 @@ class AdminPasswordResetControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => false,
-                     'message' => 'Reset token invalid.',
-                 ]);
+            ->assertJson([
+                'success' => false,
+                'message' => 'Reset token invalid.',
+            ]);
     }
 
     #[Test]
@@ -102,7 +102,7 @@ class AdminPasswordResetControllerTest extends TestCase
         // Arrange: رمز منتهي الصلاحية
         $resetCode = AdminPasswordReset::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'expires_at'    => now()->subMinutes(10),
+            'expires_at' => now()->subMinutes(10),
         ]);
 
         // Act
@@ -110,9 +110,9 @@ class AdminPasswordResetControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => false,
-                     'message' => 'Reset token invalid.',
-                 ]);
+            ->assertJson([
+                'success' => false,
+                'message' => 'Reset token invalid.',
+            ]);
     }
 }

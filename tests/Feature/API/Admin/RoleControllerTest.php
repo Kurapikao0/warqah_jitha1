@@ -42,7 +42,7 @@ class RoleControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name']
+                    '*' => ['id', 'name'],
                 ],
             ]);
     }

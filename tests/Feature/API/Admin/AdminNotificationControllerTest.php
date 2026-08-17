@@ -41,13 +41,13 @@ class AdminNotificationControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => ['id', 'is_read', 'created_at']
-                     ],
-                     'links',
-                     'meta',
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'is_read', 'created_at'],
+                ],
+                'links',
+                'meta',
+            ]);
     }
 
     #[Test]
@@ -56,7 +56,7 @@ class AdminNotificationControllerTest extends TestCase
         // Arrange
         $notification = AdminNotification::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'is_read'       => false,
+            'is_read' => false,
         ]);
 
         // Act - جربي putJson (أو postJson إذا استمر الخطأ)
@@ -64,13 +64,13 @@ class AdminNotificationControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Notification marked as read.',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Notification marked as read.',
+            ]);
 
         $this->assertDatabaseHas('admin_notifications', [
-            'id'      => $notification->id,
+            'id' => $notification->id,
             'is_read' => true,
         ]);
     }

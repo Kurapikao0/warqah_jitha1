@@ -47,6 +47,7 @@ class RolePermissionController extends Controller
                 $role,
                 (array) $request->input('permission_ids', [])
             );
+
             return response()->json([
                 'success' => true,
                 'message' => 'Permissions updated successfully.',

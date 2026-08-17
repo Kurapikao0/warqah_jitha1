@@ -57,7 +57,7 @@ class ProductControllerTest extends TestCase
             'category_id' => $category->id,
             'name' => 'Handmade Vase',
             'slug' => 'handmade-vase',
-            'sku' => 'SKU-' . uniqid(),
+            'sku' => 'SKU-'.uniqid(),
             'description' => 'A beautiful handmade ceramic vase.',
             'price' => 49.99,
             'stock_quantity' => 10,

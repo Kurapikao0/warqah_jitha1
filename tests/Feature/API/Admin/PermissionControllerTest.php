@@ -4,6 +4,7 @@ namespace Tests\Feature\API\Admin;
 
 use App\Models\AdminUser;
 use App\Models\Permission;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\Sanctum;
@@ -40,13 +41,13 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJsonStructure([
-                     'data' => [
-                         '*' => ['id', 'name']
-                     ],
-                     'links',
-                     'meta',
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name'],
+                ],
+                'links',
+                'meta',
+            ]);
     }
 
     #[Test]
@@ -54,7 +55,7 @@ class PermissionControllerTest extends TestCase
     {
         // Arrange: إرسال module المطلوبة في قاعدة البيانات
         $payload = [
-            'name'   => 'products.manage',
+            'name' => 'products.manage',
             'module' => 'products',
         ];
 
@@ -63,14 +64,14 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_CREATED)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Permission created successfully.',
-                 ])
-                 ->assertJsonStructure(['data' => ['id', 'name']]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Permission created successfully.',
+            ])
+            ->assertJsonStructure(['data' => ['id', 'name']]);
 
         $this->assertDatabaseHas('permissions', [
-            'name'   => 'products.manage',
+            'name' => 'products.manage',
             'module' => 'products',
         ]);
     }
@@ -83,7 +84,7 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-                 ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name']);
     }
 
     #[Test]
@@ -97,13 +98,13 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'data'    => [
-                         'id'   => $permission->id,
-                         'name' => $permission->name,
-                     ]
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                ],
+            ]);
     }
 
     #[Test]
@@ -112,7 +113,7 @@ class PermissionControllerTest extends TestCase
         // Arrange
         $permission = Permission::factory()->create();
         $updateData = [
-            'name'   => 'orders.update_status',
+            'name' => 'orders.update_status',
             'module' => 'orders',
         ];
 
@@ -121,14 +122,14 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Permission updated successfully.',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Permission updated successfully.',
+            ]);
 
         $this->assertDatabaseHas('permissions', [
-            'id'     => $permission->id,
-            'name'   => 'orders.update_status',
+            'id' => $permission->id,
+            'name' => 'orders.update_status',
             'module' => 'orders',
         ]);
     }
@@ -142,13 +143,13 @@ class PermissionControllerTest extends TestCase
 
         // Act
         $response = $this->putJson("/api/admin/permissions/{$permissionToUpdate->id}", [
-            'name'   => 'existing_permission',
+            'name' => 'existing_permission',
             'module' => 'settings',
         ]);
 
         // Assert
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-                 ->assertJsonValidationErrors(['name']);
+            ->assertJsonValidationErrors(['name']);
     }
 
     #[Test]
@@ -162,12 +163,12 @@ class PermissionControllerTest extends TestCase
 
         // Assert
         $response->assertStatus(Response::HTTP_OK)
-                 ->assertJson([
-                     'success' => true,
-                     'message' => 'Permission deleted successfully.',
-                 ]);
+            ->assertJson([
+                'success' => true,
+                'message' => 'Permission deleted successfully.',
+            ]);
 
-        if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(Permission::class))) {
+        if (in_array(SoftDeletes::class, class_uses_recursive(Permission::class))) {
             $this->assertSoftDeleted('permissions', ['id' => $permission->id]);
         } else {
             $this->assertDatabaseMissing('permissions', ['id' => $permission->id]);

@@ -19,6 +19,7 @@ class VerificationControllerTest extends TestCase
     protected Customer $customer;
 
     protected string $generateUrl = '/api/customer/verifications/generate';
+
     protected string $verifyUrl = '/api/customer/verifications/verify';
 
     protected function setUp(): void
@@ -46,7 +47,7 @@ class VerificationControllerTest extends TestCase
         if (enum_exists(VerificationPurpose::class)) {
             $cases = VerificationPurpose::cases();
 
-            if (!empty($cases)) {
+            if (! empty($cases)) {
                 return $cases[0]->value ?? $cases[0]->name;
             }
         }
@@ -62,7 +63,7 @@ class VerificationControllerTest extends TestCase
 
         $verificationModel = class_exists(VerificationCode::class) && method_exists(VerificationCode::class, 'factory')
             ? VerificationCode::factory()->make()
-            : new VerificationCode();
+            : new VerificationCode;
 
         $this->mock(VerificationCodeService::class, function (MockInterface $mock) use ($verificationModel) {
             $mock->shouldReceive('generate')

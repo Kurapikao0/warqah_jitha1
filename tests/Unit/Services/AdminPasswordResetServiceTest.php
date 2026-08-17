@@ -28,7 +28,7 @@ class AdminPasswordResetServiceTest extends TestCase
 
         $this->assertNotNull($reset);
         $this->assertInstanceOf(AdminPasswordReset::class, $reset);
-        
+
         // التحقق من ربطه بمستخدم الأدمن الصحيح
         $this->assertEquals($adminUser->id, $reset->admin_user_id ?? $reset->admin_id);
     }
@@ -36,13 +36,13 @@ class AdminPasswordResetServiceTest extends TestCase
     public function test_can_consume_valid_password_reset_token(): void
     {
         $adminUser = AdminUser::factory()->create();
-        
+
         // إنشاء رمز إعادة تعيين بواسطة الخدمة
         $reset = $this->service->create($adminUser);
 
         // تنفيذ عملية الاستهلاك
         $consumed = $this->service->consume($reset);
 
-        $this->assertTrue((bool)$consumed);
+        $this->assertTrue((bool) $consumed);
     }
 }

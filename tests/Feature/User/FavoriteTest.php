@@ -33,7 +33,7 @@ class FavoriteTest extends TestCase
         foreach ($products as $product) {
             Favorite::factory()->create([
                 'customer_id' => $this->customer->id,
-                'product_id'  => $product->id,
+                'product_id' => $product->id,
             ]);
         }
 
@@ -54,7 +54,7 @@ class FavoriteTest extends TestCase
 
         $this->assertDatabaseHas('favorites', [
             'customer_id' => $this->customer->id,
-            'product_id'  => $product->id,
+            'product_id' => $product->id,
         ]);
 
         // 2. التبديل الثاني (إزالة من المفضلة)
@@ -64,7 +64,7 @@ class FavoriteTest extends TestCase
 
         $this->assertDatabaseMissing('favorites', [
             'customer_id' => $this->customer->id,
-            'product_id'  => $product->id,
+            'product_id' => $product->id,
         ]);
     }
 

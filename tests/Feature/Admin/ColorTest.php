@@ -41,7 +41,7 @@ class ColorTest extends TestCase
     public function test_admin_can_create_a_new_color(): void
     {
         $payload = [
-            'name'     => 'أزرق ملكي',
+            'name' => 'أزرق ملكي',
             'hex_code' => '#4169E1',
         ];
 
@@ -50,7 +50,7 @@ class ColorTest extends TestCase
         $response->assertStatus(201);
 
         $this->assertDatabaseHas('colors', [
-            'name'     => 'أزرق ملكي',
+            'name' => 'أزرق ملكي',
             'hex_code' => '#4169E1',
         ]);
     }
@@ -58,12 +58,12 @@ class ColorTest extends TestCase
     public function test_admin_can_update_a_color(): void
     {
         $color = Color::factory()->create([
-            'name'     => 'أخضر',
+            'name' => 'أخضر',
             'hex_code' => '#008000',
         ]);
 
         $payload = [
-            'name'     => 'أخضر غامق',
+            'name' => 'أخضر غامق',
             'hex_code' => '#006400',
         ];
 
@@ -72,8 +72,8 @@ class ColorTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('colors', [
-            'id'       => $color->id,
-            'name'     => 'أخضر غامق',
+            'id' => $color->id,
+            'name' => 'أخضر غامق',
             'hex_code' => '#006400',
         ]);
     }

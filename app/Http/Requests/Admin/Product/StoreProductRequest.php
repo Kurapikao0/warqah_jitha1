@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Admin\Product;
 
+use App\Enums\ProductStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
-use App\Enums\ProductStatus;
 use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest

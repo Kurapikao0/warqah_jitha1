@@ -19,7 +19,7 @@ class VerificationCodeServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new VerificationCodeService();
+        $this->service = new VerificationCodeService;
     }
 
     #[Test]
@@ -35,7 +35,7 @@ class VerificationCodeServiceTest extends TestCase
         );
 
         $this->assertDatabaseHas('verification_codes', [
-            'id'          => $verificationCode->id,
+            'id' => $verificationCode->id,
             'customer_id' => $customer->id,
         ]);
     }

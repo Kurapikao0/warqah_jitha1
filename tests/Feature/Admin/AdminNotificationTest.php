@@ -42,7 +42,7 @@ class AdminNotificationTest extends TestCase
     {
         $notification = AdminNotification::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'is_read'       => false,
+            'is_read' => false,
         ]);
 
         $response = $this->putJson("/api/admin/notifications/{$notification->id}/read");
@@ -50,7 +50,7 @@ class AdminNotificationTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('admin_notifications', [
-            'id'      => $notification->id,
+            'id' => $notification->id,
             'is_read' => true,
         ]);
     }
@@ -69,7 +69,7 @@ class AdminNotificationTest extends TestCase
     {
         $notification = AdminNotification::factory()->create([
             'admin_user_id' => $this->admin->id,
-            'is_read'       => 1,
+            'is_read' => 1,
         ]);
 
         $this->assertIsBool($notification->is_read);

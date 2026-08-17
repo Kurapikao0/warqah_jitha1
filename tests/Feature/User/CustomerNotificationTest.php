@@ -53,7 +53,7 @@ class CustomerNotificationTest extends TestCase
     {
         $notification = CustomerNotification::factory()->create([
             'customer_id' => $this->customer->id,
-            'is_read'       => false,
+            'is_read' => false,
         ]);
 
         // استخدام PATCH مطابقاً للـ Route List الخاصة بالعميل
@@ -62,7 +62,7 @@ class CustomerNotificationTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseHas('customer_notifications', [
-            'id'      => $notification->id,
+            'id' => $notification->id,
             'is_read' => true,
         ]);
     }
@@ -86,7 +86,7 @@ class CustomerNotificationTest extends TestCase
     {
         $notification = CustomerNotification::factory()->create([
             'customer_id' => $this->customer->id,
-            'is_read'       => 1,
+            'is_read' => 1,
         ]);
 
         $this->assertInstanceOf(Customer::class, $notification->customer);

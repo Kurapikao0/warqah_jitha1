@@ -40,7 +40,7 @@ class RawMaterialControllerTest extends TestCase
     {
         if (enum_exists(RawMaterialStatus::class)) {
             $cases = RawMaterialStatus::cases();
-            if (!empty($cases)) {
+            if (! empty($cases)) {
                 // نفضل استخدام value إن وجد أو name في حال كان Validation يتوقع الاسم
                 return $cases[0]->value ?? $cases[0]->name;
             }

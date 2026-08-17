@@ -16,7 +16,6 @@ class CustomerRegisterTest extends TestCase
     // عدل المسار حسب routes/api.php
     private string $registerUrl = '/api/register';
 
-
     #[Test]
     public function customer_can_register_successfully(): void
     {
@@ -32,12 +31,10 @@ class CustomerRegisterTest extends TestCase
             'category' => $categoryValue,
         ];
 
-
         $response = $this->postJson(
             $this->registerUrl,
             $payload
         );
-
 
         $response->assertStatus(201)
             ->assertJson([
@@ -56,22 +53,18 @@ class CustomerRegisterTest extends TestCase
                 'errors',
             ]);
 
-
         $this->assertDatabaseHas('customers', [
             'email' => 'ahmed@example.com',
             'full_name' => 'أحمد علي',
             'phone' => '770000000',
         ]);
 
-
         $customer = Customer::where(
             'email',
             'ahmed@example.com'
         )->first();
 
-
         $this->assertNotNull($customer);
-
 
         // حسب اسم عمود كلمة المرور عندك
         $this->assertTrue(
@@ -82,8 +75,6 @@ class CustomerRegisterTest extends TestCase
         );
     }
 
-
-
     #[Test]
     public function registration_fails_with_invalid_or_missing_data(): void
     {
@@ -91,7 +82,6 @@ class CustomerRegisterTest extends TestCase
             $this->registerUrl,
             []
         );
-
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
@@ -102,8 +92,6 @@ class CustomerRegisterTest extends TestCase
             ]);
     }
 
-
-
     #[Test]
     public function customer_cannot_register_with_duplicate_email_or_phone(): void
     {
@@ -112,7 +100,6 @@ class CustomerRegisterTest extends TestCase
             'email' => 'existing@example.com',
             'phone' => '770000000',
         ]);
-
 
         $payload = [
             'full_name' => 'عميل جديد',
@@ -124,12 +111,10 @@ class CustomerRegisterTest extends TestCase
             'category' => CustomerCategory::cases()[0]->value,
         ];
 
-
         $response = $this->postJson(
             $this->registerUrl,
             $payload
         );
-
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors([
