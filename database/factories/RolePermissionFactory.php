@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class RolePermissionFactory extends Factory
 {
     protected $model = RolePermission::class;
+
     /**
      * Define the model's default state.
      *

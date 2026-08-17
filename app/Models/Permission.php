@@ -16,7 +16,6 @@ class Permission extends Model
      */
     const UPDATED_AT = null;
 
-    
     protected $fillable = [
         'name',
         'module',

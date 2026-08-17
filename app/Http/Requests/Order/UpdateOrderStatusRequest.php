@@ -2,18 +2,16 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Enums\OrderStatus;
 
 class UpdateOrderStatusRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return auth('admin')->check();
     }
-
 
     public function rules(): array
     {
@@ -26,7 +24,7 @@ class UpdateOrderStatusRequest extends FormRequest
 
             'note' => [
                 'nullable',
-                'string'
+                'string',
             ],
         ];
     }
@@ -35,18 +33,14 @@ class UpdateOrderStatusRequest extends FormRequest
     {
         return [
 
-            'status.required' =>
-                'حالة الطلب مطلوبة.',
+            'status.required' => 'حالة الطلب مطلوبة.',
 
-            'status.enum' =>
-                'حالة الطلب المحددة غير صحيحة.',
+            'status.enum' => 'حالة الطلب المحددة غير صحيحة.',
 
-            'note.string' =>
-                'الملاحظة يجب أن تكون نصاً.',
+            'note.string' => 'الملاحظة يجب أن تكون نصاً.',
 
         ];
     }
-
 
     public function attributes(): array
     {

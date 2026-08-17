@@ -2,236 +2,47 @@
 
 namespace App\Services;
 
-
-use App\Models\Order;
-use Illuminate\Support\Facades\DB;
-use App\Repositories\Contracts\OrderRepositoryInterface;
-use App\Models\Product;
-use App\Models\Address;
-use Illuminate\Support\Str;
 use App\Enums\OrderStatus;
-
+use App\Models\Address;
+use App\Models\Order;
+use App\Models\Product;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderService
 {
+    public function __construct(
+        protected OrderRepositoryInterface $repository
+    ) {}
 
+    public function all()
+    {
 
-public function __construct(
-protected OrderRepositoryInterface $repository
-)
-{}
+        return $this->repository->getAll();
 
+    }
 
+    public function statistics()
+    {
+        return $this->repository->statistics();
+    }
 
+    public function customerOrders(int $customerId)
+    {
 
-public function all()
-{
+        return $this->repository
+            ->getCustomerOrders($customerId);
 
-return $this->repository->getAll();
+    }
 
-}
+    public function find(int $id)
+    {
 
-public function statistics()
-{
-    return $this->repository->statistics();
-}
+        return $this->repository
+            ->findById($id);
 
-
-
-public function customerOrders($customerId)
-{
-
-return $this->repository
-->getCustomerOrders($customerId);
-
-}
-
-
-
-
-
-public function find($id)
-{
-
-return $this->repository
-->findById($id);
-
-}
-
-/*public function create(array $data)
-{
-
-
-return DB::transaction(function()
-use($data){
-
-
-$order =
-$this->repository
-->create($data);
-
-
-
-$order->statusHistory()
-->create([
-
-'status' => OrderStatus::Received
-'note'=>'Order created',
-
-]);
-
-
-
-return $order;
-
-
-});
-
-
-}*/
-
-
-
-/*public function create(array $data)
-{
-    return DB::transaction(function () use ($data) {
-
-        $address = Address::where(
-            'id',
-            $data['address_id']
-        )
-        ->where(
-            'customer_id',
-            auth()->id()
-        )
-        ->firstOrFail();
-
-        $subtotal = 0;
-
-        $items = [];
-
-        foreach ($data['items'] as $item) {
-
-            $product = Product::findOrFail(
-                $item['product_id']
-            );
-
-            $linePrice =
-                $product->price *
-                $item['quantity'];
-
-            $subtotal += $linePrice;
-
-            $items[] = [
-
-                'product' => $product,
-
-                'quantity' => $item['quantity'],
-
-                'customization_id' =>
-                    $item['customization_id']
-                    ?? null,
-
-                'unit_price' =>
-                    $product->price,
-
-            ];
-        }
-
-        $shipping = 0;
-
-        $order = $this->repository->create([
-
-            'order_number' =>
-                'ORD-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(4)),
-
-            'customer_id' =>
-                auth()->id(),
-
-            'address_id' =>
-                $address->id,
-
-            'shipping_recipient_name' =>
-                $address->recipient_name,
-
-            'shipping_phone' =>
-                $address->phone,
-
-            'shipping_address_full' =>
-                trim(
-                    $address->street . ', ' .
-                    $address->district
-                ),
-
-            'shipping_city' =>
-                $address->city,
-
-            'shipping_country' =>
-                $address->country,
-
-            'order_type' =>
-                $data['order_type'],
-
-            'status' =>
-                OrderStatus::Received,
-
-            'subtotal' =>
-                $subtotal,
-
-            'shipping_fee' =>
-                $shipping,
-
-            'total_amount' =>
-                $subtotal + $shipping,
-
-        ]);
-
-        foreach ($items as $item) {
-
-            $this->repository->createItem([
-
-                'order_id' =>
-                    $order->id,
-
-                'product_id' =>
-                    $item['product']->id,
-
-                'product_customization_request_id' =>
-                    $item['customization_id'],
-
-                'quantity' =>
-                    $item['quantity'],
-
-                'unit_price' =>
-                    $item['unit_price'],
-
-                'is_customized' =>
-                    $item['customization_id'] != null,
-
-            ]);
-        }
-
-        $order->statusHistory()->create([
-
-            'status' =>
-                OrderStatus::Received,
-
-            'note' =>
-                'Order Created',
-
-            'changed_by' =>
-                auth()->id(),
-
-        ]);
-
-        return $order->load([
-            'items.product',
-            'payment',
-            'customer'
-        ]);
-    });
-}*/
-
+    }
 
     public function create(array $data)
     {
@@ -250,25 +61,25 @@ return $order;
 
                 $product = Product::findOrFail($item['product_id']);
 
-                 // ===== التحقق من أن المنتج يدعم التخصيص =====
+                // ===== التحقق من أن المنتج يدعم التخصيص =====
                 if (
                     $data['order_type'] === 'custom'
-                    && !$product->is_customizable
+                    && ! $product->is_customizable
                 ) {
-                    abort(422, 'هذا المنتج لا يدعم التخصيص. ' . $product->name);
+                    abort(422, 'هذا المنتج لا يدعم التخصيص. '.$product->name);
                 }
                 if (
-                    !empty($item['customization_id']) &&
-                    !$product->is_customizable
+                    ! empty($item['customization_id']) &&
+                    ! $product->is_customizable
                 ) {
-                    abort(422, 'لا يمكن تخصيص هذا المنتج. ' . $product->name);
+                    abort(422, 'لا يمكن تخصيص هذا المنتج. '.$product->name);
                 }
                 // ===== التحقق من المخزون =====
                 $availableStock =
                     $product->stock_quantity - $product->reserved_quantity;
 
                 if ($availableStock < $item['quantity']) {
-                    abort(422, 'المنتج المطلوب غير متاح حالياً. ' . $product->name);
+                    abort(422, 'المنتج المطلوب غير متاح حالياً. '.$product->name);
                 }
 
                 $linePrice = $product->price * $item['quantity'];
@@ -287,13 +98,13 @@ return $order;
 
             // 3) إنشاء الطلب
             $order = $this->repository->create([
-                'order_number' => 'ORD-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(4)),
+                'order_number' => 'ORD-'.now()->format('YmdHis').'-'.Str::upper(Str::random(4)),
                 'customer_id' => auth('customer')->id(),
                 'address_id' => $address->id,
                 'shipping_recipient_name' => $address->recipient_name,
                 'shipping_phone' => $address->phone,
                 'shipping_address_full' => trim(
-                    ($address->street ?? '') . ', ' . ($address->district ?? '')
+                    ($address->street ?? '').', '.($address->district ?? '')
                 ),
                 'shipping_city' => $address->city,
                 'shipping_country' => $address->country,
@@ -340,60 +151,50 @@ return $order;
         });
     }
 
+    public function updateStatus(
+        Order $order,
+        array $data
+    ) {
 
-public function updateStatus(
-Order $order,
-array $data
-)
-{
+        return DB::transaction(function () use ($order, $data) {
 
+            /*$order->update([
 
-return DB::transaction(function()
-use($order,$data){
+            'status'=>$data['status']
 
+            ]);*/
+            $order->update([
+                'status' => OrderStatus::from($data['status']),
+            ]);
 
+            $order->statusHistory()
+                ->create([
 
-/*$order->update([
+                    'status' => OrderStatus::from($data['status']),
+                    'note' => $data['note'] ?? null,
 
-'status'=>$data['status']
+                    'changed_by' => auth('admin')->id(),
+                ]);
 
-]);*/
-$order->update([
-    'status' => OrderStatus::from($data['status'])
-]);
+            return $order;
 
+        });
 
-$order->statusHistory()
-->create([
+    }
 
-'status' => OrderStatus::from($data['status']),
-'note'=>$data['note'] ?? null,
+    public function findCustomerOrder(
+        int $customerId,
+        int $orderId)
+    {
+        return $this->repository
+            ->findCustomerOrder(
+                $customerId,
+                $orderId
+            );
+    }
 
-'changed_by' => auth('admin')->id(),
-]);
-
-
-
-return $order;
-
-
-});
-
-
-}
-
-public function findCustomerOrder(
-    int $customerId,
-    int $orderId )
-{
-    return $this->repository
-        ->findCustomerOrder(
-            $customerId,
-            $orderId
-        );
-} 
-public function delete(Order $order)
-{
-    return $order->delete();
-}
+    public function delete(Order $order)
+    {
+        return $order->delete();
+    }
 }

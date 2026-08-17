@@ -2,42 +2,38 @@
 
 namespace App\Services;
 
+use App\Models\OrderItem;
 use App\Models\Review;
 use App\Repositories\ReviewRepository;
-use Illuminate\Database\Eloquent\Collection;
 use Exception;
-use App\Models\OrderItem; 
+use Illuminate\Database\Eloquent\Collection;
 
 class ReviewService
 {
     public function __construct(
         protected ReviewRepository $repository
-    ) {
-    }
-
+    ) {}
 
     public function getAll(): Collection
     {
         return $this->repository->all();
     }
 
-
     public function getById(int $id): Review
     {
         return $this->repository->find($id);
     }
 
-
     public function create(array $data): Review
     {
         $orderItem = OrderItem::findOrFail($data['order_item_id']);
 
-    if ($orderItem->order->customer_id !== $data['customer_id']) {
-    throw new Exception('Order item does not belong to customer');
-    }
+        if ($orderItem->order->customer_id !== $data['customer_id']) {
+            throw new Exception('Order item does not belong to customer');
+        }
+
         return $this->repository->create($data);
     }
-
 
     public function update(
         Review $review,
@@ -49,7 +45,6 @@ class ReviewService
             $data
         );
     }
-
 
     public function delete(
         Review $review

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductCustomizationRequestFactory extends Factory
 {
     protected $model = ProductCustomizationRequest::class;
+
     /**
      * Define the model's default state.
      *
@@ -25,6 +26,7 @@ class ProductCustomizationRequestFactory extends Factory
         $basePrice = $this->faker->randomFloat(2, 50, 300);
         $customFee = $this->faker->randomFloat(2, 10, 50);
         $shippingFee = $this->faker->randomFloat(2, 5, 20);
+
         return [
             'request_code' => strtoupper($this->faker->bothify('REQ-#####')),
             'customer_id' => Customer::factory(),

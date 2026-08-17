@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\ProductMedia;
 
+use App\Enums\ProductMediaType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
-use App\Enums\ProductMediaType;
 
 class UpdateProductMediaRequest extends FormRequest
 {
@@ -19,23 +19,24 @@ class UpdateProductMediaRequest extends FormRequest
 
             'media_type' => [
                 'sometimes',
-                new Enum(ProductMediaType::class)
+                new Enum(ProductMediaType::class),
             ],
 
             'url' => [
                 'sometimes',
-                'url'
+                'url',
+                'max:255',
             ],
 
             'sort_order' => [
                 'sometimes',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
             'is_primary' => [
                 'sometimes',
-                'boolean'
+                'boolean',
             ],
 
         ];

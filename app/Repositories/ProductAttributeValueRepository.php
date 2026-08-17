@@ -11,15 +11,15 @@ class ProductAttributeValueRepository implements ProductAttributeValueRepository
     {
         return ProductAttributeValue::with([
             'product',
-            'attribute'
-        ])->latest()->get();
+            'attribute',
+        ])->latest('id')->get();
     }
 
     public function find(int $id): ProductAttributeValue
     {
         return ProductAttributeValue::with([
             'product',
-            'attribute'
+            'attribute',
         ])->findOrFail($id);
     }
 

@@ -12,7 +12,6 @@ class StoreAdminUserRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
@@ -22,13 +21,11 @@ class StoreAdminUserRequest extends FormRequest
                 'exists:roles,id',
             ],
 
-
             'full_name' => [
                 'required',
                 'string',
                 'max:255',
             ],
-
 
             'email' => [
                 'required',
@@ -36,20 +33,17 @@ class StoreAdminUserRequest extends FormRequest
                 'unique:admin_users,email',
             ],
 
-
             'phone' => [
                 'nullable',
                 'string',
                 'max:20',
-                new YemenPhoneRule(),
+                new YemenPhoneRule,
             ],
-
 
             'avatar_url' => [
                 'nullable',
                 'string',
             ],
-
 
             'password' => [
                 'required',

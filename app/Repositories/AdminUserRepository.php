@@ -12,18 +12,15 @@ class AdminUserRepository
             ->paginate($perPage);
     }
 
-
     public function find(AdminUser $adminUser)
     {
         return $adminUser->load('role');
     }
 
-
     public function create(array $data): AdminUser
     {
         return AdminUser::create($data);
     }
-
 
     public function update(
         AdminUser $adminUser,
@@ -34,7 +31,6 @@ class AdminUserRepository
 
         return $adminUser;
     }
-
 
     public function delete(
         AdminUser $adminUser

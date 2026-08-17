@@ -15,8 +15,7 @@ final class SendPasswordResetLinkListener
     public function __construct(
         private readonly VerificationCodeService $verificationCodeService,
         private readonly EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(PasswordResetRequested $event): void
     {

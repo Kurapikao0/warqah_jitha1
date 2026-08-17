@@ -12,71 +12,58 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminPasswordResetController extends Controller
 {
-
     public function __construct(
         protected AdminPasswordResetService $service
-    ) {
-    }
-
-
+    ) {}
 
     public function store(
         AdminUser $adminUser
     ): JsonResponse {
-
 
         $this->authorize(
             'update',
             $adminUser
         );
 
-
         $reset =
             $this->service->create(
                 $adminUser
             );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Password reset code generated.',
+            'message' => 'Password reset code generated.',
 
-            'data'=>new AdminPasswordResetResource(
+            'data' => new AdminPasswordResetResource(
                 $reset
-            )
+            ),
 
         ], Response::HTTP_CREATED);
     }
 
-
-
-
     public function destroy(
         AdminPasswordReset $reset
     ): JsonResponse {
-
 
         $this->authorize(
             'update',
             $reset->adminUser
         );
 
-
         $success =
             $this->service->consume(
                 $reset
             );
 
-
         return response()->json([
 
-            'success'=>$success,
+            'success' => $success,
 
-            'message'=>$success
+            'message' => $success
                 ? 'Reset token consumed.'
-                : 'Reset token invalid.'
+                : 'Reset token invalid.',
 
         ]);
     }

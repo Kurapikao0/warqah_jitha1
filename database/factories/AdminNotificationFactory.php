@@ -3,14 +3,16 @@
 namespace Database\Factories;
 
 use App\Models\AdminNotification;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\AdminUser;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
 /**
  * @extends Factory<AdminNotification>
  */
 class AdminNotificationFactory extends Factory
 {
     protected $model = AdminNotification::class;
+
     /**
      * Define the model's default state.
      *

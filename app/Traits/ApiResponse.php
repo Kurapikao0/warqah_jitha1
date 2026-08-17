@@ -16,7 +16,6 @@ trait ApiResponse
         ], $code);
     }
 
-
     protected function error(
         string $message,
         int $code = 400

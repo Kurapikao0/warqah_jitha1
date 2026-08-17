@@ -11,12 +11,9 @@ use Illuminate\Http\Request;
 
 class CustomerNotificationController extends Controller
 {
-
     public function __construct(
         protected CustomerNotificationService $service
-    ) {
-    }
-
+    ) {}
 
     public function index(
         Request $request
@@ -24,23 +21,19 @@ class CustomerNotificationController extends Controller
 
         $customer = $request->user();
 
-
         return response()->json([
             'data' => CustomerNotificationResource::collection(
                 $this->service->getAll(
                     $customer->id
                 )
-            )
+            ),
         ]);
     }
-
-
 
     public function show(
         Request $request,
         int $id
     ): JsonResponse {
-
 
         $notification =
             $this->service->getById(
@@ -48,64 +41,50 @@ class CustomerNotificationController extends Controller
                 $request->user()->id
             );
 
-
         return response()->json([
-            'data' =>
-                new CustomerNotificationResource(
-                    $notification
-                )
+            'data' => new CustomerNotificationResource(
+                $notification
+            ),
         ]);
     }
-
-
 
     public function read(
         Request $request,
         CustomerNotification $notification
     ): JsonResponse {
 
-
         abort_if(
             $notification->customer_id !== $request->user()->id,
             403
         );
 
-
         return response()->json([
-            'message' =>
-                'Notification marked as read',
+            'message' => 'Notification marked as read',
 
-            'data' =>
-                new CustomerNotificationResource(
-                    $this->service->markAsRead(
-                        $notification
-                    )
+            'data' => new CustomerNotificationResource(
+                $this->service->markAsRead(
+                    $notification
                 )
+            ),
         ]);
     }
-
-
 
     public function destroy(
         Request $request,
         CustomerNotification $notification
     ): JsonResponse {
 
-
         abort_if(
             $notification->customer_id !== $request->user()->id,
             403
         );
 
-
         $this->service->delete(
             $notification
         );
 
-
         return response()->json([
-            'message' =>
-                'Notification deleted successfully'
+            'message' => 'Notification deleted successfully',
         ]);
     }
 }

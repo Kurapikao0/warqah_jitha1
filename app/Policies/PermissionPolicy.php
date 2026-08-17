@@ -6,6 +6,7 @@ namespace App\Policies;
 
 use App\Models\AdminUser;
 use App\Models\Permission;
+use App\Models\Role;
 
 class PermissionPolicy
 {
@@ -62,11 +63,13 @@ class PermissionPolicy
         AdminUser $admin,
         string $permission
     ): bool {
-        if (!$admin->role) {
+        $role = $admin->role;
+
+        if (! $role instanceof Role) {
             return false;
         }
 
-        return $admin->role
+        return $role
             ->permissions()
             ->where('name', $permission)
             ->exists();

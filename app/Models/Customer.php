@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-use Laravel\Sanctum\HasApiTokens;
+
 use App\Enums\CustomerCategory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\EmailLog;
+use Laravel\Sanctum\HasApiTokens;
 
 class Customer extends Authenticatable
 {
-    use HasFactory, SoftDeletes, HasApiTokens, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+
     protected $fillable = [
         'full_name',
         'email',
@@ -98,9 +99,9 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(EmailLog::class);
     }
+
     public function routeNotificationForMail()
     {
         return $this->email;
     }
 }
-

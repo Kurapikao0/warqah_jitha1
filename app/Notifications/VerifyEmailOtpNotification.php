@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Contracts\EmailNotificationInterface;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Contracts\EmailNotificationInterface;
 
 class VerifyEmailOtpNotification extends Notification implements EmailNotificationInterface
 {
@@ -13,9 +13,7 @@ class VerifyEmailOtpNotification extends Notification implements EmailNotificati
 
     public function __construct(
         protected string $otp
-    ) {
-    }
-
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -35,18 +33,15 @@ class VerifyEmailOtpNotification extends Notification implements EmailNotificati
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-
-        ->subject($this->notificationSubject())
-
-        ->view(
-            'emails.customer.verification-otp',
-            [
-                'customer'=>$notifiable,
-                'otp'=>$this->otp,
-            ]
-);
+            ->subject($this->notificationSubject())
+            ->view(
+                'emails.customer.verification-otp',
+                [
+                    'customer' => $notifiable,
+                    'otp' => $this->otp,
+                ]
+            );
     }
-
 
     public function toArray(object $notifiable): array
     {

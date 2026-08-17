@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class OrderFactory extends Factory
 {
     protected $model = Order::class;
+
     /**
      * Define the model's default state.
      *
@@ -23,6 +24,7 @@ class OrderFactory extends Factory
     {
         $subtotal = $this->faker->randomFloat(2, 50, 1000);
         $shippingFee = $this->faker->randomFloat(2, 10, 50);
+
         return [
             'order_number' => strtoupper($this->faker->bothify('ORD-######')),
             'customer_id' => Customer::factory(),

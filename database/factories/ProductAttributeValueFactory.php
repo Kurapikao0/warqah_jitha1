@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductAttributeValueFactory extends Factory
 {
     protected $model = ProductAttributeValue::class;
+
     /**
      * Define the model's default state.
      *

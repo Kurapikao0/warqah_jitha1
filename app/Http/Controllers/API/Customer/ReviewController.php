@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Review\StoreReviewRequest;
 use App\Http\Requests\Review\UpdateReviewRequest;
 use App\Http\Resources\ReviewResource;
-use App\Models\Review;
 use App\Models\Customer;
+use App\Models\Review;
 use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,9 +16,7 @@ class ReviewController extends Controller
 {
     public function __construct(
         protected ReviewService $service
-    ) {
-    }
-
+    ) {}
 
     /**
      * Customer reviews
@@ -35,15 +33,13 @@ class ReviewController extends Controller
                 $customer->reviews()
                     ->with([
                         'product',
-                        'images'
+                        'images',
                     ])
                     ->latest()
                     ->get()
-            )
+            ),
         ]);
     }
-
-
 
     /**
      * Store review
@@ -55,22 +51,18 @@ class ReviewController extends Controller
         /** @var Customer $customer */
         $customer = $request->user();
 
-
         $review = $this->service->create([
             ...$request->validated(),
             'customer_id' => $customer->id,
         ]);
 
-
         return response()->json([
             'message' => 'Review created successfully',
             'data' => new ReviewResource(
                 $review
-            )
+            ),
         ], 201);
     }
-
-
 
     /**
      * Show review
@@ -84,13 +76,11 @@ class ReviewController extends Controller
                 $review->load([
                     'customer',
                     'product',
-                    'images'
+                    'images',
                 ])
-            )
+            ),
         ]);
     }
-
-
 
     /**
      * Update review
@@ -106,14 +96,11 @@ class ReviewController extends Controller
             $request->validated()
         );
 
-
         return response()->json([
             'message' => 'Review updated successfully',
-            'data' => new ReviewResource($review)
+            'data' => new ReviewResource($review),
         ]);
     }
-
-
 
     /**
      * Delete review
@@ -127,10 +114,8 @@ class ReviewController extends Controller
             $review
         );
 
-
         return response()->json([
-            'message' =>
-                'Review deleted successfully'
+            'message' => 'Review deleted successfully',
         ]);
     }
 }

@@ -39,12 +39,10 @@ return [
         'key' => env('EXCHANGE_RATE_API_KEY'),
         'base_url' => env('EXCHANGE_RATE_API_BASE_URL', 'https://v6.exchangerate-api.com/v6'),
     ],
-    
+
     'yemen_rates_api' => [
         'base_url' => env('YEMEN_RATES_API_BASE_URL', 'https://cygrlhmnmckoefefnsjc.supabase.co/functions/v1/public-api'),
         'city' => env('YEMEN_RATES_API_CITY', 'sanaa'),
     ],
-
-
 
 ];

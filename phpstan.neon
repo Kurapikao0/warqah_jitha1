@@ -1,0 +1,14 @@
+includes:
+    - vendor/titasgailius/larastan-casts-method/extension.neon
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+    level: 5
+    ignoreErrors:
+        - '#Access to an undefined property App\\Http\\Resources\\.*#'
+        - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$#'
+        - '#Using nullsafe (property|method) access .* is unnecessary#'
+        - '#Call to an undefined method App\\Http\\Resources\\.*#'
+        - '#not covariant with PHPDoc type#'

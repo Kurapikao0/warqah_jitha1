@@ -15,8 +15,8 @@ final class EmailNotification extends Notification
 
     public function __construct(
         string $notificationClass,
-        array $payload = [],
         private readonly object $owner,
+        array $payload = [],
     ) {
         if (
             ! class_exists($notificationClass)
@@ -57,4 +57,3 @@ final class EmailNotification extends Notification
         return $this->notification->toArray($this->owner);
     }
 }
-

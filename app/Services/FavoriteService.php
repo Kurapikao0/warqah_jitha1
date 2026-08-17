@@ -2,71 +2,51 @@
 
 namespace App\Services;
 
-
 use App\Models\Favorite;
-
-
 
 class FavoriteService
 {
+    public function toggle(
+        $customerId,
+        $productId
+    ) {
 
+        $fav =
+        Favorite::where([
+            'customer_id' => $customerId,
+            'product_id' => $productId,
+        ])
+            ->first();
 
-public function toggle(
-$customerId,
-$productId
-)
-{
+        if ($fav) {
 
+            $fav->delete();
 
-$fav =
-Favorite::where([
-'customer_id'=>$customerId,
-'product_id'=>$productId
-])
-->first();
+            return false;
 
+        }
 
+        Favorite::create([
 
-if($fav)
-{
+            'customer_id' => $customerId,
 
-$fav->delete();
+            'product_id' => $productId,
 
-return false;
+        ]);
 
-}
+        return true;
 
+    }
 
+    public function all($customerId)
+    {
 
-Favorite::create([
+        return Favorite::with('product')
+            ->where(
+                'customer_id',
+                $customerId
+            )
+            ->get();
 
-'customer_id'=>$customerId,
-
-'product_id'=>$productId
-
-]);
-
-
-return true;
-
-
-}
-
-
-
-
-public function all($customerId)
-{
-
-return Favorite::with('product')
-->where(
-'customer_id',
-$customerId
-)
-->get();
-
-}
-
-
-
+    }
 }

@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-use App\Models\DesignPattern;
-use App\Services\DesignPatternService;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\DesignPatternResource;
 use App\Http\Requests\DesignPattern\StoreDesignPatternRequest;
 use App\Http\Requests\DesignPattern\UpdateDesignPatternRequest;
+use App\Http\Resources\DesignPatternResource;
+use App\Models\DesignPattern;
+use App\Services\DesignPatternService;
 use Illuminate\Http\Request;
 
 class DesignPatternController extends Controller
 {
     public function __construct(
         protected DesignPatternService $service
-    ) {
-    }
+    ) {}
 
     protected function normalizePayload(array $data, Request $request): array
     {

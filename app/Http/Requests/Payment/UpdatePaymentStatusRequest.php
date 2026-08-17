@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Payment;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\PaymentStatus;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
 
 class UpdatePaymentStatusRequest extends FormRequest
@@ -12,6 +12,7 @@ class UpdatePaymentStatusRequest extends FormRequest
     {
         return auth('admin')->check();
     }
+
     public function rules(): array
     {
         return [
@@ -21,7 +22,7 @@ class UpdatePaymentStatusRequest extends FormRequest
             ],
             'admin_note' => [
                 'nullable',
-                'string'
+                'string',
             ],
         ];
     }
@@ -30,18 +31,14 @@ class UpdatePaymentStatusRequest extends FormRequest
     {
         return [
 
-            'status.required' =>
-                'حالة الدفع مطلوبة.',
+            'status.required' => 'حالة الدفع مطلوبة.',
 
-            'status.enum' =>
-                'حالة الدفع المحددة غير صحيحة.',
+            'status.enum' => 'حالة الدفع المحددة غير صحيحة.',
 
-            'admin_note.string' =>
-                'ملاحظة الإدارة يجب أن تكون نصاً.',
+            'admin_note.string' => 'ملاحظة الإدارة يجب أن تكون نصاً.',
 
         ];
     }
-
 
     public function attributes(): array
     {

@@ -19,7 +19,7 @@ class SystemSettingController extends Controller
         ]);
 
         return response()->json([
-            'data' => $settings
+            'data' => $settings,
         ]);
     }
 
@@ -47,7 +47,7 @@ class SystemSettingController extends Controller
         $settings->update($validated);
 
         return response()->json([
-            'data' => $settings
+            'data' => $settings,
         ]);
     }
 }

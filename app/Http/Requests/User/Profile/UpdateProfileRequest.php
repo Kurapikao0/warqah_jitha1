@@ -41,7 +41,7 @@ class UpdateProfileRequest extends FormRequest
                 'sometimes',
                 'string',
                 'max:20',
-                new YemenPhoneRule(),
+                new YemenPhoneRule,
                 Rule::unique('customers', 'phone')->ignore($customer->id),
             ],
 

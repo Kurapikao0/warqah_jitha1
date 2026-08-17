@@ -16,8 +16,7 @@ final class EmailChangedNotification extends Notification implements EmailNotifi
     public function __construct(
         private readonly string $old_email,
         private readonly string $new_email,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -43,7 +42,7 @@ final class EmailChangedNotification extends Notification implements EmailNotifi
             ->view(
                 'emails.security.email-changed',
                 [
-                    'user'      => $notifiable,
+                    'user' => $notifiable,
                     'old_email' => $this->old_email,
                     'new_email' => $this->new_email,
                 ]
@@ -55,4 +54,3 @@ final class EmailChangedNotification extends Notification implements EmailNotifi
         return [];
     }
 }
-

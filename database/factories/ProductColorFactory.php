@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductColorFactory extends Factory
 {
     protected $model = ProductColor::class;
+
     /**
      * Define the model's default state.
      *

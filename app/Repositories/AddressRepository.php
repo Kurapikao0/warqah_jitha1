@@ -8,15 +8,11 @@ use App\Repositories\Contracts\AddressRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
-
 class AddressRepository implements AddressRepositoryInterface
 {
-
-
     public function getCustomerAddresses(
         Customer $customer
-    ): Collection
-    {
+    ): Collection {
 
         return $customer
             ->addresses()
@@ -25,98 +21,68 @@ class AddressRepository implements AddressRepositoryInterface
 
     }
 
-
-
-
     public function findById(
         int $id
-    ): ?Address
-    {
+    ): ?Address {
 
         return Address::find($id);
 
     }
 
-
-
-
-
     public function create(
         Customer $customer,
         array $data
-    ): Address
-    {
-
-        return $customer
+    ): Address {
+        /** @var Address $address */
+        $address = $customer
             ->addresses()
             ->create($data);
 
+        return $address;
     }
-
-
-
-
 
     public function update(
         Address $address,
         array $data
-    ): Address
-    {
+    ): Address {
 
         $address->update($data);
-
 
         return $address->fresh();
 
     }
 
-
-
-
-
     public function delete(
         Address $address
-    ): bool
-    {
+    ): bool {
 
         return $address->delete();
 
     }
 
-
-
-
-
     public function setDefault(
         Address $address
-    ): Address
-    {
+    ): Address {
 
-        return DB::transaction(function() use ($address){
-
+        return DB::transaction(function () use ($address) {
 
             Address::where(
                 'customer_id',
                 $address->customer_id
             )
-            ->update([
+                ->update([
 
-                'is_default'=>false
+                    'is_default' => false,
 
-            ]);
-
-
+                ]);
 
             $address->update([
 
-                'is_default'=>true
+                'is_default' => true,
 
             ]);
 
-
-
             return $address->fresh();
-
 
         });
 
@@ -124,8 +90,7 @@ class AddressRepository implements AddressRepositoryInterface
 
     public function clearDefaultAddresses(
         Customer $customer
-    ): void
-    {
+    ): void {
 
         $customer->addresses()
             ->where(
@@ -133,9 +98,8 @@ class AddressRepository implements AddressRepositoryInterface
                 true
             )
             ->update([
-                'is_default'=>false
+                'is_default' => false,
             ]);
 
-    }    
-
+    }
 }

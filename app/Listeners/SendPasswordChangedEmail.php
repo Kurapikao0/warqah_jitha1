@@ -12,15 +12,13 @@ final class SendPasswordChangedEmail
 {
     public function __construct(
         private readonly EmailNotificationService $emailNotificationService,
-    ) {
-    }
+    ) {}
 
     public function handle(PasswordChanged $event): void
     {
         $this->emailNotificationService->send(
             user: $event->customer,
-            notification: new PasswordChangedNotification(),
+            notification: new PasswordChangedNotification,
         );
     }
 }
-

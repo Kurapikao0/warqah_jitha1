@@ -2,39 +2,26 @@
 
 namespace App\Http\Requests\Customization;
 
-
 use Illuminate\Foundation\Http\FormRequest;
-
-
 
 class UpdateCustomizationStatusRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return auth()->check();
+    }
 
+    public function rules(): array
+    {
 
-public function authorize(): bool
-{
-    return auth()->check();
-}
+        return [
 
-
-
-
-public function rules(): array
-{
-
-return [
-
-'status'=>
-'required|in:
+            'status' => 'required|in:
 pending_approval,
 in_production,
-completed'
+completed',
 
+        ];
 
-];
-
-
-}
-
-
+    }
 }

@@ -7,13 +7,13 @@ use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 
-
 /**
  * @extends Factory<AdminUser>
  */
 class AdminUserFactory extends Factory
 {
     protected $model = AdminUser::class;
+
     /**
      * Define the model's default state.
      *
@@ -22,7 +22,7 @@ class AdminUserFactory extends Factory
     public function definition(): array
     {
         return [
-           'role_id' => Role::factory(),
+            'role_id' => Role::factory(),
             'full_name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone' => $this->faker->phoneNumber(),

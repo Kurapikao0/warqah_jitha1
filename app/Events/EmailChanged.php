@@ -18,6 +18,5 @@ final class EmailChanged implements ShouldDispatchAfterCommit
         public readonly Customer $customer,
         public readonly string $oldEmail,
         public readonly string $newEmail,
-    ) {
-    }
+    ) {}
 }

@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\VerificationPurpose;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VerificationCode extends Model
 {
+    use HasFactory;
+
     protected $table = 'verification_codes';
 
     public const UPDATED_AT = null;
@@ -37,4 +40,3 @@ class VerificationCode extends Model
         return $this->belongsTo(Customer::class);
     }
 }
-

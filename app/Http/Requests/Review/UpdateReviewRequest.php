@@ -11,7 +11,6 @@ class UpdateReviewRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
@@ -20,12 +19,12 @@ class UpdateReviewRequest extends FormRequest
                 'sometimes',
                 'integer',
                 'min:1',
-                'max:5'
+                'max:5',
             ],
 
             'comment' => [
                 'nullable',
-                'string'
+                'string',
             ],
         ];
     }

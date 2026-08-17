@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Factories;
 
 use App\Contracts\EmailNotificationInterface;
-use App\Notifications\WelcomeNotification;
-use App\Notifications\VerifyEmailOtpNotification;
 use App\Notifications\ResetPasswordNotification;
+use App\Notifications\VerifyEmailOtpNotification;
+use App\Notifications\WelcomeNotification;
 use InvalidArgumentException;
 
 final class NotificationFactory
@@ -22,26 +22,19 @@ final class NotificationFactory
 
         return match ($notificationType) {
 
-            'welcome_email' =>
-                new WelcomeNotification(),
+            'welcome_email' => new WelcomeNotification,
 
+            'verification_otp' => new VerifyEmailOtpNotification(
+                otp: $payload['otp']
+            ),
 
-            'verification_otp' =>
-                new VerifyEmailOtpNotification(
-                    otp: $payload['otp']
-                ),
+            'password_reset' => new ResetPasswordNotification(
+                token: $payload['token']
+            ),
 
-
-            'password_reset' =>
-                new ResetPasswordNotification(
-                    token: $payload['token']
-                ),
-
-
-            default =>
-                throw new InvalidArgumentException(
-                    "Unsupported notification type: {$notificationType}"
-                ),
+            default => throw new InvalidArgumentException(
+                "Unsupported notification type: {$notificationType}"
+            ),
         };
     }
 }

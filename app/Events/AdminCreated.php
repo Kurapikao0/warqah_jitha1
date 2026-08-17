@@ -16,6 +16,5 @@ final class AdminCreated implements ShouldDispatchAfterCommit
 
     public function __construct(
         public readonly AdminUser $adminUser
-    ) {
-    }
+    ) {}
 }

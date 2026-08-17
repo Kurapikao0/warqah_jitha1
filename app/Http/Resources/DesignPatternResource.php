@@ -12,7 +12,7 @@ class DesignPatternResource extends JsonResource
         $imageUrl = $this->preview_image_url;
 
         if ($imageUrl && ! preg_match('/^https?:\/\//i', $imageUrl)) {
-            $imageUrl = asset('storage/' . $imageUrl);
+            $imageUrl = asset('storage/'.$imageUrl);
         }
 
         return [

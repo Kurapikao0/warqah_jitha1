@@ -7,34 +7,33 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductCategoryResource extends JsonResource
 {
-
     public function toArray(Request $request): array
     {
         $imageUrl = $this->image_url;
 
         if ($imageUrl && ! preg_match('/^https?:\/\//i', $imageUrl)) {
-            $imageUrl = asset('storage/' . $imageUrl);
+            $imageUrl = asset('storage/'.$imageUrl);
         }
 
         return [
 
-            'id'=>$this->id,
+            'id' => $this->id,
 
-            'name'=>$this->name,
+            'name' => $this->name,
 
-            'slug'=>$this->slug,
+            'slug' => $this->slug,
 
-            'image_url'=>$imageUrl,
+            'image_url' => $imageUrl,
 
-            'parent_id'=>$this->parent_id,
+            'parent_id' => $this->parent_id,
 
-            'children_count'=>$this->whenCounted(
+            'children_count' => $this->whenCounted(
                 'children'
             ),
 
-            'created_at'=>$this->created_at,
+            'created_at' => $this->created_at,
 
-            'updated_at'=>$this->updated_at,
+            'updated_at' => $this->updated_at,
 
         ];
     }

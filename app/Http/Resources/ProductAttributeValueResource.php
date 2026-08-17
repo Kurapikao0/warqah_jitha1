@@ -11,15 +11,15 @@ class ProductAttributeValueResource extends JsonResource
     {
         return [
 
-            'id'=>$this->id,
+            'id' => $this->id,
 
-            'value'=>$this->value,
+            'value' => $this->value,
 
-            'product'=>new ProductResource(
+            'product' => new ProductResource(
                 $this->whenLoaded('product')
             ),
 
-            'attribute'=>new ProductAttributeResource(
+            'attribute' => new ProductAttributeResource(
                 $this->whenLoaded('attribute')
             ),
 

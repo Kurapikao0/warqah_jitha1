@@ -7,18 +7,14 @@ use App\Http\Resources\AdminNotificationResource;
 use App\Models\AdminNotification;
 use App\Models\AdminUser;
 use App\Services\AdminNotificationService;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AdminNotificationController extends Controller
 {
-
     public function __construct(
         protected AdminNotificationService $service
-    ) {
-    }
-
-
+    ) {}
 
     public function index(
         AdminUser $adminUser
@@ -36,8 +32,6 @@ class AdminNotificationController extends Controller
         );
     }
 
-
-
     public function read(
         AdminNotification $notification
     ): JsonResponse {
@@ -52,16 +46,15 @@ class AdminNotificationController extends Controller
                 $notification
             );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Notification marked as read.',
+            'message' => 'Notification marked as read.',
 
-            'data'=>new AdminNotificationResource(
+            'data' => new AdminNotificationResource(
                 $notification
-            )
+            ),
 
         ]);
     }

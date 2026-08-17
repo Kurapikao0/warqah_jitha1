@@ -24,5 +24,4 @@ interface CustomerRepositoryInterface
     public function verify(Customer $customer): Customer;
 
     public function loadRelations(Customer $customer): Customer;
-    
 }

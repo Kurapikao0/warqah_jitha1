@@ -15,8 +15,8 @@ class AdminProfileController extends Controller
         $user = $request->user();
 
         $parts = explode(' ', (string) $user->full_name, 2);
-        $firstName = $parts[0] ?? '';
-        $lastName = $parts[1] ?? '';
+        $firstName = $parts[0];
+        $lastName = $parts[1];
 
         return response()->json([
             'data' => [
@@ -27,7 +27,7 @@ class AdminProfileController extends Controller
                 'role_name' => $user->role->name ?? '',
                 'avatar_url' => $user->avatar_url ? asset($user->avatar_url) : null,
                 'created_at' => $user->created_at,
-            ]
+            ],
         ]);
     }
 
@@ -38,12 +38,12 @@ class AdminProfileController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:admin_users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:admin_users,email,'.$user->id,
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'avatar_url' => 'nullable|string|url',
         ]);
 
-        $user->full_name = trim($validated['first_name'] . ' ' . $validated['last_name']);
+        $user->full_name = trim($validated['first_name'].' '.$validated['last_name']);
         $user->email = $validated['email'];
 
         if ($request->hasFile('avatar')) {
@@ -60,13 +60,13 @@ class AdminProfileController extends Controller
             $user->avatar_url = $validated['avatar_url'];
         }
 
-        if (!empty($request->new_password)) {
+        if (! empty($request->new_password)) {
             $request->validate([
                 'current_password' => 'required|string',
                 'new_password' => 'required|string|min:8|same:new_password_confirmation',
             ]);
 
-            if (!Hash::check($request->current_password, $user->password_hash)) {
+            if (! Hash::check($request->current_password, $user->password_hash)) {
                 throw ValidationException::withMessages([
                     'current_password' => ['The provided current password does not match our records.'],
                 ]);

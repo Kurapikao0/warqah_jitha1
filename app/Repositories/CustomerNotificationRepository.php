@@ -13,10 +13,9 @@ class CustomerNotificationRepository
             'customer_id',
             $customerId
         )
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
     }
-
 
     public function find(
         int $id,
@@ -27,21 +26,19 @@ class CustomerNotificationRepository
             'customer_id',
             $customerId
         )
-        ->findOrFail($id);
+            ->findOrFail($id);
     }
-
 
     public function markAsRead(
         CustomerNotification $notification
     ): CustomerNotification {
 
         $notification->update([
-            'is_read' => true
+            'is_read' => true,
         ]);
 
         return $notification->refresh();
     }
-
 
     public function delete(
         CustomerNotification $notification

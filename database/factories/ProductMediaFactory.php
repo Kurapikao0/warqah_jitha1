@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class ProductMediaFactory extends Factory
 {
     protected $model = ProductMedia::class;
+
     /**
      * Define the model's default state.
      *

@@ -2,16 +2,11 @@
 
 namespace App\Repositories;
 
-
 use App\Models\ProductCustomizationRequest;
 use App\Repositories\Contracts\CustomizationRepositoryInterface;
 
-
-
 class CustomizationRepository implements CustomizationRepositoryInterface
 {
-
-
     public function getAll()
     {
 
@@ -19,15 +14,12 @@ class CustomizationRepository implements CustomizationRepositoryInterface
             'customer',
             'baseProduct',
             'color',
-            'designPattern'
+            'designPattern',
         ])
-        ->latest()
-        ->paginate(20);
+            ->latest()
+            ->paginate(20);
 
     }
-
-
-
 
     public function findById(int $id)
     {
@@ -36,15 +28,11 @@ class CustomizationRepository implements CustomizationRepositoryInterface
             'customer',
             'baseProduct',
             'color',
-            'designPattern'
+            'designPattern',
         ])
-        ->findOrFail($id);
+            ->findOrFail($id);
 
     }
-
-
-
-
 
     public function create(array $data)
     {
@@ -53,32 +41,20 @@ class CustomizationRepository implements CustomizationRepositoryInterface
 
     }
 
-
-
-
-
     public function update(
         ProductCustomizationRequest $request,
         array $data
-    )
-    {
+    ) {
 
         return $request->update($data);
 
     }
 
-
-
-
-
     public function delete(
         ProductCustomizationRequest $request
-    )
-    {
+    ) {
 
         return $request->delete();
 
     }
-
-
 }

@@ -2,64 +2,36 @@
 
 namespace App\Repositories;
 
-
 use App\Models\Favorite;
 use App\Repositories\Contracts\FavoriteRepositoryInterface;
 
-
-
 class FavoriteRepository implements FavoriteRepositoryInterface
 {
-
-
     /**
      * Toggle Favorite
      */
     public function toggle(
-        $customerId,
-        $productId
-    )
-    {
+        int $customerId,
+        int $productId
+    ): bool {
+        $favorite = Favorite::where([
+            'customer_id' => $customerId,
+            'product_id' => $productId,
+        ])->first();
 
-
-        $favorite =
-            Favorite::where([
-                'customer_id'=>$customerId,
-                'product_id'=>$productId
-            ])
-            ->first();
-
-
-
-        if($favorite)
-        {
-
+        if ($favorite) {
             $favorite->delete();
 
             return false;
-
         }
 
-
-
         Favorite::create([
-
-            'customer_id'=>$customerId,
-
-            'product_id'=>$productId
-
+            'customer_id' => $customerId,
+            'product_id' => $productId,
         ]);
 
-
-
         return true;
-
-
     }
-
-
-
-
 
     /**
      * Get Customer Favorites
@@ -71,43 +43,28 @@ class FavoriteRepository implements FavoriteRepositoryInterface
 
             'product',
             'product.media',
-            'product.category'
+            'product.category',
 
         ])
-        ->where(
-            'customer_id',
-            $customerId
-        )
-        ->latest()
-        ->get();
-
+            ->where(
+                'customer_id',
+                $customerId
+            )
+            ->latest()
+            ->get();
 
     }
-
-
-
-
 
     /**
      * Remove Favorite
      */
     public function remove(
-        $customerId,
-        $productId
-    )
-    {
-
-        return Favorite::where([
-
-            'customer_id'=>$customerId,
-
-            'product_id'=>$productId
-
-        ])
-        ->delete();
-
-
+        int $customerId,
+        int $productId
+    ): bool {
+        return (bool) Favorite::where([
+            'customer_id' => $customerId,
+            'product_id' => $productId,
+        ])->delete();
     }
-
-
 }

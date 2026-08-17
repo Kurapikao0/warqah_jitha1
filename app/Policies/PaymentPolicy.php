@@ -22,8 +22,7 @@ class PaymentPolicy
         Payment $payment
     ): bool {
 
-        return
-            $payment->order->customer_id === $customer->id;
+        return $payment->order->customer_id === $customer->id;
 
     }
 

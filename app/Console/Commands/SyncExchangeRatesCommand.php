@@ -17,7 +17,7 @@ class SyncExchangeRatesCommand extends Command
         try {
             $records = $service->syncFromApi();
 
-            $this->info('Exchange rates synced successfully. Total records: ' . count($records));
+            $this->info('Exchange rates synced successfully. Total records: '.count($records));
 
             return self::SUCCESS;
         } catch (\Throwable $exception) {

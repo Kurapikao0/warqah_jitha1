@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckPermission;
+use Illuminate\Auth\AuthenticationException;        // ← سطر جديد تضيفه هنا
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -10,6 +11,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
@@ -40,6 +42,25 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
 
         /*
+         * Authentication errors
+         *
+         * Keep the existing Laravel auth contract:
+         * HTTP 401 for unauthenticated API requests.
+         */
+        $exceptions->render(function (// ← البلوك الجديد كامل، تحطه هنا
+            AuthenticationException $exception,             //   قبل بلوك ValidationException القديم
+            Request $request
+        ) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        });
+
+        /*
          * Validation errors
          *
          * Keep the existing Laravel validation contract:
@@ -49,7 +70,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ValidationException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -66,7 +87,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ModelNotFoundException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -77,6 +98,22 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         /*
+        * Route / model binding not found
+        */
+        $exceptions->render(function (
+            NotFoundHttpException $exception,
+            Request $request
+        ) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'code' => 'NOT_FOUND',
+                'message' => 'العنصر المطلوب غير موجود.',
+            ], 404);
+        });
+        /*
          * Database errors
          *
          * Technical details are logged internally only.
@@ -86,7 +123,7 @@ return Application::configure(basePath: dirname(__DIR__))
             QueryException $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 
@@ -111,7 +148,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Throwable $exception,
             Request $request
         ) {
-            if (!$request->expectsJson()) {
+            if (! $request->expectsJson()) {
                 return null;
             }
 

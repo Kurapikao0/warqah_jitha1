@@ -15,8 +15,7 @@ class VerificationController extends Controller
 {
     public function __construct(
         protected VerificationCodeService $verificationCodeService
-    ) {
-    }
+    ) {}
 
     /**
      * Generate verification code/token.
@@ -42,11 +41,17 @@ class VerificationController extends Controller
             ], 404);
         }
 
-        $verification = $this->verificationCodeService->generateCode($customer);
+        $purpose = VerificationPurpose::from($request->purpose);
+
+        $verification = $this->verificationCodeService->generate(
+            $customer,
+            $purpose,
+            $request->contact_value
+        );
 
         return response()->json([
             'message' => 'Verification generated successfully.',
-            'data'    => new VerificationCodeResource($verification),
+            'data' => new VerificationCodeResource($verification),
         ], 201);
     }
 

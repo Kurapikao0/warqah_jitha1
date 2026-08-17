@@ -2,16 +2,15 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
 use App\Models\OrderProductionStage;
 use App\Repositories\Contracts\OrderProductionStageRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class OrderProductionStageService
 {
     public function __construct(
         protected OrderProductionStageRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function all()
     {

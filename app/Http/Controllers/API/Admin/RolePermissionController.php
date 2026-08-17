@@ -14,36 +14,28 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RolePermissionController extends Controller
 {
-
     public function __construct(
         protected RolePermissionService $service
-    ) {
-    }
-
+    ) {}
 
     public function index(
         Role $role
     ): AnonymousResourceCollection {
-
 
         $this->authorize(
             'view',
             $role
         );
 
-
         return RolePermissionResource::collection(
             $this->service->list($role)
         );
     }
 
-
-
     public function store(
         StoreRolePermissionRequest $request,
         Role $role
     ): JsonResponse {
-
 
         $this->authorize(
             'update',
@@ -55,6 +47,11 @@ class RolePermissionController extends Controller
                 $role,
                 (array) $request->input('permission_ids', [])
             );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions updated successfully.',
+            ], Response::HTTP_OK);
         } else {
             $permission = Permission::findOrFail(
                 $request->permission_id
@@ -68,35 +65,30 @@ class RolePermissionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Permissions updated successfully.',
-        ], Response::HTTP_OK);
+            'message' => 'Permission assigned successfully.',
+        ], Response::HTTP_CREATED);
     }
-
-
 
     public function destroy(
         Role $role,
         Permission $permission
     ): JsonResponse {
 
-
         $this->authorize(
             'update',
             $role
         );
-
 
         $this->service->detach(
             $role,
             $permission
         );
 
-
         return response()->json([
 
-            'success'=>true,
+            'success' => true,
 
-            'message'=>'Permission removed successfully.',
+            'message' => 'Permission removed successfully.',
 
         ]);
     }

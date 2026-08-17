@@ -10,9 +10,7 @@ class PasswordResetRequested
 {
     use Dispatchable, SerializesModels;
 
-
     public function __construct(
         public Customer $customer
-    ) {
-    }
+    ) {}
 }

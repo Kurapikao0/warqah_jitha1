@@ -2,77 +2,56 @@
 
 namespace App\Http\Resources;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-
-
 class ProductCustomizationResource extends JsonResource
 {
+    public function toArray(Request $request): array
+    {
 
+        return [
 
-public function toArray(Request $request): array
-{
+            'id' => $this->id,
 
+            'request_code' => $this->request_code,
 
-return [
+            'product' => [
+                'id' => $this->baseProduct?->id,
+                'name' => $this->baseProduct?->name,
+            ],
 
-'id'=>$this->id,
+            'color' => $this->color?->name,
 
+            'design_pattern' => $this->designPattern?->name,
 
-'request_code'=>$this->request_code,
+            'quantity' => $this->quantity,
 
+            'dimensions' => [
 
-'product'=>[
-'id'=>$this->baseProduct?->id,
-'name'=>$this->baseProduct?->name
-],
+                'length' => $this->length_cm,
 
+                'width' => $this->width_cm,
 
-'color'=>$this->color?->name,
+                'height' => $this->height_cm,
 
+            ],
 
-'design_pattern'=>
-$this->designPattern?->name,
+            'price' => [
 
+                'base' => $this->base_price,
 
-'quantity'=>$this->quantity,
+                'customization' => $this->customization_fee,
 
+                'total' => $this->total_price,
 
-'dimensions'=>[
+            ],
 
-'length'=>$this->length_cm,
+            'status' => $this->status,
 
-'width'=>$this->width_cm,
+            'created_at' => $this->created_at,
 
-'height'=>$this->height_cm
+        ];
 
-],
-
-
-
-'price'=>[
-
-'base'=>$this->base_price,
-
-'customization'=>$this->customization_fee,
-
-'total'=>$this->total_price
-
-],
-
-
-'status'=>$this->status,
-
-
-'created_at'=>$this->created_at
-
-
-];
-
-
-}
-
-
+    }
 }

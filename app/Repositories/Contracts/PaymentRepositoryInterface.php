@@ -2,25 +2,17 @@
 
 namespace App\Repositories\Contracts;
 
-
 use App\Models\Payment;
-
 
 interface PaymentRepositoryInterface
 {
-
-
     public function getAll();
-
 
     public function getCustomerPayments($customerId);
 
-
     public function findById($id);
 
-
     public function create(array $data);
-
 
     public function update(
         Payment $payment,
@@ -28,8 +20,7 @@ interface PaymentRepositoryInterface
     );
 
     public function findCustomerPayment(
-    int $customerId,
-    int $paymentId
+        int $customerId,
+        int $paymentId
     );
-
 }

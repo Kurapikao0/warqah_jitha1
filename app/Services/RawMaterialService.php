@@ -10,27 +10,22 @@ class RawMaterialService
 {
     public function __construct(
         protected RawMaterialRepository $repository
-    ) {
-    }
-
+    ) {}
 
     public function getAll(): Collection
     {
         return $this->repository->all();
     }
 
-
     public function getById(int $id): RawMaterial
     {
         return $this->repository->find($id);
     }
 
-
     public function create(array $data): RawMaterial
     {
         return $this->repository->create($data);
     }
-
 
     public function update(
         RawMaterial $rawMaterial,
@@ -42,7 +37,6 @@ class RawMaterialService
             $data
         );
     }
-
 
     public function delete(RawMaterial $rawMaterial): bool
     {

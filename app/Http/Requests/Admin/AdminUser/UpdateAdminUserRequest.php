@@ -13,7 +13,6 @@ class UpdateAdminUserRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         $adminUser = $this->route('adminUser') ?? $this->route('admin_user');
@@ -25,13 +24,11 @@ class UpdateAdminUserRequest extends FormRequest
                 'exists:roles,id',
             ],
 
-
             'full_name' => [
                 'sometimes',
                 'string',
                 'max:255',
             ],
-
 
             'email' => [
                 'sometimes',
@@ -44,12 +41,11 @@ class UpdateAdminUserRequest extends FormRequest
                 ),
             ],
 
-
             'phone' => [
                 'nullable',
                 'string',
                 'max:20',
-                new YemenPhoneRule(),
+                new YemenPhoneRule,
                 Rule::unique(
                     'admin_users',
                     'phone'
@@ -58,12 +54,10 @@ class UpdateAdminUserRequest extends FormRequest
                 ),
             ],
 
-
             'avatar_url' => [
                 'nullable',
                 'string',
             ],
-
 
             'password' => [
                 'nullable',

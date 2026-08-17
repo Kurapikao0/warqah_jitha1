@@ -19,4 +19,3 @@ interface EmailLogRepositoryInterface
 
     public function findByIdWithOwner(int $id): ?EmailLog;
 }
-

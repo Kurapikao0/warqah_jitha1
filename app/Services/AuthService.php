@@ -19,8 +19,7 @@ final class AuthService
 {
     public function __construct(
         protected AuthRepositoryInterface $authRepository,
-    ) {
-    }
+    ) {}
 
     /**
      * Register a new customer.
@@ -94,7 +93,7 @@ final class AuthService
          */
         if (
             $customer &&
-            !empty($credentials['phone_country_code']) &&
+            ! empty($credentials['phone_country_code']) &&
             $customer->phone_country_code !==
             $credentials['phone_country_code']
         ) {
@@ -105,8 +104,8 @@ final class AuthService
          * Verify customer credentials.
          */
         if (
-            !$customer ||
-            !Hash::check(
+            ! $customer ||
+            ! Hash::check(
                 $credentials['password'],
                 $customer->password_hash
             )
@@ -149,8 +148,8 @@ final class AuthService
         );
 
         if (
-            !$admin ||
-            !Hash::check(
+            ! $admin ||
+            ! Hash::check(
                 $credentials['password'],
                 $admin->password_hash
             )

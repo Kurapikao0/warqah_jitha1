@@ -3,14 +3,16 @@
 namespace Database\Factories;
 
 use App\Models\AdminPasswordReset;
-use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\AdminUser;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
 /**
  * @extends Factory<AdminPasswordReset>
  */
 class AdminPasswordResetFactory extends Factory
 {
     protected $model = AdminPasswordReset::class;
+
     /**
      * Define the model's default state.
      *

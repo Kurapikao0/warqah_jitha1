@@ -2,92 +2,61 @@
 
 namespace App\Http\Controllers\API\Customer;
 
-
-use App\Models\ProductCustomizationRequest;
 use App\Http\Controllers\Controller;
-use App\Services\CustomizationService;
-use App\Http\Resources\ProductCustomizationResource;
 use App\Http\Requests\Customization\StoreCustomizationRequest;
-
-
+use App\Http\Resources\ProductCustomizationResource;
+use App\Models\ProductCustomizationRequest;
+use App\Services\CustomizationService;
 
 class ProductCustomizationController extends Controller
 {
+    public function __construct(
+        protected CustomizationService $service
+    ) {}
 
+    public function index()
+    {
 
-public function __construct(
-protected CustomizationService $service
-)
-{}
+        $customerId =
+        auth()->id();
 
+        return ProductCustomizationResource::collection(
 
+            ProductCustomizationRequest::where(
+                'customer_id',
+                $customerId
+            )
+                ->paginate()
 
+        );
 
-public function index()
-{
+    }
 
+    public function store(
+        StoreCustomizationRequest $request
+    ) {
 
-$customerId =
-auth()->id();
+        $data = $request->validated();
 
+        $data['customer_id'] = auth()->id();
 
+        $customization =
+        $this->service->create($data);
 
-return ProductCustomizationResource::collection(
+        return new ProductCustomizationResource(
+            $customization
+        );
 
-ProductCustomizationRequest::where(
-'customer_id',
-$customerId
-)
-->paginate()
+    }
 
-);
+    public function show($id)
+    {
+        $customization = $this->service->find($id);
 
+        $this->authorize('view', $customization);
 
-}
-
-
-
-
-
-public function store(
-StoreCustomizationRequest $request
-)
-{
-
-
-$data=$request->validated();
-
-
-$data['customer_id']=auth()->id();
-
-
-$customization=
-$this->service->create($data);
-
-
-
-return new ProductCustomizationResource(
-$customization
-);
-
-
-}
-
-
-
-
-
-public function show($id)
-{
-    $customization = $this->service->find($id);
-
-    $this->authorize('view', $customization);
-
-    return new ProductCustomizationResource(
-        $customization
-    );
-}
-
-
-
+        return new ProductCustomizationResource(
+            $customization
+        );
+    }
 }

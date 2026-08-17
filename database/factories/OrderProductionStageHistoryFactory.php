@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class OrderProductionStageHistoryFactory extends Factory
 {
     protected $model = OrderProductionStageHistory::class;
+
     /**
      * Define the model's default state.
      *

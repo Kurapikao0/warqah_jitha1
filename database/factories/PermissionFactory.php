@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class PermissionFactory extends Factory
 {
     protected $model = Permission::class;
+
     /**
      * Define the model's default state.
      *
@@ -19,7 +20,7 @@ class PermissionFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->unique()->word() . '.' . $this->faker->word(),
+            'name' => $this->faker->unique()->word().'.'.$this->faker->word(),
             'module' => $this->faker->randomElement(['products', 'orders', 'users', 'settings', 'inventory']),
             'created_at' => now(),
         ];

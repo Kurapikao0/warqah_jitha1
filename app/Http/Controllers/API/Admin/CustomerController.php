@@ -14,8 +14,7 @@ class CustomerController extends Controller
 {
     public function __construct(
         protected CustomerService $customerService
-    ) {
-    }
+    ) {}
 
     /**
      * Display customers list
@@ -30,7 +29,7 @@ class CustomerController extends Controller
             'verified' => $request->verified,
             'sort_by' => $request->sort_by,
             'sort_direction' => $request->sort_direction,
-            'per_page' => $request->per_page ?? 15
+            'per_page' => $request->per_page ?? 15,
         ];
 
         $customers = $this->customerService->getCustomers($filters);
@@ -39,7 +38,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customers fetched successfully',
             'data' => CustomerResource::collection($customers),
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
@@ -50,18 +49,17 @@ class CustomerController extends Controller
     {
         $this->authorize('create', Customer::class);
 
+        $validated = $request->validated();
 
-            $validated = $request->validated();
+        // ✅ Service سيتعامل مع تشفير password إلى password_hash
+        $customer = $this->customerService->createCustomer($validated);
 
-            // ✅ Service سيتعامل مع تشفير password إلى password_hash
-            $customer = $this->customerService->createCustomer($validated);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer created successfully',
-                'data' => new CustomerResource($customer),
-                'errors' => null
-            ], 201);
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer created successfully',
+            'data' => new CustomerResource($customer),
+            'errors' => null,
+        ], 201);
     }
 
     /**
@@ -75,7 +73,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer details',
             'data' => new CustomerResource($customer),
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
@@ -86,17 +84,17 @@ class CustomerController extends Controller
     {
         $this->authorize('update', $customer);
 
-            $validated = $request->validated();
+        $validated = $request->validated();
 
-            // ✅ Service سيتعامل مع تشفير password إلى password_hash
-            $customer = $this->customerService->updateCustomer($customer, $validated);
+        // ✅ Service سيتعامل مع تشفير password إلى password_hash
+        $customer = $this->customerService->updateCustomer($customer, $validated);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Customer updated successfully',
-                'data' => new CustomerResource($customer),
-                'errors' => null
-            ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Customer updated successfully',
+            'data' => new CustomerResource($customer),
+            'errors' => null,
+        ]);
     }
 
     /**
@@ -112,7 +110,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer deleted successfully',
             'data' => null,
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
@@ -129,7 +127,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer restored successfully',
             'data' => null,
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
@@ -146,7 +144,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer status updated',
             'data' => new CustomerResource($customer),
-            'errors' => null
+            'errors' => null,
         ]);
     }
 
@@ -163,7 +161,7 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer verified successfully',
             'data' => new CustomerResource($customer),
-            'errors' => null
+            'errors' => null,
         ]);
     }
 }

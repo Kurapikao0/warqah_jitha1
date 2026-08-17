@@ -9,8 +9,8 @@ interface OrderProductionRepositoryInterface
     public function history(Order $order);
 
     public function updateOrderStage(
-    Order $order,
-    int $stageId
+        Order $order,
+        int $stageId
     );
 
     public function createHistory(

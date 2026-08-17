@@ -1,29 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\API\Admin\ActivityLogController;
 /*
 |--------------------------------------------------------------------------
 | Authentication Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\API\Auth\AdminAuthController;
-use App\Http\Controllers\API\Auth\CustomerAuthController;
-
+use App\Http\Controllers\API\Admin\AdminNotificationController;
+use App\Http\Controllers\API\Admin\AdminPasswordResetController;
 /*
 |--------------------------------------------------------------------------
 | Admin Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\API\Admin\ActivityLogController;
-use App\Http\Controllers\API\Admin\AdminNotificationController;
-use App\Http\Controllers\API\Admin\AdminPasswordResetController;
+use App\Http\Controllers\API\Admin\AdminProfileController;
 use App\Http\Controllers\API\Admin\AdminUserController;
 use App\Http\Controllers\API\Admin\ColorController;
 use App\Http\Controllers\API\Admin\CustomerController;
 use App\Http\Controllers\API\Admin\DesignPatternController;
+use App\Http\Controllers\API\Admin\ExchangeRateController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
 use App\Http\Controllers\API\Admin\OrderProductionController;
 use App\Http\Controllers\API\Admin\OrderProductionStageController;
@@ -41,26 +38,29 @@ use App\Http\Controllers\API\Admin\RawMaterialController;
 use App\Http\Controllers\API\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\API\Admin\RoleController;
 use App\Http\Controllers\API\Admin\RolePermissionController;
-
+use App\Http\Controllers\API\Admin\SystemSettingController;
 /*
 |--------------------------------------------------------------------------
 | Customer Controllers
 |--------------------------------------------------------------------------
 */
 
-use App\Http\Controllers\API\Customer\PasswordResetController;
+use App\Http\Controllers\API\Auth\AdminAuthController;
+use App\Http\Controllers\API\Auth\CustomerAuthController;
 use App\Http\Controllers\API\Customer\AddressController;
 use App\Http\Controllers\API\Customer\CartController;
 use App\Http\Controllers\API\Customer\CartItemController;
 use App\Http\Controllers\API\Customer\CustomerNotificationController;
 use App\Http\Controllers\API\Customer\FavoriteController;
 use App\Http\Controllers\API\Customer\OrderController as CustomerOrder;
+use App\Http\Controllers\API\Customer\PasswordResetController;
 use App\Http\Controllers\API\Customer\PaymentController as CustomerPayment;
 use App\Http\Controllers\API\Customer\ProductCustomizationController as CustomerCustomization;
 use App\Http\Controllers\API\Customer\ProfileController;
 use App\Http\Controllers\API\Customer\ReviewController;
 use App\Http\Controllers\API\Customer\ReviewImageController;
 use App\Http\Controllers\API\Customer\VerificationController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/test-admin-auth', function () {
     return response()->json([
@@ -80,14 +80,6 @@ Route::get('/test-admin-auth', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/test', function (): \Illuminate\Http\JsonResponse {
-    return response()->json([
-        'status' => true,
-        'message' => 'API is working',
-    ]);
-});
-
-
 /*
 |--------------------------------------------------------------------------
 | Customer Authentication - Canonical Routes
@@ -102,7 +94,7 @@ Route::prefix('customer')->group(function (): void {
     Route::post(
         'register',
         [CustomerAuthController::class, 'register']
-    );
+    )->middleware('throttle:5,1');
 
     Route::post(
         'login',
@@ -117,9 +109,8 @@ Route::prefix('customer')->group(function (): void {
     Route::post(
         'password/reset',
         [PasswordResetController::class, 'resetPassword']
-    );
+    )->middleware('throttle:5,1');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -133,13 +124,12 @@ Route::prefix('customer')->group(function (): void {
 Route::post(
     'register',
     [CustomerAuthController::class, 'register']
-);
+)->middleware('throttle:5,1');
 
 Route::post(
     'login',
     [CustomerAuthController::class, 'login']
 )->middleware('throttle:5,1');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +154,6 @@ Route::prefix('admin/auth')->group(function (): void {
     )->middleware('auth:admin');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Customer Verification - Public
@@ -184,7 +173,6 @@ Route::post(
     'customer/verifications/verify',
     [VerificationController::class, 'verify']
 );
-
 
 /*
 |--------------------------------------------------------------------------
@@ -208,12 +196,12 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
 
-        Route::get('profile', [\App\Http\Controllers\API\Admin\AdminProfileController::class, 'show']);
-        Route::put('profile', [\App\Http\Controllers\API\Admin\AdminProfileController::class, 'update']);
+        Route::get('profile', [AdminProfileController::class, 'show']);
+        Route::put('profile', [AdminProfileController::class, 'update']);
 
-        Route::get('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'show']);
-        Route::put('settings', [\App\Http\Controllers\API\Admin\SystemSettingController::class, 'update']);
-        Route::get('exchange-rates', [\App\Http\Controllers\API\Admin\ExchangeRateController::class, 'index']);
+        Route::get('settings', [SystemSettingController::class, 'show']);
+        Route::put('settings', [SystemSettingController::class, 'update']);
+        Route::get('exchange-rates', [ExchangeRateController::class, 'index']);
 
         /*
         |--------------------------------------------------------------------------
@@ -254,7 +242,6 @@ Route::prefix('admin')
             PermissionController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Admin Users
@@ -281,7 +268,6 @@ Route::prefix('admin')
             [AdminNotificationController::class, 'index']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Admin Notifications
@@ -292,7 +278,6 @@ Route::prefix('admin')
             'notifications/{notification}/read',
             [AdminNotificationController::class, 'read']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -323,7 +308,6 @@ Route::prefix('admin')
             [CustomerController::class, 'verify']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Products
@@ -336,14 +320,9 @@ Route::prefix('admin')
         );
 
         Route::apiResource(
-            'categories',
-            ProductCategoryController::class
-        );
-
-        Route::apiResource(
             'product-categories',
             ProductCategoryController::class
-        );
+        )->parameters(['product-categories' => 'category']);
 
         // Specialized Product Media routes — must be declared BEFORE apiResource
         // so 'upload' and 'reorder' static segments take priority over {productMedia}.
@@ -377,7 +356,6 @@ Route::prefix('admin')
             ProductAttributeValueController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Product Customizations
@@ -399,7 +377,6 @@ Route::prefix('admin')
             [AdminCustomization::class, 'updateStatus']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Raw Materials
@@ -411,7 +388,6 @@ Route::prefix('admin')
             RawMaterialController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Colors
@@ -422,7 +398,6 @@ Route::prefix('admin')
             'colors',
             ColorController::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -440,7 +415,6 @@ Route::prefix('admin')
             DesignPatternController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Production Stages
@@ -452,7 +426,6 @@ Route::prefix('admin')
             OrderProductionStageController::class
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Orders
@@ -462,7 +435,7 @@ Route::prefix('admin')
         Route::apiResource(
             'orders',
             AdminOrder::class
-        );
+        )->names('admin.orders');
 
         Route::put(
             'orders/{order}/status',
@@ -494,7 +467,6 @@ Route::prefix('admin')
             [OrderStatusHistoryController::class, 'index']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Payments
@@ -515,7 +487,6 @@ Route::prefix('admin')
             'payments/{payment}/status',
             [AdminPayment::class, 'updateStatus']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -545,7 +516,6 @@ Route::prefix('admin')
             [AdminReviewController::class, 'destroy']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Activity Logs
@@ -560,7 +530,6 @@ Route::prefix('admin')
             'show',
         ]);
     });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -586,7 +555,6 @@ Route::prefix('customer')
             [CustomerAuthController::class, 'logout']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Product Customizations
@@ -597,7 +565,6 @@ Route::prefix('customer')
             'customizations',
             CustomerCustomization::class
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -611,8 +578,7 @@ Route::prefix('customer')
         )->except([
             'update',
             'destroy',
-        ]);
-
+        ])->names('customer.orders');
 
         /*
         |--------------------------------------------------------------------------
@@ -640,7 +606,6 @@ Route::prefix('customer')
             [CartItemController::class, 'destroy']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Favorites
@@ -657,23 +622,21 @@ Route::prefix('customer')
             [FavoriteController::class, 'toggle']
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Addresses
         |--------------------------------------------------------------------------
         */
+        Route::match([
+            'put', 'patch'],
+            'addresses/{address}/default',
+            [AddressController::class, 'setDefault']
+        );
 
         Route::apiResource(
             'addresses',
             AddressController::class
         );
-
-        Route::put(
-            'addresses/{address}/default',
-            [AddressController::class, 'setDefault']
-        );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -690,7 +653,6 @@ Route::prefix('customer')
             'verifications/verify',
             [VerificationController::class, 'verify']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -712,7 +674,6 @@ Route::prefix('customer')
             'review-images/{reviewImage}',
             [ReviewImageController::class, 'destroy']
         );
-
 
         /*
         |--------------------------------------------------------------------------
@@ -740,7 +701,6 @@ Route::prefix('customer')
             [CustomerNotificationController::class, 'destroy']
         )->name('notifications.destroy');
 
-
         /*
         |--------------------------------------------------------------------------
         | Payments
@@ -755,7 +715,6 @@ Route::prefix('customer')
             'store',
             'show',
         ]);
-
 
         /*
         |--------------------------------------------------------------------------

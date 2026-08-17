@@ -32,7 +32,7 @@ class UpdateDesignPatternRequest extends FormRequest
         return [
 
             'name' => [
-                'sometimes',
+                'required',
                 'string',
                 Rule::unique('design_patterns', 'name')
                     ->ignore($this->route('design_pattern')),
@@ -40,7 +40,7 @@ class UpdateDesignPatternRequest extends FormRequest
 
             'description' => [
                 'nullable',
-                'string'
+                'string',
             ],
 
             'image' => [

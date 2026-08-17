@@ -16,16 +16,16 @@ class UploadProductMediaRequest extends FormRequest
         return [
             'product_id' => [
                 'required',
-                'exists:products,id'
+                'exists:products,id',
             ],
             'media' => [
                 'required',
-                'array'
+                'array',
             ],
             'media.*' => [
                 'file',
                 'mimes:jpg,jpeg,png,webp,gif,mp4,mov,avi',
-                'max:20480' // Max 20MB
+                'max:20480', // Max 20MB
             ],
         ];
     }

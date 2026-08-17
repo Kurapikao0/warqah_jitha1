@@ -2,22 +2,21 @@
 
 namespace App\Services;
 
+use App\Events\EmailChanged;
+use App\Events\PasswordChanged;
 use App\Models\Customer;
 use App\Repositories\Contracts\CustomerRepositoryInterface;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use App\Events\EmailChanged;
-use App\Events\PasswordChanged;
 use Throwable;
 
 class CustomerService
 {
     public function __construct(
         protected CustomerRepositoryInterface $customerRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Create Customer
@@ -98,50 +97,47 @@ class CustomerService
     }
 
     /**
- * Update Customer Profile
- */
+     * Update Customer Profile
+     */
     public function updateProfile(
-    Customer $customer,
-    array $data
-): Customer {
-    return DB::transaction(function () use ($customer, $data) {
-        $oldEmail = $customer->email;
+        Customer $customer,
+        array $data
+    ): Customer {
+        return DB::transaction(function () use ($customer, $data) {
+            $oldEmail = $customer->email;
 
-        if (isset($data['password'])) {
-            $data['password_hash'] = Hash::make($data['password']);
-            unset($data['password']);
-        }
+            if (isset($data['password'])) {
+                $data['password_hash'] = Hash::make($data['password']);
+                unset($data['password']);
+            }
 
-        $emailChanged = isset($data['email'])
-            && $data['email'] !== $oldEmail;
+            $emailChanged = isset($data['email'])
+                && $data['email'] !== $oldEmail;
 
-        if ($emailChanged) {
-            $data['email_verified_at'] = null;
-        }
+            if ($emailChanged) {
+                $data['email_verified_at'] = null;
+            }
 
-        $updatedCustomer = $this->customerRepository->update(
-            $customer,
-            $data
-        );
-
-        if ($emailChanged) {
-            EmailChanged::dispatch(
-                customer: $updatedCustomer,
-                oldEmail: $oldEmail,
-                newEmail: $updatedCustomer->email,
+            $updatedCustomer = $this->customerRepository->update(
+                $customer,
+                $data
             );
-        }
 
-        return $updatedCustomer;
-    });
-}
+            if ($emailChanged) {
+                EmailChanged::dispatch(
+                    customer: $updatedCustomer,
+                    oldEmail: $oldEmail,
+                    newEmail: $updatedCustomer->email,
+                );
+            }
+
+            return $updatedCustomer;
+        });
+    }
 
     /**
      * Update Avatar (Deletes old image & stores new one)
      *
-     * @param Customer $customer
-     * @param UploadedFile $file
-     * @return Customer
      * @throws Throwable
      */
     public function updateAvatar(
@@ -165,31 +161,30 @@ class CustomerService
 
             // 3. تحديث بيانات العميل عبر الـ Repository
             return $this->customerRepository->update($customer, [
-                'avatar_url' => $newAvatarUrl
+                'avatar_url' => $newAvatarUrl,
             ]);
         });
     }
 
     /**
- * Change Password
- */
-public function changePassword(
-    Customer $customer,
-    string $password
-): Customer {
-    return DB::transaction(function () use ($customer, $password) {
-        $customer->update([
-            'password_hash' => Hash::make($password),
-        ]);
+     * Change Password
+     */
+    public function changePassword(
+        Customer $customer,
+        string $password
+    ): Customer {
+        return DB::transaction(function () use ($customer, $password) {
+            $customer->update([
+                'password_hash' => Hash::make($password),
+            ]);
 
-        $customer = $customer->fresh();
+            $customer = $customer->fresh();
 
-        PasswordChanged::dispatch($customer);
+            PasswordChanged::dispatch($customer);
 
-        return $customer;
-    });
-}
-
+            return $customer;
+        });
+    }
 
     /**
      * Get Customer Details

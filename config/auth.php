@@ -10,7 +10,6 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'customers'),
     ],
 
-
     'guards' => [
 
         'customer' => [
@@ -30,7 +29,6 @@ return [
 
     ],
 
-
     'providers' => [
 
         'customers' => [
@@ -44,7 +42,6 @@ return [
         ],
 
     ],
-
 
     'passwords' => [
 
@@ -63,7 +60,6 @@ return [
         ],
 
     ],
-
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 

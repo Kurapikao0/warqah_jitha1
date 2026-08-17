@@ -2,27 +2,16 @@
 
 namespace App\Http\Controllers\API\Admin;
 
-
-use App\Models\Order;
 use App\Http\Controllers\Controller;
-use App\Services\OrderService;
 use App\Http\Resources\OrderResource;
-
-
+use App\Models\Order;
+use App\Services\OrderService;
 
 class OrderController extends Controller
 {
-
-
     public function __construct(
         protected OrderService $service
-    )
-    {
-
-    }
-
-
-
+    ) {}
 
     /**
      * Display all orders
@@ -38,9 +27,6 @@ class OrderController extends Controller
 
     }
 
-
-
-
     /**
      * Display order details
      */
@@ -55,26 +41,22 @@ class OrderController extends Controller
 
     }
 
-
-
-
     /**
      * Delete order
      */
     public function destroy(Order $order)
     {
         $this->service->delete($order);
+
         return response()->json([
-            'message'=>'Order deleted successfully'
+            'message' => 'Order deleted successfully',
         ]);
     }
 
     public function statistics()
-{
-    return response()->json(
-        $this->service->statistics()
-    );
-}
-
-
+    {
+        return response()->json(
+            $this->service->statistics()
+        );
+    }
 }

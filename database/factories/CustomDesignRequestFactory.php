@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Customer;
 use App\Models\CustomDesignRequest;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CustomDesignRequestFactory extends Factory
 {
     protected $model = CustomDesignRequest::class;
+
     /**
      * Define the model's default state.
      *

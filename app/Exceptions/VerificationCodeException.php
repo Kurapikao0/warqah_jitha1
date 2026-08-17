@@ -1,1 +1,10 @@
-php artisan route:list --path=api
+<?php
+
+namespace App\Exceptions;
+
+use Exception;
+
+class VerificationCodeException extends Exception
+{
+    //
+}

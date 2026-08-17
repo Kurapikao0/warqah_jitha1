@@ -1,9 +1,12 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Repositories\Contracts;
 
-use App\Models\Customer;
 use App\Models\AdminUser;
+use App\Models\Customer;
+
 interface AuthRepositoryInterface
 {
     /**
@@ -24,5 +27,4 @@ interface AuthRepositoryInterface
     public function update(Customer $customer, array $data): Customer;
 
     public function findAdminByEmail(string $email): ?AdminUser;
-
 }

@@ -43,7 +43,7 @@ class ResetPasswordRequest extends FormRequest
             'password.min' => 'يجب أن تكون كلمة المرور 8 أحرف على الأقل.',
 
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق.',
-            
+
             'email.required' => 'البريد الإلكتروني مطلوب.',
 
             'email.email' => 'صيغة البريد الإلكتروني غير صحيحة.',

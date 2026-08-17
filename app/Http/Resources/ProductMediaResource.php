@@ -28,7 +28,7 @@ class ProductMediaResource extends JsonResource
 
             'product' => $this->when(
                 $this->relationLoaded('product'),
-                fn() => new ProductResource($this->product)
+                fn () => new ProductResource($this->product)
             ),
 
             'created_at' => $this->created_at,

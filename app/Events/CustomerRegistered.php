@@ -13,9 +13,7 @@ final class CustomerRegistered
     use Dispatchable;
     use SerializesModels;
 
-
     public function __construct(
         public readonly Customer $customer
-    ) {
-    }
+    ) {}
 }

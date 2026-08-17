@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\CustomerNotification;
 use App\Models\Customer;
+use App\Models\CustomerNotification;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class CustomerNotificationFactory extends Factory
 {
     protected $model = CustomerNotification::class;
+
     /**
      * Define the model's default state.
      *
@@ -20,7 +21,7 @@ class CustomerNotificationFactory extends Factory
     public function definition(): array
     {
         return [
-           'customer_id' => Customer::factory(),
+            'customer_id' => Customer::factory(),
             'type' => $this->faker->randomElement(['order_update', 'promotion', 'system']),
             'title' => $this->faker->sentence(),
             'body' => $this->faker->paragraph(),

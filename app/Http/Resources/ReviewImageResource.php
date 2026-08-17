@@ -16,7 +16,7 @@ class ReviewImageResource extends JsonResource
             'review_id' => $this->review_id,
 
             'image_url' => asset(
-                'storage/' . $this->image_url
+                'storage/'.$this->image_url
             ),
 
             'created_at' => $this->created_at,

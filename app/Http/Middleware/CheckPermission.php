@@ -17,7 +17,7 @@ class CheckPermission
     ): Response {
         $admin = $request->user('admin');
 
-        if (!$admin) {
+        if (! $admin) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated.',
@@ -31,7 +31,7 @@ class CheckPermission
             })
             ->exists();
 
-        if (!$hasPermission) {
+        if (! $hasPermission) {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden.',

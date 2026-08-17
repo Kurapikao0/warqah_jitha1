@@ -17,6 +17,7 @@ class UpdateRoleRequest extends FormRequest
     public function authorize(): bool
     {
 
+        $role = $this->route('role');
 
         return $this->user('admin')?->can('update', $role) ?? false;
     }
@@ -38,7 +39,7 @@ class UpdateRoleRequest extends FormRequest
                 'max:100',
                 //  Rule::unique('roles', 'name'),
                 Rule::unique('roles', 'name')
-                    ->ignore($this->role->id), // هذا تعديلي 
+                    ->ignore($this->role->id), // هذا تعديلي
 
             ],
 

@@ -2,41 +2,27 @@
 
 namespace App\Http\Resources;
 
-
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-
-
 class OrderStatusHistoryResource extends JsonResource
 {
+    public function toArray(Request $request): array
+    {
 
+        return [
 
-public function toArray(Request $request): array
-{
+            'id' => $this->id,
 
-return [
+            'status' => $this->status,
 
-'id'=>$this->id,
+            'note' => $this->note,
 
+            'changed_by' => $this->changedBy?->full_name,
 
-'status'=>$this->status,
+            'created_at' => $this->created_at,
 
+        ];
 
-'note'=>$this->note,
-
-
-'changed_by' =>
-$this->changedBy?->full_name,
-
-
-'created_at'=>$this->created_at
-
-
-];
-
-
-}
-
-
+    }
 }

@@ -12,12 +12,11 @@ class ReviewRepository
         return Review::with([
             'customer',
             'product',
-            'orderItem'
+            'orderItem',
         ])
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
     }
-
 
     public function find(int $id): Review
     {
@@ -25,17 +24,15 @@ class ReviewRepository
             'customer',
             'product',
             'orderItem',
-            'images'
+            'images',
         ])
-        ->findOrFail($id);
+            ->findOrFail($id);
     }
-
 
     public function create(array $data): Review
     {
         return Review::create($data);
     }
-
 
     public function update(
         Review $review,
@@ -46,7 +43,6 @@ class ReviewRepository
 
         return $review->refresh();
     }
-
 
     public function delete(
         Review $review

@@ -2,19 +2,18 @@
 
 namespace App\Services;
 
+use App\Enums\ProductMediaType;
+use App\Models\ProductMedia;
+use App\Repositories\Contracts\ProductMediaRepositoryInterface;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
-use App\Models\ProductMedia;
-use App\Enums\ProductMediaType;
-use App\Repositories\Contracts\ProductMediaRepositoryInterface;
 
 class ProductMediaService
 {
     public function __construct(
         protected ProductMediaRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function all()
     {
@@ -30,13 +29,13 @@ class ProductMediaService
     {
         return DB::transaction(function () use ($data) {
 
-            if (!empty($data['is_primary'])) {
+            if (! empty($data['is_primary'])) {
 
                 ProductMedia::where(
                     'product_id',
                     $data['product_id']
                 )->update([
-                    'is_primary' => false
+                    'is_primary' => false,
                 ]);
 
             }
@@ -54,7 +53,7 @@ class ProductMediaService
             $hasPrimary = ProductMedia::where('product_id', $productId)->where('is_primary', true)->exists();
 
             foreach ($files as $file) {
-                if (!$file instanceof UploadedFile) {
+                if (! $file instanceof UploadedFile) {
                     continue;
                 }
 
@@ -69,7 +68,7 @@ class ProductMediaService
                 $maxSortOrder++;
                 $isPrimary = false;
 
-                if (!$hasPrimary && count($createdMedia) === 0) {
+                if (! $hasPrimary && count($createdMedia) === 0) {
                     $isPrimary = true;
                     $hasPrimary = true;
                 }
@@ -118,7 +117,7 @@ class ProductMediaService
                     'product_id',
                     $media->product_id
                 )->update([
-                    'is_primary' => false
+                    'is_primary' => false,
                 ]);
 
             }
@@ -138,8 +137,8 @@ class ProductMediaService
                 // url looks like: /storage/product-media/filename.jpg
                 // Storage::disk('public') root = storage/app/public
                 // So relative path for the disk is: product-media/filename.jpg
-                $urlPath      = parse_url($media->url, PHP_URL_PATH) ?? '';
-                $storagePath  = ltrim(str_replace('/storage/', '', $urlPath), '/');
+                $urlPath = parse_url($media->url, PHP_URL_PATH) ?? '';
+                $storagePath = ltrim(str_replace('/storage/', '', $urlPath), '/');
 
                 if ($storagePath && Storage::disk('public')->exists($storagePath)) {
                     Storage::disk('public')->delete($storagePath);

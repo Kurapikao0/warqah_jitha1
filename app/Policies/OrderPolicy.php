@@ -39,7 +39,7 @@ class OrderPolicy
                 $order->status->value,
                 [
                     'pending',
-                    'received'
+                    'received',
                 ]
             );
 
@@ -57,12 +57,11 @@ class OrderPolicy
                 $order->status->value,
                 [
                     'pending',
-                    'received'
+                    'received',
                 ]
             );
 
     }
-
 
     /*
     |--------------------------------------------------------------------------

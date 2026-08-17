@@ -11,32 +11,31 @@ class StoreReviewRequest extends FormRequest
         return true;
     }
 
-
     public function rules(): array
     {
         return [
 
             'product_id' => [
                 'required',
-                'exists:products,id'
+                'exists:products,id',
             ],
 
             'order_item_id' => [
                 'required',
                 'exists:order_items,id',
-                'unique:reviews,order_item_id'
+                'unique:reviews,order_item_id',
             ],
 
             'rating' => [
                 'required',
                 'integer',
                 'min:1',
-                'max:5'
+                'max:5',
             ],
 
             'comment' => [
                 'nullable',
-                'string'
+                'string',
             ],
         ];
     }

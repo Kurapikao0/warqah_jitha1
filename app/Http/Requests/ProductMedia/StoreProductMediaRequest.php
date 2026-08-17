@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\ProductMedia;
 
+use App\Enums\ProductMediaType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Enum;
-use App\Enums\ProductMediaType;
 
 class StoreProductMediaRequest extends FormRequest
 {
@@ -19,27 +19,28 @@ class StoreProductMediaRequest extends FormRequest
 
             'product_id' => [
                 'required',
-                'exists:products,id'
+                'exists:products,id',
             ],
 
             'media_type' => [
                 'required',
-                new Enum(ProductMediaType::class)
+                new Enum(ProductMediaType::class),
             ],
 
             'url' => [
                 'required',
-                'url'
+                'url',
+                'max:255',
             ],
 
             'sort_order' => [
                 'nullable',
                 'integer',
-                'min:1'
+                'min:1',
             ],
 
             'is_primary' => [
-                'boolean'
+                'boolean',
             ],
 
         ];

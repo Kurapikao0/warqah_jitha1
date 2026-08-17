@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Models\Color;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\Contracts\ColorRepositoryInterface;
+use Illuminate\Support\Facades\DB;
 
 class ColorService
 {
     public function __construct(
         protected ColorRepositoryInterface $repository
-    ) {
-    }
+    ) {}
 
     public function all()
     {

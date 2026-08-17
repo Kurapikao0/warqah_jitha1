@@ -5,11 +5,11 @@ namespace App\Models;
 use App\Enums\ProductStatus;
 use App\Enums\ProductType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
@@ -127,6 +127,4 @@ class Product extends Model
     {
         return $this->hasOne(RawMaterial::class);
     }
-
-    
 }

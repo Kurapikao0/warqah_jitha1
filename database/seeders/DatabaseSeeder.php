@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Seeders;
-use LogicException ;
+
 use App\Enums\VerificationPurpose;
 use App\Models\ActivityLog;
 use App\Models\Address;
@@ -40,52 +40,95 @@ use App\Models\VerificationCode;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use LogicException;
 
 class DatabaseSeeder extends Seeder
 {
     private const ROLES_COUNT = 5;
+
     private const PERMISSIONS_COUNT = 20;
+
     private const ADMIN_USERS_COUNT = 6;
+
     private const ADMIN_PASSWORD_RESETS_COUNT = 4;
+
     private const ADMIN_NOTIFICATIONS_COUNT = 15;
+
     private const ACTIVITY_LOGS_COUNT = 25;
+
     private const FRAMEWORK_USERS_COUNT = 5;
+
     private const CUSTOMERS_COUNT = 30;
+
     private const ADDRESSES_PER_CUSTOMER = 2;
+
     private const VERIFICATION_CODES_COUNT = 20;
+
     private const CUSTOMER_NOTIFICATIONS_COUNT = 60;
+
     private const ROOT_CATEGORIES_COUNT = 8;
+
     private const CHILD_CATEGORIES_COUNT = 12;
+
     private const COLORS_COUNT = 12;
+
     private const DESIGN_PATTERNS_COUNT = 8;
+
     private const PRODUCT_ATTRIBUTES_COUNT = 6;
+
     private const PRODUCTS_COUNT = 50;
+
     private const MEDIA_PER_PRODUCT = 3;
+
     private const CUSTOM_DESIGN_REQUESTS_COUNT = 15;
+
     private const PRODUCT_CUSTOMIZATION_REQUESTS_COUNT = 20;
+
     private const CARTS_COUNT = 20;
+
     private const ORDERS_COUNT = 60;
+
     private const ORDER_ITEMS_COUNT = 150;
+
     private const CUSTOMIZED_ORDER_ITEMS_COUNT = 15;
+
     private const ORDER_STATUS_HISTORY_COUNT = 120;
+
     private const PAID_ORDERS_COUNT = 50;
+
     private const PRODUCTION_STAGE_HISTORY_COUNT = 90;
+
     private const REVIEWED_ITEMS_COUNT = 60;
+
     private const REVIEW_IMAGES_COUNT = 80;
+
     private const RAW_MATERIALS_COUNT = 15;
 
     private Collection $roles;
+
     private Collection $permissions;
+
     private Collection $adminUsers;
+
     private Collection $customers;
+
     private Collection $categories;
+
     private Collection $colors;
+
     private Collection $designPatterns;
+
     private Collection $attributes;
+
     private Collection $products;
+
     private Collection $carts;
+
     private Collection $productionStages;
+
     private Collection $orders;
+
     private Collection $orderItems;
 
     /**
@@ -116,7 +159,7 @@ class DatabaseSeeder extends Seeder
     {
         $superAdminRole = Role::factory()->create([
             'name' => 'super-admin',
-            'description' => 'System Administrator'
+            'description' => 'System Administrator',
         ]);
 
         $otherRoles = Role::factory()->count(self::ROLES_COUNT - 1)->create();
@@ -135,6 +178,7 @@ class DatabaseSeeder extends Seeder
             }
         });
     }
+
     /**
      * Module 1b: Admin/back-office accounts and their activity trail.
      */
@@ -145,7 +189,7 @@ class DatabaseSeeder extends Seeder
         $superAdmin = AdminUser::factory()->create([
             'full_name' => 'مدير النظام',
             'email' => 'admin@admin.com',
-            'password_hash' => \Illuminate\Support\Facades\Hash::make('p@ssword123!'),
+            'password_hash' => Hash::make('p@ssword123!'),
             'role_id' => $superAdminRole->id,
         ]);
 
@@ -222,9 +266,9 @@ class DatabaseSeeder extends Seeder
             })
             ->all();
 
-VerificationCode::insert($verificationCodes);
+        VerificationCode::insert($verificationCodes);
 
-VerificationCode::insert($verificationCodes);
+        VerificationCode::insert($verificationCodes);
 
         CustomerNotification::factory()
             ->count(self::CUSTOMER_NOTIFICATIONS_COUNT)
@@ -251,7 +295,7 @@ VerificationCode::insert($verificationCodes);
 
         $childCategories = ProductCategory::factory()
             ->count(self::CHILD_CATEGORIES_COUNT)
-            ->state(fn() => ['parent_id' => $rootCategories->random()->id])
+            ->state(fn () => ['parent_id' => $rootCategories->random()->id])
             ->create();
 
         $this->categories = $rootCategories->merge($childCategories);
@@ -308,7 +352,7 @@ VerificationCode::insert($verificationCodes);
         $cartOwners = $this->customers->random(min(self::CARTS_COUNT, $this->customers->count()));
 
         $this->carts = $cartOwners->map(
-            fn(Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
+            fn (Customer $customer) => Cart::factory()->create(['customer_id' => $customer->id])
         );
 
         $this->carts->each(function (Cart $cart) {
@@ -353,7 +397,7 @@ VerificationCode::insert($verificationCodes);
      */
     private function seedOrders(): void
     {
-        $addresses = $this->customers->flatMap(fn(Customer $customer) => $customer->addresses);
+        $addresses = $this->customers->flatMap(fn (Customer $customer) => $customer->addresses);
 
         $this->orders = Order::factory()
             ->count(self::ORDERS_COUNT)
@@ -417,7 +461,7 @@ VerificationCode::insert($verificationCodes);
 
         $reviewedItems = $this->orderItems->random(min(self::REVIEWED_ITEMS_COUNT, $this->orderItems->count()));
 
-        $reviews = $reviewedItems->map(fn(OrderItem $item) => Review::factory()->create([
+        $reviews = $reviewedItems->map(fn (OrderItem $item) => Review::factory()->create([
             'customer_id' => $orderCustomerMap[$item->order_id],
             'product_id' => $item->product_id,
             'order_item_id' => $item->id,

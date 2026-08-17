@@ -10,13 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class AddressService
 {
-
     public function __construct(
         protected AddressRepositoryInterface $addressRepository
-    ) {
-    }
-
-
+    ) {}
 
     /**
      * Get customer addresses
@@ -30,10 +26,6 @@ class AddressService
 
     }
 
-
-
-
-
     /**
      * Create address
      */
@@ -42,12 +34,10 @@ class AddressService
         array $data
     ): Address {
 
-
         return DB::transaction(function () use (
             $customer,
             $data
         ) {
-
 
             if (
                 ($data['is_default'] ?? false) === true
@@ -60,22 +50,15 @@ class AddressService
 
             }
 
-
-
             return $this->addressRepository
                 ->create(
                     $customer,
                     $data
                 );
 
-
         });
 
     }
-
-
-
-
 
     /**
      * Update address
@@ -85,27 +68,22 @@ class AddressService
         array $data
     ): Address {
 
-
         return DB::transaction(function () use (
             $address,
             $data
         ) {
 
-
             if (
                 isset($data['is_default']) &&
                 $data['is_default'] === true
             ) {
+                $customer = $address->customer;
 
-
-                $this->addressRepository
-                    ->clearDefaultAddresses(
-                        $address->customer
-                    );
-
+                if ($customer instanceof Customer) {
+                    $this->addressRepository
+                        ->clearDefaultAddresses($customer);
+                }
             }
-
-
 
             return $this->addressRepository
                 ->update(
@@ -113,14 +91,37 @@ class AddressService
                     $data
                 );
 
-
         });
 
     }
 
+    /**
+     * Set default address
+     */
+    public function setDefault(
+        Address $address
+    ): Address {
 
+        return DB::transaction(function () use ($address) {
 
+            $customer = $address->customer;
 
+            if ($customer instanceof Customer) {
+                $this->addressRepository
+                    ->clearDefaultAddresses($customer);
+            }
+
+            return $this->addressRepository
+                ->update(
+                    $address,
+                    [
+                        'is_default' => true,
+                    ]
+                );
+
+        });
+
+    }
 
     /**
      * Delete address
@@ -133,41 +134,4 @@ class AddressService
             ->delete($address);
 
     }
-
-
-
-
-
-    /**
-     * Set default address
-     */
-    public function setDefault(
-        Address $address
-    ): Address {
-
-
-        return DB::transaction(function () use ($address) {
-
-
-            $this->addressRepository
-                ->clearDefaultAddresses(
-                    $address->customer
-                );
-
-
-
-            return $this->addressRepository
-                ->update(
-                    $address,
-                    [
-                        'is_default'=>true
-                    ]
-                );
-
-
-        });
-
-    }
-
-
 }

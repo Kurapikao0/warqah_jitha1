@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AddressResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      */
@@ -18,42 +17,23 @@ class AddressResource extends JsonResource
 
             'id' => $this->id,
 
-
             'customer_id' => $this->customer_id,
 
+            'recipient_name' => $this->recipient_name,
 
-            'recipient_name' =>
-                $this->recipient_name,
+            'phone' => $this->phone,
 
+            'country' => $this->country,
 
-            'phone' =>
-                $this->phone,
+            'city' => $this->city,
 
+            'district' => $this->district,
 
-            'country' =>
-                $this->country,
+            'street' => $this->street,
 
+            'postal_code' => $this->postal_code,
 
-            'city' =>
-                $this->city,
-
-
-            'district' =>
-                $this->district,
-
-
-            'street' =>
-                $this->street,
-
-
-            'postal_code' =>
-                $this->postal_code,
-
-
-            'is_default' =>
-                (bool) $this->is_default,
-
-
+            'is_default' => (bool) $this->is_default,
 
             /*
             |--------------------------------------------------------------------------
@@ -61,12 +41,9 @@ class AddressResource extends JsonResource
             |--------------------------------------------------------------------------
             */
 
-            'customer' =>
-                new CustomerResource(
-                    $this->whenLoaded('customer')
-                ),
-
-
+            'customer' => new CustomerResource(
+                $this->whenLoaded('customer')
+            ),
 
             /*
             |--------------------------------------------------------------------------
@@ -74,22 +51,15 @@ class AddressResource extends JsonResource
             |--------------------------------------------------------------------------
             */
 
-            'orders' =>
-                OrderResource::collection(
-                    $this->whenLoaded('orders')
-                ),
+            'orders' => OrderResource::collection(
+                $this->whenLoaded('orders')
+            ),
 
+            'created_at' => $this->created_at,
 
-
-            'created_at' =>
-                $this->created_at,
-
-
-            'updated_at' =>
-                $this->updated_at,
+            'updated_at' => $this->updated_at,
 
         ];
 
     }
-
 }
