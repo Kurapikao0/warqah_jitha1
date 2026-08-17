@@ -1,5 +1,8 @@
-# ورقة وجذع | Warqah Wa Jitha
+<h1 align="center">ورقة وجذع | Warqah Wa Jitha</h1>
 
+<p align="center">
+  منصة متجر إلكتروني لبيع المنتجات المصنوعة يدويًا كبدائل لعصي الروتان
+</p>
 <p align="center">
   <strong>Arabic E-Commerce Store for Handmade Products</strong>
 </p>
