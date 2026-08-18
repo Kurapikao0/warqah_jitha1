@@ -23,35 +23,37 @@ class ProductAttributeService
     }
 
     public function create(array $data)
-    {
-        return DB::transaction(function () use ($data) {
+{
+    return DB::transaction(function () use ($data) {
 
-            $data['input_type'] = $data['type'] ?? 'text';
-
+        if (isset($data['type'])) {
+            $data['input_type'] = $data['type'];
             unset($data['type']);
+        }
 
-            return $this->repository->create($data);
+        return $this->repository->create($data);
 
-        });
-    }
+    });
+}
 
     public function update(
-        ProductAttribute $attribute,
-        array $data
-    ) {
-        return DB::transaction(function () use ($attribute, $data) {
+    ProductAttribute $attribute,
+    array $data
+) {
+    return DB::transaction(function () use ($attribute, $data) {
 
-            $data['input_type'] = $data['type'] ?? $attribute->input_type;
-
+        if (isset($data['type'])) {
+            $data['input_type'] = $data['type'];
             unset($data['type']);
+        }
 
-            return $this->repository->update(
-                $attribute,
-                $data
-            );
+        return $this->repository->update(
+            $attribute,
+            $data
+        );
 
-        });
-    }
+    });
+}
 
     public function delete(ProductAttribute $attribute)
     {

@@ -25,8 +25,6 @@ class ProductAttributeResource extends JsonResource
 
             'input_type' => $inputType,
 
-            'type' => $inputType,
-
             'values' => ProductAttributeValueResource::collection(
                 $this->whenLoaded('values')
             ),
