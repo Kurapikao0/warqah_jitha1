@@ -19,7 +19,11 @@ class ProductService
 
     public function getById($id)
     {
-        return $this->repository->findById($id);
+        return Product::with([
+            'category',
+            'media',
+            'attributes'
+        ])->findOrFail($id);
     }
 
     public function create(array $data)

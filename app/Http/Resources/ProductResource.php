@@ -39,6 +39,16 @@ class ProductResource extends JsonResource
 
             'media' => $this->whenLoaded('media', fn () => ProductMediaResource::collection($this->media)),
 
+            'attributes' => $this->whenLoaded('attributes', function () {
+                return $this->attributes->map(function ($attribute) {
+                    return [
+                        'id' => $attribute->id,
+                        'name' => $attribute->name,
+                        'input_type' => $attribute->input_type,
+                        'value' => $attribute->pivot->value,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at,
         ];
     }

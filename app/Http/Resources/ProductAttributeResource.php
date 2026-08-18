@@ -21,15 +21,16 @@ class ProductAttributeResource extends JsonResource
 
             'name' => $this->name,
 
-            'display_name' => $this->name,
+            'display_name' => $this->display_name,
 
             'input_type' => $inputType,
-
-            'type' => $inputType,
 
             'values' => ProductAttributeValueResource::collection(
                 $this->whenLoaded('values')
             ),
+            'is_required' => $this->is_required,
+
+        'options' => $this->options,
 
             'created_at' => $this->created_at,
 
