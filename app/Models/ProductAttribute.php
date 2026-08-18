@@ -16,13 +16,17 @@ class ProductAttribute extends Model
 
     protected $fillable = [
         'name',
+        'display_name',
         'input_type',
+        'is_required',
+        'options',
     ];
-
     protected function casts(): array
     {
         return [
             'input_type' => ProductAttributeInputType::class,
+            'is_required' => 'boolean',
+            'options' => 'array',
         ];
     }
 

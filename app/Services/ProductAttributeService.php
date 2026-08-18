@@ -26,6 +26,10 @@ class ProductAttributeService
     {
         return DB::transaction(function () use ($data) {
 
+            $data['input_type'] = $data['type'] ?? 'text';
+
+            unset($data['type']);
+
             return $this->repository->create($data);
 
         });
@@ -36,6 +40,10 @@ class ProductAttributeService
         array $data
     ) {
         return DB::transaction(function () use ($attribute, $data) {
+
+            $data['input_type'] = $data['type'] ?? $attribute->input_type;
+
+            unset($data['type']);
 
             return $this->repository->update(
                 $attribute,

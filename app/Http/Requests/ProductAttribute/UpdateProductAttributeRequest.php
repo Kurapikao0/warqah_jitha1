@@ -25,10 +25,6 @@ class UpdateProductAttributeRequest extends FormRequest
             $data['input_type'] = $data['type'];
         }
 
-        if (! array_key_exists('type', $data) && array_key_exists('input_type', $data)) {
-            $data['type'] = $data['input_type'];
-        }
-
         $this->replace($data);
     }
 
@@ -38,21 +34,40 @@ class UpdateProductAttributeRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        return [
+{
+    return [
 
-            'name' => [
-                'sometimes',
-                'string',
-                Rule::unique('product_attributes', 'name')
-                    ->ignore($this->route('product_attribute')),
-            ],
+        'name' => [
+            'sometimes',
+            'string',
+            Rule::unique('product_attributes', 'name')
+                ->ignore($this->route('product_attribute')),
+        ],
 
-            'input_type' => [
-                'required',
-                new Enum(ProductAttributeInputType::class),
-            ],
+        'display_name' => [
+            'sometimes',
+            'string',
+            'max:255',
+        ],
 
-        ];
-    }
+        'input_type' => [
+            'required',
+            new Enum(ProductAttributeInputType::class),
+        ],
+
+        'is_required' => [
+            'sometimes',
+            'boolean',
+        ],
+
+        'options' => [
+            'nullable',
+            'array',
+        ],
+
+        'options.*' => [
+            'string',
+        ],
+    ];
+}
 }
