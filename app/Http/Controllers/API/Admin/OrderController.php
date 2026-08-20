@@ -16,12 +16,12 @@ class OrderController extends Controller
     /**
      * Display all orders
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
 
         return OrderResource::collection(
 
-            $this->service->all()
+            $this->service->all((int) $request->query('per_page', 20))
 
         );
 
@@ -53,10 +53,13 @@ class OrderController extends Controller
         ]);
     }
 
-    public function statistics()
+    public function statistics(\Illuminate\Http\Request $request)
     {
         return response()->json(
-            $this->service->statistics()
+            $this->service->statistics(
+                $request->query('from'),
+                $request->query('to')
+            )
         );
     }
 }
