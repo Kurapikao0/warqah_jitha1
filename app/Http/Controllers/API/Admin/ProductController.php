@@ -20,7 +20,8 @@ class ProductController extends Controller
     {
         return ProductResource::collection(
             $this->service->getAll(
-                $request->query('search')
+                $request->query('search'),
+                (int) $request->query('per_page', 20)
             )
         );
     }

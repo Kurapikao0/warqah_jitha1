@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function all(?string $search = null): LengthAwarePaginator
+    public function all(?string $search = null, int $perPage = 20): LengthAwarePaginator
     {
         return Product::query()
             ->with([
@@ -28,7 +28,7 @@ class ProductRepository implements ProductRepositoryInterface
                 }
             )
             ->latest()
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
     }
 

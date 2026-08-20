@@ -16,16 +16,16 @@ class OrderService
         protected OrderRepositoryInterface $repository
     ) {}
 
-    public function all()
+    public function all(int $perPage = 20)
     {
 
-        return $this->repository->getAll();
+        return $this->repository->getAll($perPage);
 
     }
 
-    public function statistics()
+    public function statistics($from = null, $to = null)
     {
-        return $this->repository->statistics();
+        return $this->repository->statistics($from, $to);
     }
 
     public function customerOrders(int $customerId)

@@ -7,7 +7,7 @@ use App\Models\OrderItem;
 
 interface OrderRepositoryInterface
 {
-    public function getAll();
+    public function getAll(int $perPage = 20);
 
     public function getCustomerOrders($customerId);
 
@@ -21,5 +21,5 @@ interface OrderRepositoryInterface
 
     public function findCustomerOrder(int $customerId, int $orderId);
 
-    public function statistics();
+    public function statistics($from = null, $to = null);
 }

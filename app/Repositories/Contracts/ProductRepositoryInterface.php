@@ -9,7 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ProductRepositoryInterface
 {
-    public function all(?string $search = null): LengthAwarePaginator;
+    public function all(?string $search = null, int $perPage = 20): LengthAwarePaginator;
 
     public function findById(int $id): Product;
 

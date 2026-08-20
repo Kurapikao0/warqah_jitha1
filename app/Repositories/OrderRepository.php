@@ -8,7 +8,7 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function getAll()
+    public function getAll(int $perPage = 20)
     {
 
         return Order::with([
@@ -23,7 +23,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         ])
             ->latest()
-            ->paginate(20);
+            ->paginate($perPage);
 
     }
 
@@ -102,26 +102,86 @@ class OrderRepository implements OrderRepositoryInterface
             ->findOrFail($orderId);
     }
 
-    public function statistics()
+    public function statistics($from = null, $to = null)
     {
+        $querySalesTimeseries = Order::whereHas('payment', function ($query) {
+            $query->where('status', 'paid');
+        });
+
+        $queryTotalRevenue = Order::whereHas('payment', function ($query) {
+            $query->where('status', 'paid');
+        });
+
+        if ($from) {
+            $querySalesTimeseries->whereDate('created_at', '>=', $from);
+            $queryTotalRevenue->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $querySalesTimeseries->whereDate('created_at', '<=', $to);
+            $queryTotalRevenue->whereDate('created_at', '<=', $to);
+        }
+
+        $salesTimeseries = $querySalesTimeseries
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as revenue')
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->take(30)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'date' => $item->date,
+                    'revenue' => (float) $item->revenue,
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        $totalRevenue = $queryTotalRevenue->sum('total_amount');
+        
+        $paidOrdersCount = Order::whereHas('payment', function ($query) {
+            $query->where('status', 'paid');
+        });
+        
+        $baseOrdersQuery = Order::query();
+        if ($from) {
+            $paidOrdersCount->whereDate('created_at', '>=', $from);
+            $baseOrdersQuery->whereDate('created_at', '>=', $from);
+        }
+        if ($to) {
+            $paidOrdersCount->whereDate('created_at', '<=', $to);
+            $baseOrdersQuery->whereDate('created_at', '<=', $to);
+        }
+        
+        $paidOrdersCount = $paidOrdersCount->count();
+
+        $avgOrderValue = $paidOrdersCount > 0 ? (float) $totalRevenue / $paidOrdersCount : 0;
+
         return [
 
-            'total_orders' => Order::count(),
+            'total_orders' => (clone $baseOrdersQuery)->count(),
 
-            'pending' => Order::where(
+            'pending' => (clone $baseOrdersQuery)->where(
                 'status',
                 'received'
             )->count(),
 
-            'production' => Order::where(
+            'production' => (clone $baseOrdersQuery)->where(
                 'status',
                 'in_production'
             )->count(),
 
-            'completed' => Order::where(
+            'completed' => (clone $baseOrdersQuery)->where(
                 'status',
                 'completed'
             )->count(),
+
+            'total_revenue' => (float) $totalRevenue,
+            
+            'paid_orders_count' => $paidOrdersCount,
+            
+            'avg_order_value' => (float) $avgOrderValue,
+
+            'sales_timeseries' => $salesTimeseries,
 
         ];
     }

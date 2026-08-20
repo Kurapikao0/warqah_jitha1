@@ -12,9 +12,9 @@ class ProductService
         protected ProductRepositoryInterface $repository
     ) {}
 
-    public function getAll(?string $search = null)
+    public function getAll(?string $search = null, int $perPage = 20)
     {
-        return $this->repository->all($search);
+        return $this->repository->all($search, $perPage);
     }
 
     public function getById($id)
