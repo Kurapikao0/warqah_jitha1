@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FavoriteResource;
 use App\Services\FavoriteService;
 
 class FavoriteController extends Controller
@@ -31,11 +32,8 @@ class FavoriteController extends Controller
 
     public function index()
     {
-
-        return $this->service
-            ->all(
-                auth()->id()
-            );
-
+        return FavoriteResource::collection(
+            $this->service->all(auth()->id())
+        );
     }
 }
