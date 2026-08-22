@@ -41,7 +41,10 @@ class FavoriteService
     public function all($customerId)
     {
 
-        return Favorite::with('product')
+        return Favorite::with([
+            'product.media',
+            'product.category',
+        ])
             ->where(
                 'customer_id',
                 $customerId

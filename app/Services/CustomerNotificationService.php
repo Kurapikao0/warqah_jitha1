@@ -37,6 +37,16 @@ class CustomerNotificationService
             ->markAsRead($notification);
     }
 
+    public function unreadCount(int $customerId): int
+    {
+        return $this->repository->unreadCount($customerId);
+    }
+
+    public function markAllAsRead(int $customerId): Collection
+    {
+        return $this->repository->markAllAsRead($customerId);
+    }
+
     public function delete(
         CustomerNotification $notification
     ): bool {

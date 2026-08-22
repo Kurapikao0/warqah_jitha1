@@ -89,7 +89,12 @@ Route::get('/test-admin-auth', function () {
 | These are the primary customer authentication endpoints.
 |
 */
-
+Route::get('/test', function () {
+    return response()->json([
+        'status' => true,
+        'message' => 'API is working'
+    ], 200);
+});
 Route::prefix('customer')->group(function (): void {
 
     Route::post(
@@ -716,6 +721,16 @@ Route::prefix('customer')
             'notifications',
             [CustomerNotificationController::class, 'index']
         )->name('notifications.index');
+
+        Route::get(
+            'notifications/unread-count',
+            [CustomerNotificationController::class, 'unreadCount']
+        )->name('notifications.unread-count');
+
+        Route::patch(
+            'notifications/read-all',
+            [CustomerNotificationController::class, 'markAllAsRead']
+        )->name('notifications.read-all');
 
         Route::get(
             'notifications/{id}',

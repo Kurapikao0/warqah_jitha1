@@ -40,6 +40,22 @@ class CustomerNotificationRepository
         return $notification->refresh();
     }
 
+    public function unreadCount(int $customerId): int
+    {
+        return CustomerNotification::where('customer_id', $customerId)
+            ->where('is_read', false)
+            ->count();
+    }
+
+    public function markAllAsRead(int $customerId): Collection
+    {
+        CustomerNotification::where('customer_id', $customerId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return $this->allByCustomer($customerId);
+    }
+
     public function delete(
         CustomerNotification $notification
     ): bool {

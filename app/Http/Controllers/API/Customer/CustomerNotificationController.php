@@ -48,6 +48,23 @@ class CustomerNotificationController extends Controller
         ]);
     }
 
+    public function unreadCount(Request $request): JsonResponse
+    {
+        return response()->json([
+            'unread_count' => $this->service->unreadCount($request->user()->id),
+        ]);
+    }
+
+    public function markAllAsRead(Request $request): JsonResponse
+    {
+        return response()->json([
+            'message' => 'All notifications marked as read',
+            'data' => CustomerNotificationResource::collection(
+                $this->service->markAllAsRead($request->user()->id)
+            ),
+        ]);
+    }
+
     public function read(
         Request $request,
         CustomerNotification $notification
