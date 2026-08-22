@@ -82,6 +82,13 @@ class PaymentService
             );
     }
 
+    public function delete(Payment $payment): bool
+    {
+        return DB::transaction(function () use ($payment) {
+            return (bool) $payment->delete();
+        });
+    }
+
     public function create(array $data)
     {
         return DB::transaction(function () use ($data) {

@@ -36,6 +36,16 @@ class PaymentController extends Controller
 
     }
 
+    public function destroy(Payment $payment)
+    {
+        $this->service->delete($payment);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment deleted successfully',
+        ]);
+    }
+
     public function updateStatus(
         UpdatePaymentStatusRequest $request,
         Payment $payment

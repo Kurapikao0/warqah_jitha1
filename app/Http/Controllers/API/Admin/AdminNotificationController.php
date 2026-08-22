@@ -32,6 +32,13 @@ class AdminNotificationController extends Controller
         );
     }
 
+    public function mine(): AnonymousResourceCollection
+    {
+        return AdminNotificationResource::collection(
+            $this->service->paginate(auth('admin')->user())
+        );
+    }
+
     public function read(
         AdminNotification $notification
     ): JsonResponse {

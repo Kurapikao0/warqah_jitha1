@@ -21,6 +21,7 @@ use App\Http\Controllers\API\Admin\ColorController;
 use App\Http\Controllers\API\Admin\CustomerController;
 use App\Http\Controllers\API\Admin\DesignPatternController;
 use App\Http\Controllers\API\Admin\ExchangeRateController;
+use App\Http\Controllers\API\Admin\CustomDesignRequestController;
 use App\Http\Controllers\API\Admin\OrderController as AdminOrder;
 use App\Http\Controllers\API\Admin\OrderProductionController;
 use App\Http\Controllers\API\Admin\OrderProductionStageController;
@@ -268,6 +269,11 @@ Route::prefix('admin')
             [AdminNotificationController::class, 'index']
         );
 
+        Route::get(
+            'notifications',
+            [AdminNotificationController::class, 'mine']
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Admin Notifications
@@ -367,9 +373,19 @@ Route::prefix('admin')
             [AdminCustomization::class, 'index']
         );
 
+        Route::post(
+            'customizations',
+            [AdminCustomization::class, 'store']
+        );
+
         Route::get(
             'customizations/{id}',
             [AdminCustomization::class, 'show']
+        );
+
+        Route::delete(
+            'customizations/{customization}',
+            [AdminCustomization::class, 'destroy']
         );
 
         Route::put(
@@ -433,6 +449,13 @@ Route::prefix('admin')
         */
 
         Route::apiResource(
+            'custom-design-requests',
+            CustomDesignRequestController::class
+        )->only(['index', 'store', 'show', 'update', 'destroy']);
+
+
+
+        Route::apiResource(
             'orders',
             AdminOrder::class
         )->names('admin.orders');
@@ -486,6 +509,11 @@ Route::prefix('admin')
         Route::put(
             'payments/{payment}/status',
             [AdminPayment::class, 'updateStatus']
+        );
+
+        Route::delete(
+            'payments/{payment}',
+            [AdminPayment::class, 'destroy']
         );
 
         /*
@@ -627,8 +655,11 @@ Route::prefix('customer')
         | Addresses
         |--------------------------------------------------------------------------
         */
-        Route::match([
-            'put', 'patch'],
+        Route::match(
+            [
+                'put',
+                'patch'
+            ],
             'addresses/{address}/default',
             [AddressController::class, 'setDefault']
         );

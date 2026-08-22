@@ -13,7 +13,7 @@ class AdminNotificationResource extends JsonResource
 
             'id' => $this->id,
 
-            'type' => $this->type->value,
+            'type' => $this->type?->value ?? (string) $this->type,
             'title' => $this->title,
 
             'body' => $this->body,
