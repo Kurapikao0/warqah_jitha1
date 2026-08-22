@@ -441,6 +441,10 @@ Route::prefix('admin')
         | Production Stages
         |--------------------------------------------------------------------------
         */
+        Route::post(
+            'production-stages/reorder',
+            [OrderProductionStageController::class, 'reorder']
+        );
 
         Route::apiResource(
             'production-stages',
