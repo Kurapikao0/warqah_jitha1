@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Models\Product;
@@ -17,53 +19,87 @@ class ProductService
         return $this->repository->all($search, $perPage);
     }
 
-    public function getById($id)
+    public function getById(int $id): Product
     {
-        return Product::with([
-            'category',
-            'media',
-            'attributes'
-        ])->findOrFail($id);
+        return $this->repository->findById($id);
     }
 
-    public function create(array $data)
+    public function create(array $data): Product
     {
+        return DB::transaction(function () use ($data): Product {
+            $attributeValues = $data['attribute_values'] ?? [];
 
-        return DB::transaction(function () use ($data) {
+            unset($data['attribute_values']);
 
-            return $this->repository
-                ->create($data);
+            $product = $this->repository->create($data);
 
+            $this->syncAttributes($product, $attributeValues);
+
+            return $product->fresh([
+                'category',
+                'media',
+                'attributes',
+            ]);
         });
-
     }
 
     public function update(
         Product $product,
         array $data
-    ) {
+    ): Product {
+        return DB::transaction(function () use ($product, $data): Product {
+            $hasAttributeValues = array_key_exists(
+                'attribute_values',
+                $data
+            );
 
-        return DB::transaction(function () use ($product, $data) {
+            $attributeValues = $data['attribute_values'] ?? [];
 
-            return $this->repository
-                ->update(
+            unset($data['attribute_values']);
+
+            $this->repository->update(
+                $product,
+                $data
+            );
+
+            if ($hasAttributeValues) {
+                $this->syncAttributes(
                     $product,
-                    $data
+                    $attributeValues
                 );
+            }
 
+            return $this->repository->findById($product->id);
         });
-
     }
 
-    public function delete(Product $product)
+    public function delete(Product $product): bool
     {
-
-        return DB::transaction(function () use ($product) {
-
-            return $this->repository
-                ->delete($product);
-
+        return DB::transaction(function () use ($product): bool {
+            return $this->repository->delete($product);
         });
+    }
 
+    /**
+     * Synchronize the attributes assigned to a product.
+     *
+     * The product_attribute_values table has a unique constraint
+     * on (product_id, attribute_id), so sync() is the correct
+     * operation for replacing the current assignments.
+     */
+    private function syncAttributes(
+        Product $product,
+        array $attributeValues
+    ): void {
+        $mapped = collect($attributeValues)
+            ->keyBy('attribute_id')
+            ->map(
+                fn (array $attribute): array => [
+                    'value' => $attribute['value'],
+                ]
+            )
+            ->all();
+
+        $product->attributes()->sync($mapped);
     }
 }

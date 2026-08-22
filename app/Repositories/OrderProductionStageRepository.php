@@ -35,4 +35,37 @@ class OrderProductionStageRepository implements OrderProductionStageRepositoryIn
     {
         return (bool) $stage->delete();
     }
+
+    public function reorder(array $stageIds): void
+    {
+        $stages = OrderProductionStage::query()
+            ->whereIn('id', $stageIds)
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('id');
+
+        foreach ($stageIds as $index => $stageId) {
+            $stage = $stages->get($stageId);
+
+            if ($stage === null) {
+                continue;
+            }
+
+            $stage->update([
+                'sort_order' => -($index + 1),
+            ]);
+        }
+
+        foreach ($stageIds as $index => $stageId) {
+            $stage = $stages->get($stageId);
+
+            if ($stage === null) {
+                continue;
+            }
+
+            $stage->update([
+                'sort_order' => $index + 1,
+            ]);
+        }
+    }
 }

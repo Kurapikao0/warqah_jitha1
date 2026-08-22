@@ -47,9 +47,37 @@ class StoreProductAttributeRequest extends FormRequest
                 'unique:product_attributes,name',
             ],
 
+            'display_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
             'input_type' => [
                 'required',
                 new Enum(ProductAttributeInputType::class),
+            ],
+
+            'is_required' => [
+                'sometimes',
+                'boolean',
+            ],
+
+            'options' => [
+                'nullable',
+                'array',
+            ],
+
+            'options.*.value' => [
+                'required_with:options',
+                'string',
+                'max:255',
+            ],
+
+            'options.*.label' => [
+                'required_with:options',
+                'string',
+                'max:255',
             ],
 
         ];

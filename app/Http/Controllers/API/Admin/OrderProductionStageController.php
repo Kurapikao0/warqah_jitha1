@@ -8,6 +8,7 @@ use App\Http\Requests\OrderProductionStage\UpdateOrderProductionStageRequest;
 use App\Http\Resources\OrderProductionStageResource;
 use App\Models\OrderProductionStage;
 use App\Services\OrderProductionStageService;
+use App\Http\Requests\OrderProductionStage\ReorderOrderProductionStagesRequest;
 
 class OrderProductionStageController extends Controller
 {
@@ -32,6 +33,18 @@ class OrderProductionStageController extends Controller
         return new OrderProductionStageResource($stage);
     }
 
+    public function reorder(
+        ReorderOrderProductionStagesRequest $request
+    ) {
+        $this->service->reorder(
+            $request->validated('stage_ids')
+        );
+
+        return response()->json([
+            'message' => 'Production stages reordered successfully.',
+        ]);
+    }
+    
     public function show($id)
     {
         return new OrderProductionStageResource(

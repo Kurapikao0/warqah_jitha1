@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductCustomizationRequest extends Model
 {
@@ -71,5 +72,13 @@ class ProductCustomizationRequest extends Model
     public function orderItem(): HasOne
     {
         return $this->hasOne(OrderItem::class);
+    }
+
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(
+            ProductCustomizationAttributeValue::class,
+            'customization_request_id'
+        );
     }
 }

@@ -28,14 +28,20 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-
-        $product =
-        $this->service->create(
+        $product = $this->service->create(
             $request->validated()
         );
 
-        return new ProductResource($product);
-
+        return response()->json([
+            'message' => 'Product created successfully',
+            'data' => new ProductResource(
+                $product->load([
+                    'category',
+                    'media',
+                    'attributes',
+                ])
+            ),
+        ], 201);
     }
 
     public function show($id)
@@ -51,18 +57,21 @@ class ProductController extends Controller
         UpdateProductRequest $request,
         Product $product
     ) {
-
         $this->service->update(
             $product,
             $request->validated()
         );
 
-        return response()->json([
-
-            'message' => 'Product updated successfully',
-
+        $product = $product->fresh([
+            'category',
+            'media',
+            'attributes',
         ]);
 
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'data' => new ProductResource($product),
+        ]);
     }
 
     public function destroy(Product $product)

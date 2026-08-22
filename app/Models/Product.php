@@ -90,7 +90,7 @@ class Product extends Model
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(ProductAttribute::class, 'product_attribute_values', 'product_id', 'attribute_id')
-            ->withPivot('value');
+            ->withPivot('id','value');
     }
 
     public function favorites(): HasMany

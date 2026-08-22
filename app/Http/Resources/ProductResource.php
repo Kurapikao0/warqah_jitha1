@@ -35,20 +35,42 @@ class ProductResource extends JsonResource
 
             'is_customizable' => $this->is_customizable,
 
-            'category' => $this->whenLoaded('category', fn () => new ProductCategoryResource($this->category)),
+            'category' => $this->whenLoaded(
+                'category',
+                fn () => new ProductCategoryResource($this->category)
+            ),
 
-            'media' => $this->whenLoaded('media', fn () => ProductMediaResource::collection($this->media)),
+            'media' => $this->whenLoaded(
+                'media',
+                fn () => ProductMediaResource::collection($this->media)
+            ),
 
-            'attributes' => $this->whenLoaded('attributes', function () {
-                return $this->attributes->map(function ($attribute) {
-                    return [
-                        'id' => $attribute->id,
-                        'name' => $attribute->name,
-                        'input_type' => $attribute->input_type,
-                        'value' => $attribute->pivot->value,
-                    ];
-                });
-            }),
+            'attributes' => $this->whenLoaded(
+                'attributes',
+                function () {
+                    return $this->attributes->map(
+                        function ($attribute): array {
+                            $inputType = $attribute->input_type;
+
+                            if ($inputType instanceof \BackedEnum) {
+                                $inputType = $inputType->value;
+                            }
+
+                            return [
+                                'id' => $attribute->id,
+                                'name' => $attribute->name,
+                                'display_name' => $attribute->display_name,
+                                'input_type' => $inputType,
+                                'is_required' => $attribute->is_required,
+                                'options' => $attribute->options,
+                                'value' => $attribute->pivot->value ?? null,
+                                'attribute_value_id' => $attribute->pivot->id ?? null,
+                            ];
+                        }
+                    );
+                }
+            ),
+
             'created_at' => $this->created_at,
         ];
     }

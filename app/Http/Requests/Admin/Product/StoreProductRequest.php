@@ -51,6 +51,24 @@ class StoreProductRequest extends FormRequest
             'is_customizable' => 'boolean',
 
             'status' => ['required', Rule::enum(ProductStatus::class)],
+
+            'attribute_values' => [
+                'nullable',
+                'array',
+            ],
+
+            'attribute_values.*.attribute_id' => [
+                'required',
+                'integer',
+                'exists:product_attributes,id',
+                'distinct',
+            ],
+
+            'attribute_values.*.value' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ];
 
     }

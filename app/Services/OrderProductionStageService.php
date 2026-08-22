@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\OrderProductionStage;
 use App\Repositories\Contracts\OrderProductionStageRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OrderProductionStageService
 {
@@ -48,6 +49,37 @@ class OrderProductionStageService
 
             return $this->repository->delete($stage);
 
+        });
+    }
+
+    public function reorder(array $stageIds): void
+    {
+        DB::transaction(function () use ($stageIds) {
+            $currentIds = $this->repository
+                ->all()
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+
+            $requestedIds = collect($stageIds)
+                ->map(fn ($id) => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+
+            if ($currentIds !== $requestedIds) {
+                throw ValidationException::withMessages([
+                    'stage_ids' => [
+                        'يجب أن يحتوي الترتيب على جميع مراحل الإنتاج الموجودة في النظام مرة واحدة فقط.',
+                    ],
+                ]);
+            }
+
+            $this->repository->reorder(
+                array_map('intval', $stageIds)
+            );
         });
     }
 }

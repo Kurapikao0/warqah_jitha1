@@ -9,6 +9,7 @@ use App\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
+use App\Models\ProductAttribute;
 
 /*
 |--------------------------------------------------------------------------
@@ -131,6 +132,257 @@ class ProductControllerTest extends TestCase
             'name' => 'Handmade Vase',
         ]);
     }
+
+    public function test_creating_a_product_without_attributes_still_works(): void
+    {
+        $this->actingAsAdmin();
+
+        $payload = $this->validPayload();
+
+        $response = $this->postJson('/api/admin/products', $payload);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('data.name', $payload['name']);
+
+        $product = Product::where('sku', $payload['sku'])->firstOrFail();
+
+        $this->assertDatabaseMissing('product_attribute_values', [
+            'product_id' => $product->id,
+        ]);
+    }
+
+    public function test_creating_a_product_with_two_attributes_stores_both(): void
+    {
+        $this->actingAsAdmin();
+
+        $attributeOne = ProductAttribute::factory()->create([
+            'display_name' => 'اللون',
+            'input_type' => 'text',
+        ]);
+
+        $attributeTwo = ProductAttribute::factory()->create([
+            'display_name' => 'المقاس',
+            'input_type' => 'text',
+        ]);
+
+        $payload = $this->validPayload([
+            'attribute_values' => [
+                [
+                    'attribute_id' => $attributeOne->id,
+                    'value' => 'أحمر',
+                ],
+                [
+                    'attribute_id' => $attributeTwo->id,
+                    'value' => 'كبير',
+                ],
+            ],
+        ]);
+
+        $response = $this->postJson('/api/admin/products', $payload);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('data.name', $payload['name'])
+            ->assertJsonFragment([
+                'id' => $attributeOne->id,
+                'display_name' => 'اللون',
+                'value' => 'أحمر',
+            ])
+            ->assertJsonFragment([
+                'id' => $attributeTwo->id,
+                'display_name' => 'المقاس',
+                'value' => 'كبير',
+            ]);
+
+        $product = Product::where('sku', $payload['sku'])->firstOrFail();
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attributeOne->id,
+            'value' => 'أحمر',
+        ]);
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attributeTwo->id,
+            'value' => 'كبير',
+        ]);
+    }
+
+    public function test_updating_product_changes_existing_attribute_value(): void
+    {
+        $this->actingAsAdmin();
+
+        $attribute = ProductAttribute::factory()->create();
+
+        $product = Product::factory()->create();
+
+        $product->attributes()->attach($attribute->id, [
+            'value' => 'قديم',
+        ]);
+
+        $response = $this->putJson("/api/admin/products/{$product->id}", [
+            'attribute_values' => [
+                [
+                    'attribute_id' => $attribute->id,
+                    'value' => 'جديد',
+                ],
+            ],
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Product updated successfully')
+            ->assertJsonFragment([
+                'id' => $attribute->id,
+                'value' => 'جديد',
+            ]);
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attribute->id,
+            'value' => 'جديد',
+        ]);
+
+        $this->assertDatabaseMissing('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attribute->id,
+            'value' => 'قديم',
+        ]);
+    }
+
+    public function test_updating_product_removes_attribute_no_longer_submitted(): void
+    {
+        $this->actingAsAdmin();
+
+        $attributeOne = ProductAttribute::factory()->create();
+        $attributeTwo = ProductAttribute::factory()->create();
+
+        $product = Product::factory()->create();
+
+        $product->attributes()->attach([
+            $attributeOne->id => ['value' => 'قيمة 1'],
+            $attributeTwo->id => ['value' => 'قيمة 2'],
+        ]);
+
+        $response = $this->putJson("/api/admin/products/{$product->id}", [
+            'attribute_values' => [
+                [
+                    'attribute_id' => $attributeOne->id,
+                    'value' => 'قيمة 1 محدثة',
+                ],
+            ],
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Product updated successfully');
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attributeOne->id,
+            'value' => 'قيمة 1 محدثة',
+        ]);
+
+        $this->assertDatabaseMissing('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $attributeTwo->id,
+        ]);
+    }
+
+    public function test_updating_product_adds_new_attribute(): void
+    {
+        $this->actingAsAdmin();
+
+        $existingAttribute = ProductAttribute::factory()->create();
+        $newAttribute = ProductAttribute::factory()->create();
+
+        $product = Product::factory()->create();
+
+        $product->attributes()->attach($existingAttribute->id, [
+            'value' => 'قديم',
+        ]);
+
+        $response = $this->putJson("/api/admin/products/{$product->id}", [
+            'attribute_values' => [
+                [
+                    'attribute_id' => $existingAttribute->id,
+                    'value' => 'محدث',
+                ],
+                [
+                    'attribute_id' => $newAttribute->id,
+                    'value' => 'جديد',
+                ],
+            ],
+        ]);
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Product updated successfully');
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $existingAttribute->id,
+            'value' => 'محدث',
+        ]);
+
+        $this->assertDatabaseHas('product_attribute_values', [
+            'product_id' => $product->id,
+            'attribute_id' => $newAttribute->id,
+            'value' => 'جديد',
+        ]);
+    }
+
+    public function test_duplicate_attribute_id_in_one_request_is_rejected(): void
+    {
+        $this->actingAsAdmin();
+
+        $attribute = ProductAttribute::factory()->create();
+
+        $payload = $this->validPayload([
+            'attribute_values' => [
+                [
+                    'attribute_id' => $attribute->id,
+                    'value' => 'الأول',
+                ],
+                [
+                    'attribute_id' => $attribute->id,
+                    'value' => 'الثاني',
+                ],
+            ],
+        ]);
+
+        $response = $this->postJson('/api/admin/products', $payload);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'attribute_values.1.attribute_id',
+            ]);
+    }
+
+    public function test_invalid_attribute_id_is_rejected(): void
+    {
+        $this->actingAsAdmin();
+
+        $payload = $this->validPayload([
+            'attribute_values' => [
+                [
+                    'attribute_id' => 999999,
+                    'value' => 'قيمة',
+                ],
+        ],
+    ]);
+
+    $response = $this->postJson('/api/admin/products', $payload);
+
+    $response
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors([
+            'attribute_values.0.attribute_id',
+        ]);
+}
 
     public function test_creating_a_product_fails_without_a_name(): void
     {
