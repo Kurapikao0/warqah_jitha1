@@ -33,7 +33,7 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
-        $this->authorize('create', Order::class);
+        $this->authorize('createForAdmin', Order::class);
 
         $order = $this->service->createForAdmin(
             $request->validated()

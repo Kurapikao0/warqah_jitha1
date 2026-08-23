@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\AdminUser;
@@ -31,7 +33,6 @@ class OrderPolicy
         Customer $customer,
         Order $order
     ): bool {
-
         return
             $order->customer_id === $customer->id
             &&
@@ -40,16 +41,15 @@ class OrderPolicy
                 [
                     'pending',
                     'received',
-                ]
+                ],
+                true
             );
-
     }
 
     public function delete(
         Customer $customer,
         Order $order
     ): bool {
-
         return
             $order->customer_id === $customer->id
             &&
@@ -58,9 +58,9 @@ class OrderPolicy
                 [
                     'pending',
                     'received',
-                ]
+                ],
+                true
             );
-
     }
 
     /*
@@ -70,6 +70,12 @@ class OrderPolicy
     */
 
     public function viewAny(
+        AdminUser $admin
+    ): bool {
+        return true;
+    }
+
+    public function createForAdmin(
         AdminUser $admin
     ): bool {
         return true;
