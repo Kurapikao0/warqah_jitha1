@@ -151,6 +151,162 @@ class OrderService
         });
     }
 
+    /**
+     * Create an order from the admin panel.
+     *
+     * Unlike the customer checkout flow, the admin chooses the customer
+     * directly. The customer's default/first address is used when one exists.
+     */
+    public function createForAdmin(array $data)
+    {
+        return DB::transaction(function () use ($data) {
+            $customer = \App\Models\Customer::query()
+                ->findOrFail((int) $data['customer_id']);
+
+            $address = $customer->addresses()
+                ->where('is_default', true)
+                ->first()
+                ?? $customer->addresses()->first();
+
+            $subtotal = 0.0;
+            $preparedItems = [];
+
+            foreach ($data['items'] as $item) {
+                $product = Product::query()
+                    ->whereKey((int) $item['product_id'])
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                $quantity = (int) $item['quantity'];
+                $availableStock = max(
+                    0,
+                    (int) $product->stock_quantity - (int) $product->reserved_quantity
+                );
+
+                if ($availableStock < $quantity) {
+                    abort(
+                        422,
+                        'الكمية المطلوبة من المنتج غير متاحة حالياً: '.$product->name
+                    );
+                }
+
+                $customizationId = $item['customization_id'] ?? null;
+                $customizationNote = trim((string) ($item['customization_note'] ?? ''));
+                $hasCustomization = $customizationId !== null || $customizationNote !== '';
+
+                if (
+                    ($data['order_type'] ?? 'ready_made') === 'custom'
+                    && ! $product->is_customizable
+                ) {
+                    abort(422, 'هذا المنتج لا يدعم التخصيص: '.$product->name);
+                }
+
+                if ($hasCustomization && ! $product->is_customizable) {
+                    abort(422, 'لا يمكن تخصيص هذا المنتج: '.$product->name);
+                }
+
+                if ($customizationId !== null) {
+                    $requestExists = \App\Models\ProductCustomizationRequest::query()
+                        ->whereKey((int) $customizationId)
+                        ->where(function ($query) use ($customer, $product) {
+                            $query->whereNull('customer_id')
+                                ->orWhere('customer_id', $customer->id);
+                        })
+                        ->where(function ($query) use ($product) {
+                            $query->whereNull('base_product_id')
+                                ->orWhere('base_product_id', $product->id);
+                        })
+                        ->exists();
+
+                    if (! $requestExists) {
+                        abort(422, 'طلب التخصيص المحدد غير صالح لهذا العميل أو المنتج.');
+                    }
+                }
+
+                $unitPrice = (float) $product->price;
+                $subtotal += $unitPrice * $quantity;
+
+                $preparedItems[] = [
+                    'product' => $product,
+                    'quantity' => $quantity,
+                    'customization_id' => $customizationId,
+                    'customization_note' => $customizationNote !== '' ? $customizationNote : null,
+                    'unit_price' => $unitPrice,
+                    'is_customized' => $hasCustomization || ($data['order_type'] ?? null) === 'custom',
+                ];
+            }
+
+            $shippingFee = max(0.0, (float) ($data['shipping_fee'] ?? 0));
+            $total = $subtotal + $shippingFee;
+
+            $order = $this->repository->create([
+                'order_number' => 'ORD-'.now()->format('YmdHis').'-'.Str::upper(Str::random(4)),
+                'customer_id' => $customer->id,
+                'address_id' => $address?->id,
+                'shipping_recipient_name' => $address?->recipient_name ?? $customer->full_name,
+                'shipping_phone' => $address?->phone ?? $customer->phone ?? '-',
+                'shipping_address_full' => $address
+                    ? trim(implode(', ', array_filter([
+                        $address->street,
+                        $address->district,
+                    ])))
+                    : 'لم يتم تحديد عنوان شحن',
+                'shipping_city' => $address?->city ?? 'غير محدد',
+                'shipping_country' => $address?->country ?? 'Yemen',
+                'order_type' => $data['order_type'],
+                'status' => OrderStatus::Received,
+                'current_production_stage_id' => \App\Models\OrderProductionStage::query()
+                    ->orderBy('sort_order')
+                    ->value('id'),
+                'expected_delivery_date' => $data['expected_delivery_date'] ?? null,
+                'subtotal' => $subtotal,
+                'shipping_fee' => $shippingFee,
+                'total_amount' => $total,
+            ]);
+
+            foreach ($preparedItems as $item) {
+                $this->repository->createItem([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'product_customization_request_id' => $item['customization_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'customization_note' => $item['customization_note'],
+                    'is_customized' => $item['is_customized'],
+                ]);
+
+                $item['product']->increment(
+                    'reserved_quantity',
+                    $item['quantity']
+                );
+            }
+
+            $order->statusHistory()->create([
+                'status' => OrderStatus::Received,
+                'note' => 'Order created from admin panel',
+                'changed_by' => auth('admin')->id(),
+            ]);
+
+            $stageId = $order->current_production_stage_id;
+            if ($stageId) {
+                $order->productionStageHistory()->create([
+                    'stage_id' => $stageId,
+                    'changed_by' => auth('admin')->id(),
+                ]);
+            }
+
+            return $order->load([
+                'customer',
+                'items.product',
+                'payment',
+                'statusHistory',
+                'productionStageHistory',
+                'currentProductionStage',
+                'address',
+            ]);
+        });
+    }
+
     public function updateStatus(
         Order $order,
         array $data
