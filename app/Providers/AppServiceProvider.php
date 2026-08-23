@@ -52,6 +52,12 @@ use App\Repositories\ProductMediaRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Contracts\CustomDesignRequestImageRepositoryInterface;
+use App\Repositories\CustomDesignRequestImageRepository;
+use App\Repositories\Contracts\CustomDesignRequestRepositoryInterface;
+use App\Repositories\CustomDesignRequestRepository;
+use App\Models\ProductCustomizationRequest;
+use App\Policies\CustomizationPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -113,6 +119,11 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            CustomDesignRequestImageRepositoryInterface::class,
+            CustomDesignRequestImageRepository::class
+        );
+
+        $this->app->bind(
             ColorRepositoryInterface::class,
             ColorRepository::class
         );
@@ -151,6 +162,11 @@ class AppServiceProvider extends ServiceProvider
             EmailLogRepositoryInterface::class,
             EmailLogRepository::class
         );
+
+        $this->app->bind(
+            CustomDesignRequestRepositoryInterface::class,
+            CustomDesignRequestRepository::class
+        );
     }
 
     public function boot(): void
@@ -175,10 +191,10 @@ class AppServiceProvider extends ServiceProvider
             RawMaterialPolicy::class
         );
 
-        // Gate::policy(
-        //     Category::class,
-        //     CategoryPolicy::class
-        // );
+        Gate::policy(
+            ProductCustomizationRequest::class,
+            CustomizationPolicy::class
+        );
 
         Gate::policy(
             Address::class,

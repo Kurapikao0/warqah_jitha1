@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
@@ -47,8 +49,8 @@ return Application::configure(basePath: dirname(__DIR__))
          * Keep the existing Laravel auth contract:
          * HTTP 401 for unauthenticated API requests.
          */
-        $exceptions->render(function (// ← البلوك الجديد كامل، تحطه هنا
-            AuthenticationException $exception,             //   قبل بلوك ValidationException القديم
+        $exceptions->render(function (
+            AuthenticationException $exception,
             Request $request
         ) {
             if (! $request->expectsJson()) {
@@ -60,12 +62,34 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 401);
         });
 
-        /*
-         * Validation errors
-         *
-         * Keep the existing Laravel validation contract:
-         * HTTP 422 + message + errors.
-         */
+        $exceptions->render(function (
+            AuthorizationException $exception,
+            Request $request
+        ) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'code' => 'FORBIDDEN',
+                'message' => 'ليس لديك صلاحية لتنفيذ هذه العملية.',
+            ], 403);
+        });
+
+        $exceptions->render(function (
+            AccessDeniedHttpException $exception,
+            Request $request
+        ) {
+            if (! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'code' => 'FORBIDDEN',
+                'message' => 'ليس لديك صلاحية لتنفيذ هذه العملية.',
+            ], 403);
+        });
+
         $exceptions->render(function (
             ValidationException $exception,
             Request $request
@@ -80,6 +104,9 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 422);
         });
 
+        
+
+       
         /*
          * Resource not found
          */
@@ -138,7 +165,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'حدث خطأ في النظام، يرجى المحاولة لاحقًا.',
             ], 500);
         });
-
+        
         /*
          * Unexpected exceptions
          *
