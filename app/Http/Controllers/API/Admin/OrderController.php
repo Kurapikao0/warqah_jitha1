@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Order\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
@@ -25,6 +26,22 @@ class OrderController extends Controller
 
         );
 
+    }
+
+    /**
+     * Create a new order from the admin panel.
+     */
+    public function store(StoreOrderRequest $request)
+    {
+        $this->authorize('create', Order::class);
+
+        $order = $this->service->createForAdmin(
+            $request->validated()
+        );
+
+        return (new OrderResource($order))
+            ->response()
+            ->setStatusCode(201);
     }
 
     /**
