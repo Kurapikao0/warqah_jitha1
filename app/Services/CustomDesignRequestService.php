@@ -12,12 +12,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Repositories\CustomerNotificationRepository;
 
 class CustomDesignRequestService
 {
     public function __construct(
         protected CustomDesignRequestRepositoryInterface $repository,
         protected CustomDesignRequestImageRepositoryInterface $imageRepository,
+        protected CustomerNotificationRepository $customerNotificationRepository,
+
     ) {}
 
     public function getAll(array $filters = [])
@@ -58,6 +61,18 @@ class CustomDesignRequestService
             $data,
             $files
         ): CustomDesignRequest {
+            $oldStatus = $request->status instanceof \BackedEnum
+                ? $request->status->value
+                : (string) $request->status;
+
+            $oldQuotedPrice = $request->quoted_price;
+            if (
+                array_key_exists('quoted_price', $data)
+                && $data['quoted_price'] !== null
+                && (float) $data['quoted_price'] >= 0
+            ) {
+                $data['status'] = 'quoted';
+            }
             $this->repository->update(
                 $request,
                 $data
@@ -68,7 +83,44 @@ class CustomDesignRequestService
                 $files
             );
 
-            return $this->repository->findById($request->id);
+            $updatedRequest = $this->repository->findById(
+                $request->id
+            );
+
+            $newStatus = $updatedRequest->status instanceof \BackedEnum
+                ? $updatedRequest->status->value
+                : (string) $updatedRequest->status;
+
+            $newQuotedPrice = $updatedRequest->quoted_price;
+
+            $wasQuoted = $oldStatus === 'quoted';
+            $isQuoted = $newStatus === 'quoted';
+            $priceChanged = (string) $oldQuotedPrice !== (string) $newQuotedPrice;
+
+            if (
+                $isQuoted
+                && $newQuotedPrice !== null
+                && (!$wasQuoted || $priceChanged)
+            ) {
+                $this->customerNotificationRepository->create([
+                    'customer_id' => $updatedRequest->customer_id,
+                    'type' => 'order_update',
+                    'title' => 'تم تسعير طلب التصميم الحر',
+                    'body' => sprintf(
+                        'تم تحديد سعر طلب التصميم الحر رقم #%d بمبلغ %s.',
+                        $updatedRequest->id,
+                        number_format(
+                            (float) $newQuotedPrice,
+                            2,
+                            '.',
+                            ','
+                        )
+                    ),
+                    'is_read' => false,
+                ]);
+            }
+
+            return $updatedRequest;
         });
     }
 

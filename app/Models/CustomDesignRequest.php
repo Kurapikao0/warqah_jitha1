@@ -16,12 +16,14 @@ class CustomDesignRequest extends Model
         'customer_id',
         'description',
         'status',
+        'quoted_price',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => CustomDesignRequestStatus::class,
+            'quoted_price' => 'decimal:2',
         ];
     }
 
@@ -29,7 +31,7 @@ class CustomDesignRequest extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-    
+
     public function images(): HasMany
     {
         return $this->hasMany(

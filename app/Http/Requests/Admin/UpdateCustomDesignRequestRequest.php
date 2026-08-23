@@ -37,6 +37,12 @@ class UpdateCustomDesignRequestRequest extends FormRequest
                 'max:4000',
             ],
 
+            'quoted_price' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
             'images' => [
                 'nullable',
                 'array',

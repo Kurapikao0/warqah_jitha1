@@ -39,7 +39,6 @@ class StoreProductAttributeRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'name' => [
                 'required',
                 'string',
@@ -68,18 +67,11 @@ class StoreProductAttributeRequest extends FormRequest
                 'array',
             ],
 
-            'options.*.value' => [
-                'required_with:options',
+            'options.*' => [
+                'required',
                 'string',
                 'max:255',
             ],
-
-            'options.*.label' => [
-                'required_with:options',
-                'string',
-                'max:255',
-            ],
-
         ];
     }
 }

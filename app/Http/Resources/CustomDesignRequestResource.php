@@ -11,12 +11,16 @@ class CustomDesignRequestResource extends JsonResource
     {
         return [
             'id' => $this->id,
+
             'customer' => [
                 'id' => $this->customer?->id,
                 'full_name' => $this->customer?->full_name,
             ],
+
             'description' => $this->description,
             'status' => $this->status,
+            'quoted_price' => $this->quoted_price,
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
