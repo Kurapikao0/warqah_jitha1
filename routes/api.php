@@ -456,7 +456,10 @@ Route::prefix('admin')
         | Orders
         |--------------------------------------------------------------------------
         */
-
+        Route::delete(
+            'custom-design-requests/{customDesignRequest}/images/{image}',
+            [CustomDesignRequestController::class, 'destroyImage']
+        );
         Route::apiResource(
             'custom-design-requests',
             CustomDesignRequestController::class

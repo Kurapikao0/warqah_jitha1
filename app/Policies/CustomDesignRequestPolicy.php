@@ -23,7 +23,7 @@ class CustomDesignRequestPolicy
         return $user->id === $customDesignRequest->customer_id;
     }
 
-    public function create(Customer $customer): bool
+    public function create(AdminUser|Customer $user): bool
     {
         return true;
     }

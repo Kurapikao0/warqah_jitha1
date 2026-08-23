@@ -6,6 +6,7 @@ use App\Enums\CustomDesignRequestStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomDesignRequest extends Model
 {
@@ -27,5 +28,13 @@ class CustomDesignRequest extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+    
+    public function images(): HasMany
+    {
+        return $this->hasMany(
+            CustomDesignRequestImage::class,
+            'custom_design_request_id'
+        )->orderBy('sort_order');
     }
 }
