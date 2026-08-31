@@ -75,6 +75,12 @@ Route::get('/test-admin-auth', function () {
 |--------------------------------------------------------------------------
 */
 
+Route::get('products', [\App\Http\Controllers\API\Public\ProductController::class, 'index']);
+Route::get('products/price-range', [\App\Http\Controllers\API\Public\ProductController::class, 'priceRange']);
+Route::get('products/{product}', [\App\Http\Controllers\API\Public\ProductController::class, 'show']);
+Route::get('categories', [\App\Http\Controllers\API\Public\CategoryController::class, 'index']);
+Route::get('settings', [\App\Http\Controllers\API\Public\SettingController::class, 'index']);
+
 /*
 |--------------------------------------------------------------------------
 | API Health Check
@@ -100,22 +106,22 @@ Route::prefix('customer')->group(function (): void {
     Route::post(
         'register',
         [CustomerAuthController::class, 'register']
-    )->middleware('throttle:5,1');
+    )->middleware('throttle:auth');
 
     Route::post(
         'login',
         [CustomerAuthController::class, 'login']
-    )->middleware('throttle:5,1');
+    )->middleware('throttle:auth');
 
     Route::post(
         'password/forgot',
         [PasswordResetController::class, 'forgotPassword']
-    )->middleware('throttle:5,1');
+    )->middleware('throttle:auth');
 
     Route::post(
         'password/reset',
         [PasswordResetController::class, 'resetPassword']
-    )->middleware('throttle:5,1');
+    )->middleware('throttle:auth');
 });
 
 /*
@@ -130,12 +136,12 @@ Route::prefix('customer')->group(function (): void {
 Route::post(
     'register',
     [CustomerAuthController::class, 'register']
-)->middleware('throttle:5,1');
+)->middleware('throttle:auth');
 
 Route::post(
     'login',
     [CustomerAuthController::class, 'login']
-)->middleware('throttle:5,1');
+)->middleware('throttle:auth');
 
 /*
 |--------------------------------------------------------------------------
@@ -152,7 +158,7 @@ Route::prefix('admin/auth')->group(function (): void {
     Route::post(
         'login',
         [AdminAuthController::class, 'login']
-    )->middleware('throttle:5,1');
+    )->middleware('throttle:auth');
 
     Route::post(
         'logout',
@@ -204,6 +210,33 @@ Route::prefix('admin')
 
         Route::get('profile', [AdminProfileController::class, 'show']);
         Route::put('profile', [AdminProfileController::class, 'update']);
+
+        Route::get('notifications', function (\Illuminate\Http\Request $request) {
+            return response()->json([
+                'data' => $request->user('admin')->unreadNotifications
+            ]);
+        });
+
+        Route::post('/notifications/mark-as-read', function (\Illuminate\Http\Request $request) {
+            $request->user('admin')->unreadNotifications()->update(['read_at' => now()]);
+            return response()->json(['success' => true]);
+        });
+
+        Route::get('/test-notification', function () {
+            $admins = \App\Models\Admin::all();
+            $product = \App\Models\Product::first();
+            
+            if ($admins->isEmpty() || !$product) {
+                return response()->json(['error' => 'Ensure you have at least one Admin and one Product in the database.'], 400);
+            }
+
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($product));
+            
+            return response()->json([
+                'message' => 'Test notification dispatched successfully!',
+                'product' => $product->name
+            ]);
+        });
 
         Route::get('settings', [SystemSettingController::class, 'show']);
         Route::put('settings', [SystemSettingController::class, 'update']);

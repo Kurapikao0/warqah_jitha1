@@ -127,11 +127,14 @@ class OrderService
                     'is_customized' => $item['customization_id'] != null,
                 ]);
 
-                // ===== هنا سابعاً: حجز الكمية =====
-                $item['product']->increment(
-                    'reserved_quantity',
-                    $item['quantity']
-                );
+                // Auto-Decrement Stock
+                $item['product']->decrement('stock_quantity', $item['quantity']);
+                $item['product']->refresh();
+
+                if ($item['product']->stock_quantity <= 5) {
+                    $admins = \App\Models\Admin::all();
+                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($item['product']));
+                }
             }
 
             // 5) إنشاء سجل حالة الطلب
@@ -275,10 +278,14 @@ class OrderService
                     'is_customized' => $item['is_customized'],
                 ]);
 
-                $item['product']->increment(
-                    'reserved_quantity',
-                    $item['quantity']
-                );
+                // Auto-Decrement Stock
+                $item['product']->decrement('stock_quantity', $item['quantity']);
+                $item['product']->refresh();
+
+                if ($item['product']->stock_quantity <= 5) {
+                    $admins = \App\Models\Admin::all();
+                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($item['product']));
+                }
             }
 
             $order->statusHistory()->create([

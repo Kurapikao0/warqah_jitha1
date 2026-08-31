@@ -76,6 +76,22 @@ class ProductService
     public function delete(Product $product): bool
     {
         return DB::transaction(function () use ($product): bool {
+            // Delete associated physical media files securely
+            foreach ($product->media()->get() as $media) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($media->url)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($media->url);
+                }
+            }
+            
+            // Delete related records manually to prevent FK constraint errors
+            $product->media()->delete();
+            $product->attributes()->detach();
+            $product->colors()->detach();
+
+            // Clear favorites and cart items if needed, or rely on cascade
+            $product->favorites()->delete();
+            $product->cartItems()->delete();
+
             return $this->repository->delete($product);
         });
     }
