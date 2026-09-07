@@ -62,4 +62,9 @@ class CustomerNotificationRepository
 
         return $notification->delete();
     }
+
+    public function create(array $data): CustomerNotification
+    {
+        return CustomerNotification::create($data);
+    }
 }

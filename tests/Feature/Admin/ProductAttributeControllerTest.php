@@ -170,6 +170,52 @@ class ProductAttributeControllerTest extends TestCase
             ->assertJsonValidationErrors(['input_type']);
     }
 
+    public function test_admin_can_create_a_select_product_attribute_with_options(): void
+    {
+        $this->actingAsAdmin();
+
+        $response = $this->postJson('/api/admin/product-attributes', [
+            'name' => 'Color',
+            'display_name' => 'اللون',
+            'input_type' => 'select',
+            'is_required' => true,
+            'options' => [
+                'أحمر',
+                'أزرق',
+                'أخضر',
+            ],
+        ]);
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Color')
+            ->assertJsonPath('data.input_type', 'select')
+            ->assertJsonPath('data.options.0', 'أحمر')
+            ->assertJsonPath('data.options.1', 'أزرق')
+            ->assertJsonPath('data.options.2', 'أخضر');
+
+        $this->assertDatabaseHas('product_attributes', [
+            'name' => 'Color',
+        ]);
+    }
+    public function test_creating_a_product_attribute_rejects_empty_option(): void
+    {
+        $this->actingAsAdmin();
+
+        $response = $this->postJson('/api/admin/product-attributes', [
+            'name' => 'Size',
+            'display_name' => 'المقاس',
+            'input_type' => 'select',
+            'options' => [
+                'صغير',
+                '',
+            ],
+        ]);
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['options.1']);
+    }   
     /*
     |--------------------------------------------------------------------------
     | Show

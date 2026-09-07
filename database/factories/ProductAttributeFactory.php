@@ -19,9 +19,20 @@ class ProductAttributeFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->word();
+
         return [
-            'name' => $this->faker->unique()->word(),
-            'input_type' => $this->faker->randomElement(['text', 'number', 'select', 'color', 'boolean']),
+            'name' => $name,
+            'display_name' => $name,
+            'input_type' => $this->faker->randomElement([
+                'text',
+                'number',
+                'select',
+                'color',
+                'boolean',
+            ]),
+            'is_required' => false,
+            'options' => null,
             'created_at' => now(),
         ];
     }

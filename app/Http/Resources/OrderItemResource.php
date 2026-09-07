@@ -28,6 +28,10 @@ class OrderItemResource extends JsonResource
 
             'customized' => $this->is_customized,
 
+            'customization_id' => $this->product_customization_request_id,
+
+            'customization_note' => $this->customization_note,
+
         ];
 
     }

@@ -35,6 +35,14 @@ class ProductAttribute extends Model
         return $this->hasMany(ProductAttributeValue::class, 'attribute_id');
     }
 
+    public function customizationValues(): HasMany
+    {
+        return $this->hasMany(
+            ProductCustomizationAttributeValue::class,
+            'attribute_id'
+        );
+    }
+    
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_attribute_values', 'attribute_id', 'product_id')

@@ -16,6 +16,7 @@ class ProductRepository implements ProductRepositoryInterface
             ->with([
                 'category',
                 'media',
+                'attributes',
             ])
             ->when(
                 filled($search),

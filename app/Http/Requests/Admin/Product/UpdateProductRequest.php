@@ -13,20 +13,55 @@ class UpdateProductRequest extends FormRequest
 
     public function rules(): array
     {
-
         return [
 
-            'name' => 'sometimes|string|max:255',
+            'name' => [
+                'sometimes',
+                'string',
+                'max:255',
+            ],
 
-            'sku' => 'sometimes|string|unique:products,sku,'.$this->product->id,
+            'sku' => [
+                'sometimes',
+                'string',
+                'unique:products,sku,' . $this->product->id,
+            ],
 
-            'price' => 'sometimes|numeric|min:0',
+            'price' => [
+                'sometimes',
+                'numeric',
+                'min:0',
+            ],
 
-            'stock_quantity' => 'sometimes|integer|min:0',
+            'stock_quantity' => [
+                'sometimes',
+                'integer',
+                'min:0',
+            ],
 
-            'status' => 'sometimes|string',
+            'status' => [
+                'sometimes',
+                'string',
+                'in:active,inactive',
+            ],
 
+            'attribute_values' => [
+                'nullable',
+                'array',
+            ],
+
+            'attribute_values.*.attribute_id' => [
+                'required',
+                'integer',
+                'exists:product_attributes,id',
+                'distinct',
+            ],
+
+            'attribute_values.*.value' => [
+                'required',
+                'string',
+                'max:255',
+            ],
         ];
-
     }
 }

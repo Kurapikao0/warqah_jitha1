@@ -18,4 +18,6 @@ interface OrderProductionStageRepositoryInterface
     ): OrderProductionStage;
 
     public function delete(OrderProductionStage $stage): bool;
+
+    public function reorder(array $stageIds): void;
 }

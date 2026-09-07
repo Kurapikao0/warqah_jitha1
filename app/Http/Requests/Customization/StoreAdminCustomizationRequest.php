@@ -6,16 +6,22 @@ namespace App\Http\Requests\Customization;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCustomizationRequest extends FormRequest
+class StoreAdminCustomizationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth()->check();
+        return auth('admin')->check();
     }
 
     public function rules(): array
     {
         return [
+            'customer_id' => [
+                'required',
+                'integer',
+                'exists:customers,id',
+            ],
+
             'base_product_id' => [
                 'required',
                 'integer',
