@@ -38,6 +38,10 @@ class Product extends Model
         'status',
     ];
 
+    protected $appends = [
+        'available_stock',
+    ];
+
     /**
      * `average_rating` and `reviews_count` are derived/aggregate fields
      * maintained by the application (e.g. after review moderation) and
@@ -103,6 +107,11 @@ class Product extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    public function stockReservations(): HasMany
+    {
+        return $this->hasMany(StockReservation::class);
+    }
+
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
@@ -126,5 +135,25 @@ class Product extends Model
     public function rawMaterial(): HasOne
     {
         return $this->hasOne(RawMaterial::class);
+    }
+
+    public function getAvailableStockAttribute(): int
+    {
+        return max(0, (int) $this->stock_quantity - (int) ($this->reserved_quantity ?? 0));
+    }
+
+    public function recalculateReservedQuantity(): int
+    {
+        $activeReservations = (int) $this->stockReservations()
+            ->where('status', 'active')
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                  ->orWhere('expires_at', '>', now());
+            })
+            ->sum('quantity');
+
+        $this->update(['reserved_quantity' => $activeReservations]);
+
+        return $activeReservations;
     }
 }

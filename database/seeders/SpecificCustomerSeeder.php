@@ -11,6 +11,7 @@ use App\Models\CustomDesignRequest;
 use App\Models\CustomerNotification;
 use App\Models\Address;
 use App\Models\OrderProductionStage;
+use App\Enums\CustomDesignRequestStatus;
 
 class SpecificCustomerSeeder extends Seeder
 {
@@ -18,21 +19,21 @@ class SpecificCustomerSeeder extends Seeder
     {
         $customerId = 233;
 
-        // جلب أول مرحلة إنتاج متوفرة لتفادي خطأ الـ Unique Constraint
+        // 1. جلب أول مرحلة إنتاج متوفرة لتفادي خطأ الـ Unique Constraint
         $stageId = OrderProductionStage::first()?->id;
 
-        // 1. العناوين (Addresses)
+        // 2. العناوين (Addresses)
         Address::factory(2)->create([
             'customer_id' => $customerId,
         ]);
 
-        // 2. السلة وعناصرها (Cart & CartItem)
+        // 3. السلة وعناصرها (Cart & CartItem)
         $cart = Cart::firstOrCreate(['customer_id' => $customerId]);
         CartItem::factory(3)->create([
             'cart_id' => $cart->id,
         ]);
 
-        // 3. الطلبات وعناصرها (Order & OrderItem)
+        // 4. الطلبات وعناصرها (Order & OrderItem)
         Order::factory(3)->create([
             'customer_id' => $customerId,
             'current_production_stage_id' => $stageId,
@@ -42,12 +43,19 @@ class SpecificCustomerSeeder extends Seeder
             ]);
         });
 
-        // 4. طلبات التخصيص (CustomDesignRequest)
-        CustomDesignRequest::factory(2)->create([
-            'customer_id' => $customerId,
-        ]);
+        // 5. طلبات التخصيص (Custom Design Requests)
+        // جلب حالات الـ Enum المتاحة
+        $statuses = CustomDesignRequestStatus::cases();
 
-        // 5. إشعارات العميل (CustomerNotification)
+        CustomDesignRequest::factory(8)->make()->each(function ($designRequest) use ($customerId, $statuses) {
+            $designRequest->customer_id = $customerId;
+            if (!empty($statuses)) {
+                $designRequest->status = fake()->randomElement($statuses);
+            }
+            $designRequest->save();
+        });
+
+        // 6. إشعارات العميل (CustomerNotification)
         CustomerNotification::factory(4)->create([
             'customer_id' => $customerId,
         ]);

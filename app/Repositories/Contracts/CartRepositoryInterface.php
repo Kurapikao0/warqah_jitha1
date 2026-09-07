@@ -13,4 +13,12 @@ interface CartRepositoryInterface
     public function updateItem($item, array $data);
 
     public function removeItem($item);
+
+    public function clearCart($customerId);
+
+    public function renewReservation($customerId, int $durationMinutes = 5);
+
+    public function renewItemReservation($item, int $durationMinutes = 5);
+
+    public function syncCart($customerId, array $items);
 }

@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('exchange-rates:sync')->hourly();
+        $schedule->command('stock:clean-expired')->everyMinute();
     }
 
     protected function commands(): void

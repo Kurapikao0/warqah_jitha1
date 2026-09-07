@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckPermission;
-use Illuminate\Auth\AuthenticationException;        // ← سطر جديد تضيفه هنا
+use Illuminate\Auth\AuthenticationException;        // â†گ ط³ط·ط± ط¬ط¯ظٹط¯ طھط¶ظٹظپظ‡ ظ‡ظ†ط§
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -21,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ])
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('exchange-rates:sync')->hourly();
+        $schedule->command('stock:clean-expired')->everyMinute();
     })
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -49,6 +50,8 @@ return Application::configure(basePath: dirname(__DIR__))
          * Keep the existing Laravel auth contract:
          * HTTP 401 for unauthenticated API requests.
          */
+        $exceptions->render(function (// â†گ ط§ظ„ط¨ظ„ظˆظƒ ط§ظ„ط¬ط¯ظٹط¯ ظƒط§ظ…ظ„طŒ طھط­ط·ظ‡ ظ‡ظ†ط§
+            AuthenticationException $exception,             //   ظ‚ط¨ظ„ ط¨ظ„ظˆظƒ ValidationException ط§ظ„ظ‚ط¯ظٹظ…
         $exceptions->render(function (
             AuthenticationException $exception,
             Request $request
@@ -99,7 +102,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return response()->json([
-                'message' => $exception->getMessage() ?: 'البيانات المدخلة غير صحيحة.',
+                'message' => $exception->getMessage() ?: 'ط§ظ„ط¨ظٹط§ظ†ط§طھ ط§ظ„ظ…ط¯ط®ظ„ط© ط؛ظٹط± طµط­ظٹط­ط©.',
                 'errors' => $exception->errors(),
             ], 422);
         });
@@ -120,7 +123,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json([
                 'code' => 'NOT_FOUND',
-                'message' => 'العنصر المطلوب غير موجود.',
+                'message' => 'ط§ظ„ط¹ظ†طµط± ط§ظ„ظ…ط·ظ„ظˆط¨ ط؛ظٹط± ظ…ظˆط¬ظˆط¯.',
             ], 404);
         });
 
@@ -137,7 +140,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json([
                 'code' => 'NOT_FOUND',
-                'message' => 'العنصر المطلوب غير موجود.',
+                'message' => 'ط§ظ„ط¹ظ†طµط± ط§ظ„ظ…ط·ظ„ظˆط¨ ط؛ظٹط± ظ…ظˆط¬ظˆط¯.',
             ], 404);
         });
         /*
@@ -162,7 +165,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json([
                 'code' => 'SERVER_ERROR',
-                'message' => 'حدث خطأ في النظام، يرجى المحاولة لاحقًا.',
+                'message' => 'ط­ط¯ط« ط®ط·ط£ ظپظٹ ط§ظ„ظ†ط¸ط§ظ…طŒ ظٹط±ط¬ظ‰ ط§ظ„ظ…ط­ط§ظˆظ„ط© ظ„ط§ط­ظ‚ظ‹ط§.',
             ], 500);
         });
         
@@ -187,9 +190,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json([
                 'code' => 'SERVER_ERROR',
-                'message' => 'حدث خطأ غير متوقع، يرجى المحاولة لاحقًا.',
+                'message' => 'ط­ط¯ط« ط®ط·ط£ ط؛ظٹط± ظ…طھظˆظ‚ط¹طŒ ظٹط±ط¬ظ‰ ط§ظ„ظ…ط­ط§ظˆظ„ط© ظ„ط§ط­ظ‚ظ‹ط§.',
             ], 500);
         });
 
     })
     ->create();
+

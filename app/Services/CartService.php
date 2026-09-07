@@ -13,54 +13,49 @@ class CartService
 
     public function getCart($customerId)
     {
-
-        $cart =
-        $this->repository
-            ->getCustomerCart($customerId);
+        $cart = $this->repository->getCustomerCart($customerId);
 
         if (! $cart) {
-
-            $cart =
-            $this->repository
-                ->createCart($customerId);
-
+            $cart = $this->repository->createCart($customerId);
         }
 
         return $cart;
-
     }
 
-    public function addItem(
-        array $data
-    ) {
-
+    public function addItem(array $data)
+    {
         return DB::transaction(function () use ($data) {
-
-            return $this->repository
-                ->addItem($data);
-
+            return $this->repository->addItem($data);
         });
-
     }
 
-    public function updateItem(
-        $item,
-        array $data
-    ) {
-
-        return $this->repository
-            ->updateItem(
-                $item,
-                $data
-            );
-
+    public function updateItem($item, array $data)
+    {
+        return $this->repository->updateItem($item, $data);
     }
 
     public function removeItem($item)
     {
+        return $this->repository->removeItem($item);
+    }
 
-        return $this->repository
-            ->removeItem($item);
+    public function clearCart($customerId)
+    {
+        return $this->repository->clearCart($customerId);
+    }
 
+    public function renewReservation($customerId, int $durationMinutes = 5)
+    {
+        return $this->repository->renewReservation($customerId, $durationMinutes);
+    }
+
+    public function renewItemReservation($item, int $durationMinutes = 5)
+    {
+        return $this->repository->renewItemReservation($item, $durationMinutes);
+    }
+
+    public function syncCart($customerId, array $items)
+    {
+        return $this->repository->syncCart($customerId, $items);
     }
 }

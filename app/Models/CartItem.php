@@ -15,12 +15,16 @@ class CartItem extends Model
         'product_id',
         'quantity',
         'customization_note',
+        'reserved_at',
+        'expires_at',
     ];
 
     protected function casts(): array
     {
         return [
             'quantity' => 'integer',
+            'reserved_at' => 'datetime',
+            'expires_at' => 'datetime',
         ];
     }
 
@@ -32,5 +36,23 @@ class CartItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function isExpired(): bool
+    {
+        if (! $this->expires_at) {
+            return false;
+        }
+
+        return $this->expires_at->isPast();
+    }
+
+    public function remainingSeconds(): int
+    {
+        if (! $this->expires_at || $this->isExpired()) {
+            return 0;
+        }
+
+        return max(0, (int) now()->diffInSeconds($this->expires_at, false));
     }
 }
