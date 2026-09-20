@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Cart\AddCartItemRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
 use App\Http\Resources\CartItemResource;
+use App\Http\Resources\CartResource;
 use App\Models\CartItem;
 use App\Services\CartService;
 use Illuminate\Http\Request;
@@ -48,16 +49,25 @@ class CartItemController extends Controller
             403
         );
 
-        $this->service
+        $updatedItem = $this->service
             ->updateItem(
                 $cartItem,
                 $request->validated()
             );
 
+        $cart = $this->service->getCart(auth()->id());
+
         return response()->json([
             'message' => 'Cart updated',
-            'data' => new CartItemResource($cartItem->fresh('product.media')),
-        ]);
+            'data' => [
+                'item' => new CartItemResource($updatedItem),
+                'cart' => new CartResource($cart),
+                'cart_count' => (int) $cart->items->sum('quantity'),
+                'total_price' => $cart->items->sum(
+                    fn ($item) => $item->product ? $item->product->price * $item->quantity : 0
+                ),
+            ],
+        ], 200);
 
     }
 

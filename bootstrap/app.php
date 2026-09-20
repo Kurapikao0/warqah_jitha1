@@ -50,8 +50,10 @@ return Application::configure(basePath: dirname(__DIR__))
          * Keep the existing Laravel auth contract:
          * HTTP 401 for unauthenticated API requests.
          */
+        /*
         $exceptions->render(function (// â†گ ط§ظ„ط¨ظ„ظˆظƒ ط§ظ„ط¬ط¯ظٹط¯ ظƒط§ظ…ظ„طŒ طھط­ط·ظ‡ ظ‡ظ†ط§
             AuthenticationException $exception,             //   ظ‚ط¨ظ„ ط¨ظ„ظˆظƒ ValidationException ط§ظ„ظ‚ط¯ظٹظ…
+        */
         $exceptions->render(function (
             AuthenticationException $exception,
             Request $request
@@ -196,4 +198,3 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->create();
-

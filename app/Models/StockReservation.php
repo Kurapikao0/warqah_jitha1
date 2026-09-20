@@ -18,6 +18,7 @@ class StockReservation extends Model
         'order_id',
         'session_id',
         'quantity',
+        'reserved_quantity',
         'reserved_at',
         'expires_at',
         'status',
@@ -27,6 +28,7 @@ class StockReservation extends Model
     {
         return [
             'quantity' => 'integer',
+            'reserved_quantity' => 'integer',
             'reserved_at' => 'datetime',
             'expires_at' => 'datetime',
         ];

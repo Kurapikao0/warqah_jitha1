@@ -23,8 +23,18 @@ class CartResource extends JsonResource
             'expires_at' => $activeExpiresAt,
             'remaining_seconds' => $remainingSeconds,
             'is_reservation_expired' => $this->items->isNotEmpty() && ($remainingSeconds <= 0),
+            'total_quantity' => $this->items->sum('quantity'),
+            'cart_count' => $this->items->sum('quantity'),
+            'reserved_quantity' => $this->items->sum(function ($item) {
+                return $item->reserved_at && ! $item->isExpired()
+                    ? (int) ($item->stockReservation?->reserved_quantity ?? 0)
+                    : 0;
+            }),
             'total' => $this->items->sum(function ($item) {
                 return $item->product ? ($item->product->price * $item->quantity) : 0;
+            }),
+            'total_price' => $this->items->sum(function ($item) {
+                return $item->product ? $item->product->price * $item->quantity : 0;
             }),
         ];
     }

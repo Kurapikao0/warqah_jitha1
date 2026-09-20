@@ -14,13 +14,13 @@ class OrderItemResource extends JsonResource
 
             'id' => $this->id,
 
-            'product' => [
-
+            'product' => $this->product ? [
                 'id' => $this->product->id,
-
                 'name' => $this->product->name,
-
-            ],
+                'media' => $this->product->relationLoaded('media')
+                    ? ProductMediaResource::collection($this->product->media)
+                    : [],
+            ] : null,
 
             'quantity' => $this->quantity,
 

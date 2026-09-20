@@ -16,8 +16,9 @@ class ProductCatalogController extends Controller
         $perPage = (int) $request->query('per_page', 9);
         $page = (int) $request->query('page', 1);
         $search = $request->query('search');
+        $categoryId = $request->query('category_id');
 
-        $paginator = $this->service->getAll($search, $perPage);
+        $paginator = $this->service->getAll($search, $perPage, $categoryId);
 
         // Return paginated resource collection (keeps meta and links via resource collection)
         return ProductResource::collection($paginator);

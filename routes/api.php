@@ -70,7 +70,8 @@ Route::get('/test-admin-auth', function () {
 
 Route::get('products', [\App\Http\Controllers\API\Public\ProductController::class, 'index']);
 Route::get('products/price-range', [\App\Http\Controllers\API\Public\ProductController::class, 'priceRange']);
-Route::get('products/{product}', [\App\Http\Controllers\API\Public\ProductController::class, 'show']);
+Route::get('products/{id}/reviews', [\App\Http\Controllers\API\Public\ProductController::class, 'reviews'])->whereNumber('id');
+Route::get('products/{id}', [\App\Http\Controllers\API\Public\ProductController::class, 'show'])->whereNumber('id');
 Route::get('categories', [\App\Http\Controllers\API\Public\CategoryController::class, 'index']);
 Route::get('settings', [\App\Http\Controllers\API\Public\SettingController::class, 'index']);
 
@@ -118,6 +119,9 @@ Route::middleware('web')->prefix('auth')->group(function (): void {
         [PasswordResetController::class, 'resetPassword']
     )->middleware('throttle:auth');
 });
+
+Route::post('auth/google/exchange', [GoogleAuthController::class, 'exchangeCode'])
+    ->middleware('throttle:10,1');
 
 /*
 |--------------------------------------------------------------------------
@@ -654,6 +658,7 @@ Route::prefix('customer')
 
         // Customizations & Orders
         Route::apiResource('customizations', CustomerCustomization::class);
+        Route::get('orders/{order}/tracking', [CustomerOrder::class, 'tracking'])->name('customer.orders.tracking');
         Route::apiResource('orders', CustomerOrder::class)->except(['update', 'destroy'])->names('customer.orders');
 
         // Cart
@@ -681,7 +686,8 @@ Route::prefix('customer')
         Route::post('verifications/verify', [VerificationController::class, 'verify']);
 
         // Reviews
-        Route::apiResource('reviews', ReviewController::class);
+        Route::post('products/{product}/reviews', [ReviewController::class, 'storeForProduct']);
+        Route::apiResource('reviews', ReviewController::class)->withTrashed(['destroy']);
         Route::post('reviews/{review}/images', [ReviewImageController::class, 'store']);
         Route::delete('review-images/{reviewImage}', [ReviewImageController::class, 'destroy']);
 

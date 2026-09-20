@@ -5,8 +5,12 @@ namespace App\Http\Controllers\API\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -57,19 +61,74 @@ class GoogleAuthController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $tokenResponse = Http::asForm()->post('https://oauth2.googleapis.com/token', [
-            'code' => $code,
-            'client_id' => config('services.google.client_id'),
-            'client_secret' => config('services.google.client_secret'),
-            'redirect_uri' => config('services.google.redirect'),
-            'grant_type' => 'authorization_code',
-        ]);
+        $clientId = trim((string) config('services.google.client_id', ''));
+        $clientSecret = trim((string) config('services.google.client_secret', ''));
+        $redirectUri = trim((string) config('services.google.redirect', ''));
+
+        if ($clientId === '' || $clientSecret === '' || $redirectUri === '') {
+            Log::error('Google OAuth is not configured', [
+                'client_id_present' => $clientId !== '',
+                'client_secret_present' => $clientSecret !== '',
+                'redirect_uri_present' => $redirectUri !== '',
+                'config_cached' => app()->configurationIsCached(),
+            ]);
+
+            $payload = [
+                'success' => false,
+                'message' => 'Google OAuth is not configured on the server.',
+            ];
+
+            if (app()->isLocal() && config('app.debug')) {
+                $payload['details'] = [
+                    'client_id_present' => $clientId !== '',
+                    'client_secret_present' => $clientSecret !== '',
+                    'redirect_uri_present' => $redirectUri !== '',
+                    'config_cached' => app()->configurationIsCached(),
+                ];
+            }
+
+            return response()->json($payload, Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        $googleHttp = Http::withOptions([
+            'verify' => $this->googleCaBundle(),
+        ])
+            ->connectTimeout((float) config('services.google.connect_timeout', 5))
+            ->timeout((float) config('services.google.timeout', 15));
+
+        try {
+            $tokenResponse = $googleHttp->asForm()->post('https://oauth2.googleapis.com/token', [
+                'code' => $code,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'redirect_uri' => $redirectUri,
+                'grant_type' => 'authorization_code',
+            ]);
+        } catch (ConnectionException|RequestException $exception) {
+            report($exception);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'تعذر الاتصال بخدمة Google، يرجى المحاولة لاحقاً.',
+            ], Response::HTTP_BAD_GATEWAY);
+        }
 
         if ($tokenResponse->failed()) {
+            $googleError = $tokenResponse->json();
+            Log::warning('Google OAuth token exchange failed', [
+                'status' => $tokenResponse->status(),
+                'error' => $googleError['error'] ?? null,
+                'error_description' => $googleError['error_description'] ?? null,
+                'client_id_suffix' => substr($clientId, -12),
+                'redirect_uri' => $redirectUri,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Google token exchange failed.',
-                'details' => $tokenResponse->json(),
+                'details' => app()->isLocal() && config('app.debug')
+                    ? $googleError
+                    : ['error' => $googleError['error'] ?? 'google_token_exchange_failed'],
             ], Response::HTTP_BAD_GATEWAY);
         }
 
@@ -82,9 +141,18 @@ class GoogleAuthController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        $googleInfoResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
-            'id_token' => $idToken,
-        ]);
+        try {
+            $googleInfoResponse = $googleHttp->get('https://oauth2.googleapis.com/tokeninfo', [
+                'id_token' => $idToken,
+            ]);
+        } catch (ConnectionException|RequestException $exception) {
+            report($exception);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'تعذر الاتصال بخدمة Google، يرجى المحاولة لاحقاً.',
+            ], Response::HTTP_BAD_GATEWAY);
+        }
 
         if ($googleInfoResponse->failed()) {
             return response()->json([
@@ -133,14 +201,61 @@ class GoogleAuthController extends Controller
             'email_verified_at' => $customer->email_verified_at ?? now(),
         ]);
 
-        $token = $customer->createToken('google-auth-token')->plainTextToken;
+        $token = $customer->createToken(
+            'google-auth-token',
+            ['*'],
+            now()->addDays(7),
+        )->plainTextToken;
 
         $frontendUrl = rtrim((string) env('FRONTEND_URL', 'http://localhost:5173'), '/');
 
-        return redirect(
-            $frontendUrl . '/auth/google/callback?token=' . urlencode($token)
-            . '&email=' . urlencode($customer->email)
-            . '&full_name=' . urlencode($customer->full_name)
+        $exchangeCode = Str::random(64);
+        Cache::put(
+            'google-auth-exchange:' . hash('sha256', $exchangeCode),
+            ['token' => $token, 'customer_id' => $customer->id],
+            now()->addMinute(),
         );
+
+        return redirect($frontendUrl . '/auth/google/callback?code=' . urlencode($exchangeCode));
+    }
+
+    public function exchangeCode(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'size:64'],
+        ]);
+
+        $payload = Cache::pull(
+            'google-auth-exchange:' . hash('sha256', $validated['code']),
+        );
+
+        if (!is_array($payload) || !isset($payload['token'], $payload['customer_id'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired Google login code.',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $customer = Customer::findOrFail((int) $payload['customer_id']);
+
+        return response()->json([
+            'token' => $payload['token'],
+            'user' => [
+                'id' => (string) $customer->id,
+                'full_name' => $customer->full_name,
+                'email' => $customer->email,
+                'phone' => $customer->phone,
+                'avatar_url' => $customer->avatar_url,
+            ],
+        ]);
+    }
+
+    private function googleCaBundle(): string|bool
+    {
+        $configuredPath = (string) config('services.google.ca_bundle', '');
+
+        return $configuredPath !== '' && is_file($configuredPath)
+            ? $configuredPath
+            : true;
     }
 }

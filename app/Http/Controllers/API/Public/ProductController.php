@@ -7,6 +7,7 @@ namespace App\Http\Controllers\API\Public;
 use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\PublicReviewResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -52,6 +53,24 @@ class ProductController extends Controller
             ->findOrFail($id);
 
         return new ProductResource($product);
+    }
+
+    /**
+     * Retrieve published reviews for a product.
+     */
+    public function reviews(int $id): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $product = Product::query()
+            ->where('status', ProductStatus::Active->value)
+            ->findOrFail($id);
+
+        return PublicReviewResource::collection(
+            $product->reviews()
+                ->where('status', 'published')
+                ->with('customer:id,full_name')
+                ->latest()
+                ->get()
+        );
     }
 
     /**

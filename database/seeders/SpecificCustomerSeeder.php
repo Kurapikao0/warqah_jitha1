@@ -1,63 +1,35 @@
-<?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\CustomDesignRequest;
-use App\Models\CustomerNotification;
+use App\Models\Customer;
 use App\Models\Address;
-use App\Models\OrderProductionStage;
-use App\Enums\CustomDesignRequestStatus;
 
-class SpecificCustomerSeeder extends Seeder
+class DatabaseSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
-        $customerId = 233;
+        // 1. إنشاء العميل رقم 233 أو استرجاعه إذا كان موجوداً
+        $customer = Customer::firstOrCreate(
+            ['id' => 233],
+            [
+                'name' => 'Vivianne Howell IV',
+                // إذا كان جدول العملاء يتطلب حقول إجبارية أخرى (مثل email أو password)، أضفها هنا
+            ]
+        );
 
-        // 1. جلب أول مرحلة إنتاج متوفرة لتفادي خطأ الـ Unique Constraint
-        $stageId = OrderProductionStage::first()?->id;
-
-        // 2. العناوين (Addresses)
-        Address::factory(2)->create([
-            'customer_id' => $customerId,
+        // 2. إدخال العنوان وربطه بالعميل مباشرة
+        Address::create([
+            'customer_id' => $customer->id,
+            'recipient_name' => 'Vivianne Howell IV',
+            'phone' => '770351011',
+            'country' => 'Yemen',
+            'city' => 'Yvettemouth',
+            'district' => 'Kendra Hills',
+            'street' => '7055 Hegmann Circle Suite 494',
+            'postal_code' => '13578',
+            'is_default' => 1,
         ]);
 
-        // 3. السلة وعناصرها (Cart & CartItem)
-        $cart = Cart::firstOrCreate(['customer_id' => $customerId]);
-        CartItem::factory(3)->create([
-            'cart_id' => $cart->id,
-        ]);
-
-        // 4. الطلبات وعناصرها (Order & OrderItem)
-        Order::factory(3)->create([
-            'customer_id' => $customerId,
-            'current_production_stage_id' => $stageId,
-        ])->each(function ($order) {
-            OrderItem::factory(2)->create([
-                'order_id' => $order->id,
-            ]);
-        });
-
-        // 5. طلبات التخصيص (Custom Design Requests)
-        // جلب حالات الـ Enum المتاحة
-        $statuses = CustomDesignRequestStatus::cases();
-
-        CustomDesignRequest::factory(8)->make()->each(function ($designRequest) use ($customerId, $statuses) {
-            $designRequest->customer_id = $customerId;
-            if (!empty($statuses)) {
-                $designRequest->status = fake()->randomElement($statuses);
-            }
-            $designRequest->save();
-        });
-
-        // 6. إشعارات العميل (CustomerNotification)
-        CustomerNotification::factory(4)->create([
-            'customer_id' => $customerId,
-        ]);
+        $this->command->info('Customer and Address seeded successfully for customer ID: 233');
     }
 }

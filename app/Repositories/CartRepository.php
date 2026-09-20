@@ -13,6 +13,29 @@ class CartRepository implements CartRepositoryInterface
 {
     public const DEFAULT_RESERVATION_MINUTES = 5;
 
+    private function activeReservationForItem(int $cartItemId): ?StockReservation
+    {
+        $reservations = StockReservation::where('cart_item_id', $cartItemId)
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->get();
+
+        $reservation = $reservations->first();
+
+        if ($reservations->count() > 1) {
+            $reservations->skip(1)->each(
+                fn (StockReservation $duplicate) => $duplicate->update(['status' => 'released'])
+            );
+        }
+
+        return $reservation;
+    }
+
     public function cleanupExpiredReservations(?int $customerId = null): int
     {
         $now = now();
@@ -63,6 +86,7 @@ class CartRepository implements CartRepositoryInterface
 
         return Cart::with([
             'items.product.media',
+            'items.stockReservation',
         ])
             ->where('customer_id', $customerId)
             ->first();
@@ -86,7 +110,6 @@ class CartRepository implements CartRepositoryInterface
             $this->cleanupExpiredReservations();
 
             $product = Product::lockForUpdate()->findOrFail($productId);
-            $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
 
             $existingItem = CartItem::where('cart_id', $cartId)
                 ->where('product_id', $productId)
@@ -95,12 +118,12 @@ class CartRepository implements CartRepositoryInterface
             $expiresAt = now()->addMinutes(self::DEFAULT_RESERVATION_MINUTES);
 
             if ($existingItem) {
-                if ($availableStock < $quantity) {
-                    abort(422, 'الكمية المطلوبة غير متوفرة في المخزون المتاح للمنتج: ' . $product->name);
-                }
-
                 $newTotalQty = (int) $existingItem->quantity + $quantity;
-                $product->increment('reserved_quantity', $quantity);
+                $reservation = $this->activeReservationForItem($existingItem->id);
+                $product->recalculateReservedQuantity();
+                $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
+                $reservedQuantity = (int) ($reservation?->reserved_quantity ?? 0);
+                $targetReservedQuantity = min($newTotalQty, $reservedQuantity + $availableStock);
 
                 $existingItem->update([
                     'quantity' => $newTotalQty,
@@ -117,37 +140,38 @@ class CartRepository implements CartRepositoryInterface
                     [
                         'customer_id' => $customerId,
                         'quantity' => $newTotalQty,
+                        'reserved_quantity' => $targetReservedQuantity,
                         'reserved_at' => now(),
                         'expires_at' => $expiresAt,
                         'status' => 'active',
                     ]
                 );
+                $product->recalculateReservedQuantity();
 
-                return $existingItem->load('product.media');
-            }
-
-            if ($availableStock < $quantity) {
-                abort(422, 'الكمية المطلوبة غير متوفرة في المخزون المتاح للمنتج: ' . $product->name);
+                return $existingItem->load(['product.media', 'stockReservation']);
             }
 
             $data['reserved_at'] = now();
             $data['expires_at'] = $expiresAt;
+            $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
 
             $cartItem = CartItem::create($data);
 
-            $product->increment('reserved_quantity', $quantity);
+            $reservedQuantity = min($quantity, $availableStock);
 
             StockReservation::create([
                 'product_id' => $product->id,
                 'cart_item_id' => $cartItem->id,
                 'customer_id' => $customerId,
                 'quantity' => $quantity,
+                'reserved_quantity' => $reservedQuantity,
                 'reserved_at' => now(),
                 'expires_at' => $expiresAt,
                 'status' => 'active',
             ]);
+            $product->recalculateReservedQuantity();
 
-            return $cartItem->load('product.media');
+            return $cartItem->load(['product.media', 'stockReservation']);
         });
     }
 
@@ -161,26 +185,18 @@ class CartRepository implements CartRepositoryInterface
             if (isset($data['quantity'])) {
                 $newQuantity = max(1, (int) $data['quantity']);
                 $product = Product::lockForUpdate()->findOrFail($item->product_id);
-                $reservation = StockReservation::where('cart_item_id', $item->id)
-                    ->where('status', 'active')
-                    ->where(function ($query) {
-                        $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
-                    })
-                    ->lockForUpdate()
-                    ->first();
-                $reservedQuantity = $reservation ? (int) $reservation->quantity : 0;
-                $diff = $newQuantity - $reservedQuantity;
+                $reservation = $this->activeReservationForItem($item->id);
+                $product->recalculateReservedQuantity();
+                $reservedQuantity = (int) ($reservation?->reserved_quantity ?? 0);
+                $availableForItem = max(
+                    0,
+                    (int) $product->stock_quantity
+                    - (int) ($product->reserved_quantity ?? 0)
+                    + $reservedQuantity
+                );
+                $targetReservedQuantity = min($newQuantity, $reservedQuantity + $availableForItem);
 
-                if ($diff > 0) {
-                    $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
-                    if ($availableStock < $diff) {
-                        abort(422, 'الكمية المطلوبة غير متوفرة في المخزون المتاح للمنتج: ' . $product->name);
-                    }
-                    $product->increment('reserved_quantity', $diff);
-                } elseif ($diff < 0) {
-                    $product->decrement('reserved_quantity', min(abs($diff), $reservedQuantity));
-                }
-
+                $reservedQuantity = $targetReservedQuantity;
                 $expiresAt = now()->addMinutes(self::DEFAULT_RESERVATION_MINUTES);
                 $data['reserved_at'] = now();
                 $data['expires_at'] = $expiresAt;
@@ -193,14 +209,18 @@ class CartRepository implements CartRepositoryInterface
                     [
                         'customer_id' => $customerId,
                         'quantity' => $newQuantity,
+                        'reserved_quantity' => $reservedQuantity,
                         'reserved_at' => now(),
                         'expires_at' => $expiresAt,
                         'status' => 'active',
                     ]
                 );
+                $product->recalculateReservedQuantity();
             }
 
-            return $item->update($data);
+            $item->update($data);
+
+            return $item->fresh(['product.media', 'stockReservation']);
         });
     }
 
@@ -217,11 +237,8 @@ class CartRepository implements CartRepositoryInterface
                 ->first();
 
             if ($product && $reservation) {
-                $product->decrement('reserved_quantity', min(
-                    (int) $product->reserved_quantity,
-                    (int) $reservation->quantity
-                ));
                 $reservation->update(['status' => 'released']);
+                $product->recalculateReservedQuantity();
             }
 
             return $item->delete();
@@ -239,13 +256,12 @@ class CartRepository implements CartRepositoryInterface
             foreach ($cart->items as $item) {
                 $product = Product::lockForUpdate()->find($item->product_id);
                 if ($product) {
-                    $newReserved = max(0, (int) ($product->reserved_quantity ?? 0) - (int) $item->quantity);
-                    $product->update(['reserved_quantity' => $newReserved]);
+                    StockReservation::where('cart_item_id', $item->id)
+                        ->where('status', 'active')
+                        ->lockForUpdate()
+                        ->update(['status' => 'released']);
+                    $product->recalculateReservedQuantity();
                 }
-
-                StockReservation::where('cart_item_id', $item->id)
-                    ->where('status', 'active')
-                    ->update(['status' => 'released']);
 
                 $item->delete();
             }
@@ -257,6 +273,7 @@ class CartRepository implements CartRepositoryInterface
     public function renewReservation($customerId, int $durationMinutes = self::DEFAULT_RESERVATION_MINUTES)
     {
         return DB::transaction(function () use ($customerId, $durationMinutes) {
+            $this->cleanupExpiredReservations($customerId);
             $cart = Cart::with('items')->where('customer_id', $customerId)->first();
             if (! $cart || $cart->items->isEmpty()) {
                 return false;
@@ -270,14 +287,13 @@ class CartRepository implements CartRepositoryInterface
                     continue;
                 }
 
-                $reservation = StockReservation::where('cart_item_id', $item->id)->first();
+                $reservation = $this->activeReservationForItem($item->id);
 
                 if (! $reservation || $reservation->status !== 'active' || $reservation->isExpired()) {
                     $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
-                    if ($availableStock < $item->quantity) {
-                        abort(422, 'لا يتوفر مخزون كافٍ لإعادة حجز المنتج: ' . $product->name);
-                    }
-                    $product->increment('reserved_quantity', $item->quantity);
+                    $reservedQuantity = min((int) $item->quantity, $availableStock);
+                } else {
+                    $reservedQuantity = (int) ($reservation->reserved_quantity ?? 0);
                 }
 
                 $item->update([
@@ -293,11 +309,13 @@ class CartRepository implements CartRepositoryInterface
                     [
                         'customer_id' => $customerId,
                         'quantity' => $item->quantity,
+                        'reserved_quantity' => $reservedQuantity,
                         'reserved_at' => now(),
                         'expires_at' => $expiresAt,
                         'status' => 'active',
                     ]
                 );
+                $product->recalculateReservedQuantity();
             }
 
             return true;
@@ -312,20 +330,13 @@ class CartRepository implements CartRepositoryInterface
 
             $cartItem = CartItem::whereKey($item->id)->lockForUpdate()->firstOrFail();
             $product = Product::lockForUpdate()->findOrFail($cartItem->product_id);
-            $reservation = StockReservation::where('cart_item_id', $cartItem->id)
-                ->where('status', 'active')
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
-                })
-                ->lockForUpdate()
-                ->first();
+            $reservation = $this->activeReservationForItem($cartItem->id);
 
             if (! $reservation) {
                 $availableStock = max(0, (int) $product->stock_quantity - (int) ($product->reserved_quantity ?? 0));
-                if ($availableStock < (int) $cartItem->quantity) {
-                    abort(422, 'لا يتوفر مخزون كافٍ لإعادة حجز المنتج: ' . $product->name . '. المتاح حالياً: ' . $availableStock);
-                }
-                $product->increment('reserved_quantity', (int) $cartItem->quantity);
+                $reservedQuantity = min((int) $cartItem->quantity, $availableStock);
+            } else {
+                $reservedQuantity = (int) ($reservation->reserved_quantity ?? 0);
             }
 
             $expiresAt = now()->addMinutes(max(1, $durationMinutes));
@@ -342,11 +353,13 @@ class CartRepository implements CartRepositoryInterface
                 [
                     'customer_id' => $customerId,
                     'quantity' => $cartItem->quantity,
+                    'reserved_quantity' => $reservedQuantity,
                     'reserved_at' => now(),
                     'expires_at' => $expiresAt,
                     'status' => 'active',
                 ]
             );
+            $product->recalculateReservedQuantity();
 
             return $cartItem->fresh('product.media');
         });

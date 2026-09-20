@@ -52,4 +52,16 @@ class OrderController extends Controller
 
         return new OrderResource($order);
     }
+
+    public function tracking($id)
+    {
+        $order = $this->service->findCustomerOrder(
+            auth('customer')->id(),
+            $id
+        );
+
+        $this->authorize('view', $order);
+
+        return new OrderResource($order);
+    }
 }

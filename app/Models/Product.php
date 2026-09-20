@@ -150,7 +150,7 @@ class Product extends Model
                 $q->whereNull('expires_at')
                   ->orWhere('expires_at', '>', now());
             })
-            ->sum('quantity');
+            ->sum('reserved_quantity');
 
         $this->update(['reserved_quantity' => $activeReservations]);
 

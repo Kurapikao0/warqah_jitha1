@@ -15,7 +15,7 @@ class OrderRepository implements OrderRepositoryInterface
 
             'customer',
 
-            'items.product',
+            'items.product.media',
 
             'payment',
 
@@ -32,7 +32,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         return Order::with([
 
-            'items.product',
+            'items.product.media',
 
             'payment',
 
@@ -53,7 +53,7 @@ class OrderRepository implements OrderRepositoryInterface
 
             'customer',
 
-            'items.product',
+            'items.product.media',
 
             'payment',
 
@@ -93,10 +93,11 @@ class OrderRepository implements OrderRepositoryInterface
         int $orderId
     ) {
         return Order::with([
-            'items.product',
+            'items.product.media',
             'payment',
             'statusHistory',
             'productionStageHistory',
+            'address',
         ])
             ->where('customer_id', $customerId)
             ->findOrFail($orderId);

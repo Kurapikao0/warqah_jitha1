@@ -10,7 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    public function all(?string $search = null, int $perPage = 20): LengthAwarePaginator
+    public function all(?string $search = null, int $perPage = 20, int|string|null $categoryId = null): LengthAwarePaginator
     {
         return Product::query()
             ->with([
@@ -27,6 +27,10 @@ class ProductRepository implements ProductRepositoryInterface
                             ->orWhere('sku', 'ilike', '%'.$search.'%');
                     });
                 }
+            )
+            ->when(
+                filled($categoryId),
+                fn ($query) => $query->where('category_id', $categoryId)
             )
             ->latest()
             ->paginate($perPage)

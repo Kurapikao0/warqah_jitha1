@@ -168,14 +168,6 @@ class OrderService
 
                 // Recalculate reserved quantity
                 $product->recalculateReservedQuantity();
-                // Auto-Decrement Stock
-                $item['product']->decrement('stock_quantity', $item['quantity']);
-                $item['product']->refresh();
-
-                if ($item['product']->stock_quantity <= 5) {
-                    $admins = \App\Models\Admin::all();
-                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($item['product']));
-                }
             }
 
             // 5) Create Status History
@@ -194,8 +186,6 @@ class OrderService
         });
     }
 
-    public function updateStatus(Order $order, array $data)
-    {
     /**
      * Create an order from the admin panel.
      *

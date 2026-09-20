@@ -22,13 +22,16 @@ class CartItemResource extends JsonResource
             ],
             'quantity' => $this->quantity,
             'reserved_quantity' => $this->reserved_at && ! $this->isExpired()
-                ? (int) $this->quantity
+                ? (int) ($this->stockReservation?->reserved_quantity ?? 0)
                 : 0,
             'customization_note' => $this->customization_note,
             'reserved_at' => $this->reserved_at,
             'expires_at' => $this->expires_at,
+            'reserved_until' => $this->expires_at,
             'remaining_seconds' => $this->remainingSeconds(),
             'is_expired' => $this->isExpired(),
+            'is_reserved' => $this->reserved_at !== null && ! $this->isExpired()
+                && (int) ($this->stockReservation?->reserved_quantity ?? 0) > 0,
         ];
     }
 }
