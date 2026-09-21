@@ -113,4 +113,22 @@ class ProfileController extends Controller
             'errors' => null,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * Delete authenticated customer account.
+     */
+    public function destroy(Request $request)
+    {
+        $customer = $request->user();
+
+        $this->customerService->deleteCustomer($customer);
+        $customer->currentAccessToken()?->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account deleted successfully',
+            'data' => null,
+            'errors' => null,
+        ], Response::HTTP_OK);
+    }
 }

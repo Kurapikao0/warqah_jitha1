@@ -181,7 +181,7 @@ class GoogleAuthController extends Controller
         $name = (string) ($googleUser['name'] ?? explode('@', $email)[0] ?? 'Google User');
         $avatar = $googleUser['picture'] ?? null;
 
-        $customer = Customer::query()->firstOrCreate(
+        $customer = Customer::withTrashed()->firstOrNew(
             ['email' => $email],
             [
                 'full_name' => $name,
@@ -194,6 +194,14 @@ class GoogleAuthController extends Controller
                 'email_verified_at' => now(),
             ]
         );
+
+        if ($customer->trashed()) {
+            $customer->restore();
+        }
+
+        if (! $customer->exists) {
+            $customer->save();
+        }
 
         $customer->update([
             'full_name' => $customer->full_name ?: $name,

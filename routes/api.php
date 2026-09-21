@@ -703,6 +703,7 @@ Route::prefix('customer')
         Route::apiResource('payments', CustomerPayment::class)->only(['index', 'store', 'show']);
         Route::get('profile', [ProfileController::class, 'show']);
         Route::put('profile', [ProfileController::class, 'update']);
+        Route::delete('profile', [ProfileController::class, 'destroy']);
         Route::put('profile/password', [ProfileController::class, 'updatePassword']);
         Route::post('profile/avatar', [ProfileController::class, 'updateAvatar']);
     });
