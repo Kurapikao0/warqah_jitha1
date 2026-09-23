@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Customer;
 
 use App\Enums\VerificationPurpose;
+use App\Exceptions\VerificationCodeException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\GenerateVerificationCodeRequest;
 use App\Http\Requests\Customer\VerifyVerificationCodeRequest;
@@ -43,11 +44,17 @@ class VerificationController extends Controller
 
         $purpose = VerificationPurpose::from($request->purpose);
 
-        $verification = $this->verificationCodeService->generate(
-            $customer,
-            $purpose,
-            $request->contact_value
-        );
+        try {
+            $verification = $this->verificationCodeService->generate(
+                $customer,
+                $purpose,
+                $request->contact_value
+            );
+        } catch (VerificationCodeException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 429);
+        }
 
         return response()->json([
             'message' => 'Verification generated successfully.',

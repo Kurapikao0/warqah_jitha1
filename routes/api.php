@@ -681,10 +681,6 @@ Route::prefix('customer')
         Route::match(['put', 'patch'], 'addresses/{address}/default', [AddressController::class, 'setDefault']);
         Route::apiResource('addresses', AddressController::class);
 
-        // Verification
-        Route::post('verifications/generate', [VerificationController::class, 'generate']);
-        Route::post('verifications/verify', [VerificationController::class, 'verify']);
-
         // Reviews
         Route::post('products/{product}/reviews', [ReviewController::class, 'storeForProduct']);
         Route::apiResource('reviews', ReviewController::class)->withTrashed(['destroy']);
